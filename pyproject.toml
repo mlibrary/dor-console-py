@@ -1,0 +1,13 @@
+[project]
+name = "dor-console-py"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "faker>=37.4.0",
+    "faker-biology>=0.6.5",
+    "fastapi>=0.116.0",
+    "jinja2>=3.1.6",
+    "typer>=0.16.0",
+]
