@@ -35,6 +35,10 @@ class Config:
         cache_path = TMP_ROOT / "cache"
         cache_path.makedirs(exist_ok=True)
         return cache_path
+    
+    def get_dlxs_image_api_url(self):
+        hostname = os.getenv("DLXS_HOST", "quod.lib.umich.edu")
+        return f"https://{hostname}/cgi/i/image/api"
 
 
 config = Config.from_env()

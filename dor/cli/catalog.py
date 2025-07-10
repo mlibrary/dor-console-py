@@ -48,7 +48,9 @@ def collection(collid: str, limit: int = -1, object_type: str = 'types:slide'):
         object_type = f"types:{types}"
     object_type = object_type.lower()
 
-    collection_url = f"https://roger.quod.lib.umich.edu/cgi/i/image/api/collection/{collid}"
+    image_api_url = config.get_dlxs_image_api_url()
+
+    collection_url = f"{image_api_url}/collection/{collid}"
 
     num_processed = 0
     page_index = 0
