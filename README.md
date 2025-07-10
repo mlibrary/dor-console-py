@@ -48,6 +48,15 @@ $ uv run dor catalog collection <collid> --object_type page
 
 Harvesting uses data from the DLXS Image API so the data has the appearance of migrated data.
 
+By default, data will be fetched from `quod.lib.umich.edu`
+using `curl` --- mumble, mumble, cloudflare --- but if you
+have issues with connecting to `quod.lib.umich.edu`:
+
+* connect to the Library VPN
+* set `export DLXS_HOST=roger.quod.lib.umich.edu` before running the harvest command
+
+`¯\_(ツ)_/¯`
+
 ## Running the dev server
 
 The application uses [FastAPI](https://fastapi.tiangolo.com/)
