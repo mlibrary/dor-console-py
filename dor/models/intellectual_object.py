@@ -14,7 +14,7 @@ class IntellectualObject(Base):
     bin_identifier: Mapped[uuid.UUID] = mapped_column(Uuid, unique=False, index=True)
     identifier: Mapped[uuid.UUID] = mapped_column(Uuid, unique=False, index=True)
     alternate_identifiers: Mapped[str] = mapped_column(String, nullable=True)
-    type: Mapped[str] = mapped_column(String)
+    type: Mapped[str] = mapped_column(String, index=True)
     revision_number: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

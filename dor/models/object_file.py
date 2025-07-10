@@ -14,8 +14,8 @@ class ObjectFile(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     identifier: Mapped[str] = mapped_column(String)
     # identifier: Mapped[uuid.UUID] = mapped_column(Uuid, unique=True)
-    file_format: Mapped[str] = mapped_column(String)
-    file_function: Mapped[str] = mapped_column(String)
+    file_format: Mapped[str] = mapped_column(String, index=True)
+    file_function: Mapped[str] = mapped_column(String, index=True)
     size: Mapped[int] = mapped_column(Integer)
     digest: Mapped[bytes] = mapped_column(
         LargeBinary(32), unique=False, nullable=False)

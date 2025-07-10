@@ -9,19 +9,21 @@ import hashlib
 from dor.config import config
 from dor.models.checksum import Checksum
 from dor.utils import fetch, create_uuid_from_string, extract_identifier
-from dor.models.intellectual_object import IntellectualObject
+from dor.models.intellectual_object import CurrentRevision, IntellectualObject
 from dor.models.object_file import ObjectFile
 
 fake = Faker()
 
-def build_intellectual_object(collid: str, manifest_data: dict, object_type: str):
+def build_intellectual_objects(collid: str, manifest_data: dict, object_type: str):
+    intellectual_objects = []
 
     identifier, alternate_identifier = extract_identifier(manifest_data['@id'])
 
-    config.console.print(f":stuck_out_tongue_closed_eyes: harvesting {len(manifest_data['sequences'])} filesets")
+    config.console.print(f":stuck_out_tongue_closed_eyes: processing {alternate_identifier}")
 
+    bin_identifier = identifier
     intellectual_object = IntellectualObject(
-        bin_identifier=identifier,
+        bin_identifier=bin_identifier,
         identifier=identifier,
         alternate_identifiers=alternate_identifier,
         type=object_type,
@@ -30,8 +32,44 @@ def build_intellectual_object(collid: str, manifest_data: dict, object_type: str
         updated_at=datetime.now(),
         title=manifest_data['label']
     )
+    intellectual_object.revision = CurrentRevision(
+        revision_number=intellectual_object.revision_number,
+        intellectual_object=intellectual_object,
+        intellectual_object_identifier=intellectual_object.identifier
+    )
+    intellectual_object.object_files.extend(build_object_files_for_intellectual_object(intellectual_object))
+    intellectual_objects.append(intellectual_object)
 
-    return intellectual_object
+
+    canvases = manifest_data['sequences'][0]['canvases']
+    for canvas in canvases:
+
+        # canvas ids are so weird
+        canvas_id = canvas['@id'].split('/')[-3]
+        identifier, alternate_identifier = extract_identifier(canvas_id)
+        config.console.print(f":star2: processing {alternate_identifier}")
+        intellectual_object = IntellectualObject(
+            bin_identifier=bin_identifier,
+            identifier=identifier,
+            alternate_identifiers=alternate_identifier,
+            type="types:fileset",
+            revision_number=1,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
+            title=manifest_data['label']
+        )
+        intellectual_object.revision = CurrentRevision(
+            revision_number=intellectual_object.revision_number,
+            intellectual_object=intellectual_object,
+            intellectual_object_identifier=intellectual_object.identifier
+        )
+
+        intellectual_object.object_files.extend(
+            build_object_files_for_canvas(intellectual_object, canvas))
+    
+        intellectual_objects.append(intellectual_object)
+
+    return intellectual_objects
 
 
 def build_object_files_for_intellectual_object(intellectual_object: IntellectualObject):

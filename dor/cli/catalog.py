@@ -8,7 +8,7 @@ import typer
 from typing import List
 import json
 
-from dor.builder import build_intellectual_object, build_object_files_for_canvas, build_object_files_for_intellectual_object
+from dor.builder import build_intellectual_objects, build_object_files_for_canvas, build_object_files_for_intellectual_object
 from dor.utils import fetch
 
 from dor.adapters.sqlalchemy import Base
@@ -67,28 +67,28 @@ def collection(collid: str, limit: int = -1, object_type: str = 'types:slide'):
             manifest_url = datum['@id']
             manifest_data = fetch(manifest_url)
 
-            intellectual_object = build_intellectual_object(
+            intellectual_objects = build_intellectual_objects(
                 collid=collid,
                 manifest_data=manifest_data,
                 object_type=object_type,
             )
 
-            session.add(intellectual_object)
-            intellectual_object.object_files.extend(build_object_files_for_intellectual_object(intellectual_object))
+            session.add_all(intellectual_objects)
+            # intellectual_object.object_files.extend(build_object_files_for_intellectual_object(intellectual_object))
 
-            canvases = manifest_data['sequences'][0]['canvases']
-            for canvas in canvases:
-                intellectual_object.object_files.extend(build_object_files_for_canvas(intellectual_object, canvas))
+            # canvases = manifest_data['sequences'][0]['canvases']
+            # for canvas in canvases:
+            #     intellectual_object.object_files.extend(build_object_files_for_canvas(intellectual_object, canvas))
 
-            revision = CurrentRevision(
-                revision_number=intellectual_object.revision_number,
-                intellectual_object=intellectual_object,
-                intellectual_object_identifier=intellectual_object.identifier
-            )
-            session.add(revision)
+            # revision = CurrentRevision(
+            #     revision_number=intellectual_object.revision_number,
+            #     intellectual_object=intellectual_object,
+            #     intellectual_object_identifier=intellectual_object.identifier
+            # )
+            # session.add(revision)
             session.commit()
 
-            console.print(f":frame_with_picture:\t{num_processed} : importing {intellectual_object.title}")
+            console.print(f":frame_with_picture:\t{num_processed} : importing {datum['label']}")
             if limit > 0 and num_processed >= limit: break
 
 
@@ -133,7 +133,7 @@ def objects(object_type: str = None):
             table.add_row(
                 str(intellectual_object.bin_identifier),
                 str(intellectual_object.identifier),
-                intellectual_object.alternate_identifier,
+                intellectual_object.alternate_identifiers,
                 intellectual_object.type,
                 str(len(intellectual_object.object_files)),
                 str(intellectual_object.revision_number),
