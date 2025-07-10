@@ -15,6 +15,7 @@ class ObjectFile(Base):
     identifier: Mapped[str] = mapped_column(String)
     # identifier: Mapped[uuid.UUID] = mapped_column(Uuid, unique=True)
     file_format: Mapped[str] = mapped_column(String)
+    file_function: Mapped[str] = mapped_column(String)
     size: Mapped[int] = mapped_column(Integer)
     digest: Mapped[bytes] = mapped_column(
         LargeBinary(32), unique=False, nullable=False)
@@ -27,8 +28,8 @@ class ObjectFile(Base):
         ForeignKey("catalog_intellectual_object.id"), index=True)
 
     intellectual_object: Mapped["IntellectualObject"] = relationship(
-        back_populates="file_set_files")
+        back_populates="object_files")
     premis_events: Mapped[List["PremisEvent"]] = relationship(
-        back_populates="file_set_file")
+        back_populates="object_file")
     checksums: Mapped[List["Checksum"]] = relationship(
-        back_populates="file_set_file")
+        back_populates="object_file")

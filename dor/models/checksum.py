@@ -21,5 +21,5 @@ class Checksum(Base):
     file_set_file_id: Mapped[int] = mapped_column(ForeignKey(
         "catalog_object_file.id"), nullable=False, index=True)
 
-    file_set_file: Mapped["ObjectFile"] = relationship(
+    object_file: Mapped["ObjectFile"] = relationship(
         back_populates="checksums")

@@ -21,9 +21,9 @@ class IntellectualObject(Base):
     title: Mapped[str] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String, nullable=True)
 
-    file_set_files: Mapped[List["ObjectFile"]] = relationship(back_populates="intellectual_object")
+    object_files: Mapped[List["ObjectFile"]] = relationship(back_populates="intellectual_object")
     premis_events: Mapped[List["PremisEvent"]] = relationship(back_populates="intellectual_object")
-    revision: Mapped["LatestRevision"] = relationship(back_populates="intellectual_object", uselist=False)
+    revision: Mapped["CurrentRevision"] = relationship(back_populates="intellectual_object", uselist=False)
 
     __table_args__ = (
         UniqueConstraint('identifier', 'revision_number', name='uq_intellectual_object_revision'),

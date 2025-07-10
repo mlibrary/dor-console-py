@@ -28,5 +28,5 @@ class PremisEvent(Base):
 
     intellectual_object: Mapped["IntellectualObject"] = relationship(
         back_populates="premis_events")
-    file_set_file: Mapped["ObjectFile"] = relationship(
+    object_file: Mapped["ObjectFile"] = relationship(
         back_populates="premis_events")
