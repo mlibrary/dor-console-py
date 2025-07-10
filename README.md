@@ -60,6 +60,8 @@ have issues with connecting to `quod.lib.umich.edu`:
 The fetched data is cached in `tmp/cache`, so the harvest 
 can be re-run without re-fetching data from the API.
 
+To re-process a collection, you need to run `initialize` first to reset the database.
+
 ## Running the dev server
 
 The application uses [FastAPI](https://fastapi.tiangolo.com/)

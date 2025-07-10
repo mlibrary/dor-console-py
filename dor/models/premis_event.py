@@ -15,6 +15,7 @@ class PremisEvent(Base):
     # event_identifier
     identifier: Mapped[uuid.UUID] = mapped_column(Uuid, unique=True)
     type: Mapped[str] = mapped_column(String)
+    date_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     detail: Mapped[str] = mapped_column(String, nullable=True)
     outcome: Mapped[str] = mapped_column(String, nullable=True)
     outcome_detail_note: Mapped[str] = mapped_column(String, nullable=True)
@@ -23,7 +24,7 @@ class PremisEvent(Base):
     # foreign key to file set file
     intellectual_object_id: Mapped[int] = mapped_column(ForeignKey(
         "catalog_intellectual_object.id"), nullable=True, index=True)
-    file_set_file_id: Mapped[int] = mapped_column(ForeignKey(
+    object_file_id: Mapped[int] = mapped_column(ForeignKey(
         "catalog_object_file.id"), nullable=True, index=True)
 
     intellectual_object: Mapped["IntellectualObject"] = relationship(

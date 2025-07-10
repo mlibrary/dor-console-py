@@ -3,11 +3,12 @@ from faker import Faker
 import json
 import random
 from uuid import uuid4
-from datetime import datetime
+from datetime import datetime, timedelta
 import hashlib
 
 from dor.config import config
 from dor.models.checksum import Checksum
+from dor.models.premis_event import PremisEvent
 from dor.utils import fetch, create_uuid_from_string, extract_identifier
 from dor.models.intellectual_object import CurrentRevision, IntellectualObject
 from dor.models.object_file import ObjectFile
@@ -38,6 +39,21 @@ def build_intellectual_objects(collid: str, manifest_data: dict, object_type: st
         intellectual_object_identifier=intellectual_object.identifier
     )
     intellectual_object.object_files.extend(build_object_files_for_intellectual_object(intellectual_object))
+    intellectual_object.premis_events.append(PremisEvent(
+        identifier=uuid4(),
+        type="ingestion start",
+        date_time=(datetime.now() - timedelta(seconds=8600)),
+        detail=fake.catch_phrase(),
+        outcome=fake.ipv6()
+    ))
+    intellectual_object.premis_events.append(PremisEvent(
+        identifier=uuid4(),
+        type="ingestion end",
+        date_time=datetime.now(),
+        detail=fake.catch_phrase(),
+        outcome=fake.ipv6()
+    ))
+
     intellectual_objects.append(intellectual_object)
 
 
@@ -67,6 +83,21 @@ def build_intellectual_objects(collid: str, manifest_data: dict, object_type: st
         intellectual_object.object_files.extend(
             build_object_files_for_canvas(intellectual_object, canvas))
     
+        intellectual_object.premis_events.append(PremisEvent(
+            identifier=uuid4(),
+            type="ingestion start",
+            date_time=(datetime.now() - timedelta(seconds=8600)),
+            detail=fake.catch_phrase(),
+            outcome=fake.ipv6()
+        ))
+        intellectual_object.premis_events.append(PremisEvent(
+            identifier=uuid4(),
+            type="ingestion end",
+            date_time=datetime.now(),
+            detail=fake.catch_phrase(),
+            outcome=fake.ipv6()
+        ))
+
         intellectual_objects.append(intellectual_object)
 
     return intellectual_objects
@@ -103,6 +134,21 @@ def build_object_files_for_intellectual_object(intellectual_object: Intellectual
             updated_at=datetime.now()
         )
         object_file.checksums.append(checksum)
+
+        object_file.premis_events.append(PremisEvent(
+            identifier=uuid4(),
+            type="virus check",
+            date_time=(datetime.now() - timedelta(seconds=8600)),
+            detail=fake.catch_phrase(),
+            outcome=fake.ipv6()
+        ))
+        object_file.premis_events.append(PremisEvent(
+            identifier=uuid4(),
+            type="accession",
+            date_time=datetime.now(),
+            detail=fake.catch_phrase(),
+            outcome=fake.ipv6()
+        ))
 
         object_files.append(object_file)
 
