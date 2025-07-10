@@ -1,0 +1,37 @@
+{% block content %}
+<p>
+  Showing {{ page.range }} of {{ page.total_items }}.
+</p>
+<table>
+  <thead>
+    <tr>
+      <td>Bin</td>
+      <td>Identifier</td>
+      <td>Alternate Identifiers</td>
+      <td>Type</td>
+      <td>Revision</td>
+      <td>Created</td>
+      <td>Updated</td>
+      <td>Title</td>
+      <td># Filesets</td>
+      <td># Files</td>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in page.items %}
+    <tr>
+      <td>{{ item.bin_identifier }}</td>
+      <td>{{ item.identifier }}</td>
+      <td>{{ item.alternate_identifiers }}</td>
+      <td>{{ item.type }}</td>
+      <td>{{ item.revision_number }}</td>
+      <td>{{ item.created_at }}</td>
+      <td>{{ item.updated_at }}</td>
+      <td>{{ item.title }}</td>
+      <td>{{ item.filesets|length }}</td>
+      <td>{{ item.object_files|length }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

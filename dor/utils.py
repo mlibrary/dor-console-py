@@ -4,6 +4,8 @@ import subprocess
 import shlex
 import uuid
 from pathlib import Path
+from dataclasses import dataclass, field
+import math
 
 from dor.config import TMP_ROOT
 
@@ -51,3 +53,41 @@ def fetch(url: str):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         raise
+
+
+@dataclass
+class Page:
+    total_items: int = -1
+    total_pages: int = -1
+    offset: int = -1
+    limit: int = 15
+    next_offset: int = -1
+    previous_offset: int = -1
+    items: list = field(default_factory=list)
+    benchmark: float = 0.0
+
+    def __post_init__(self):
+        self._update_totals()
+
+    def _update_totals(self):
+        self.total_pages = math.ceil(self.total_items / self.limit)
+        if self.offset - self.limit >= 0:
+            self.previous_offset = self.offset - self.limit
+        if self.offset + self.limit < self.total_items:
+            self.next_offset = self.offset + self.limit
+
+    @property
+    def is_useful(self):
+        return self.limit < self.total_items
+
+    @property
+    def index(self):
+        return int(self.offset / self.limit + 1)
+
+    @property
+    def range(self):
+        start = self.offset + 1
+        end = self.offset + self.limit
+        if end > self.total_items:
+            end = self.total_items
+        return f"{start}-{end}"

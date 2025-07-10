@@ -2,8 +2,8 @@ from datetime import datetime
 from typing import List
 import uuid
 
-from sqlalchemy import ARRAY, Column, DateTime, ForeignKey, Integer, String, UniqueConstraint, Uuid
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ARRAY, Column, DateTime, ForeignKey, Integer, String, UniqueConstraint, Uuid, and_
+from sqlalchemy.orm import Mapped, mapped_column, relationship, foreign, remote
 from sqlalchemy.ext.mutable import MutableList
 
 from dor.adapters.sqlalchemy import Base
@@ -20,6 +20,24 @@ class IntellectualObject(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     title: Mapped[str] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String, nullable=True)
+
+    # filesets=relationship(
+    #     'IntellectualObject',
+    #     backref="root",
+    #     remote_side=[bin_identifier],
+    #     primaryjoin="IntellectualObject.bin_identifier == IntellectualObject.identifier AND IntellectualObject.type == 'types:fileset'"
+    # )
+
+    filesets = relationship(
+        "IntellectualObject", 
+        primaryjoin=(
+            (foreign(identifier) == remote(bin_identifier)) &
+            (remote(type) == "types:fileset")
+        ),
+        uselist=True,
+        viewonly=True,
+        lazy='selectin',
+    )
 
     object_files: Mapped[List["ObjectFile"]] = relationship(back_populates="intellectual_object")
     premis_events: Mapped[List["PremisEvent"]] = relationship(back_populates="intellectual_object")
