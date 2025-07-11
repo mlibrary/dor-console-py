@@ -16,14 +16,16 @@ from dor.models.object_file import ObjectFile
 
 fake = Faker()
 
+
 def build_collection(collection_data: dict, collection_type: str):
     identifier, alternate_identifier = extract_identifier(collection_data['@id'])
+    created_at = fake.past_datetime(start_date="-20y")
     collection = Collection(
         identifier=identifier,
         alternate_identifiers=alternate_identifier,
         type=collection_type,
-        created_at=datetime.now(),
-        updated_at=datetime.now(),
+        created_at=created_at,
+        updated_at=created_at,
         title=collection_data['label'],
         description=collection_data['attribution']
     )
@@ -37,6 +39,7 @@ def build_intellectual_objects(collid: str, manifest_data: dict, object_type: st
 
     config.console.print(f":stuck_out_tongue_closed_eyes: processing {alternate_identifier}")
 
+    created_at = fake.past_datetime(start_date="-20y")
     bin_identifier = identifier
     intellectual_object = IntellectualObject(
         bin_identifier=bin_identifier,
@@ -44,8 +47,8 @@ def build_intellectual_objects(collid: str, manifest_data: dict, object_type: st
         alternate_identifiers=alternate_identifier,
         type=object_type,
         revision_number=1,
-        created_at=datetime.now(),
-        updated_at=datetime.now(),
+        created_at=created_at,
+        updated_at=created_at,
         title=manifest_data['label']
     )
     intellectual_object.revision = CurrentRevision(
@@ -57,14 +60,14 @@ def build_intellectual_objects(collid: str, manifest_data: dict, object_type: st
     intellectual_object.premis_events.append(PremisEvent(
         identifier=uuid4(),
         type="ingestion start",
-        date_time=(datetime.now() - timedelta(seconds=8600)),
+        date_time=(created_at - fake.time_delta(end_datetime='-30h')),
         detail=fake.catch_phrase(),
         outcome=fake.ipv6()
     ))
     intellectual_object.premis_events.append(PremisEvent(
         identifier=uuid4(),
         type="ingestion end",
-        date_time=datetime.now(),
+        date_time=created_at,
         detail=fake.catch_phrase(),
         outcome=fake.ipv6()
     ))
@@ -79,14 +82,16 @@ def build_intellectual_objects(collid: str, manifest_data: dict, object_type: st
         canvas_id = canvas['@id'].split('/')[-3]
         identifier, alternate_identifier = extract_identifier(canvas_id)
         config.console.print(f":star2: processing {alternate_identifier}")
+
+        created_at = fake.past_datetime(start_date="-20y")
         intellectual_object = IntellectualObject(
             bin_identifier=bin_identifier,
             identifier=identifier,
             alternate_identifiers=alternate_identifier,
             type="types:fileset",
             revision_number=1,
-            created_at=datetime.now(),
-            updated_at=datetime.now(),
+            created_at=created_at,
+            updated_at=created_at,
             title=manifest_data['label']
         )
         intellectual_object.revision = CurrentRevision(
@@ -101,14 +106,14 @@ def build_intellectual_objects(collid: str, manifest_data: dict, object_type: st
         intellectual_object.premis_events.append(PremisEvent(
             identifier=uuid4(),
             type="ingestion start",
-            date_time=(datetime.now() - timedelta(seconds=8600)),
+            date_time=(created_at - fake.time_delta(end_datetime='-30h')),
             detail=fake.catch_phrase(),
             outcome=fake.ipv6()
         ))
         intellectual_object.premis_events.append(PremisEvent(
             identifier=uuid4(),
             type="ingestion end",
-            date_time=datetime.now(),
+            date_time=created_at,
             detail=fake.catch_phrase(),
             outcome=fake.ipv6()
         ))
@@ -137,30 +142,30 @@ def build_object_files_for_intellectual_object(intellectual_object: Intellectual
             size=fake.random_int(min=600),
             digest=digest,
             revision_number=1,
-            created_at=datetime.now(),
-            updated_at=datetime.now(),
+            created_at=intellectual_object.created_at,
+            updated_at=intellectual_object.created_at,
             last_fixity_check=datetime.now()
         )
 
         checksum = Checksum(
             algorithm="sha256",
             digest=digest,
-            created_at=datetime.now(),
-            updated_at=datetime.now()
+            created_at=intellectual_object.created_at + fake.time_delta(end_datetime="+1h"),
+            updated_at=intellectual_object.created_at + fake.time_delta(end_datetime="+1h"),
         )
         object_file.checksums.append(checksum)
 
         object_file.premis_events.append(PremisEvent(
             identifier=uuid4(),
             type="virus check",
-            date_time=(datetime.now() - timedelta(seconds=8600)),
+            date_time=(intellectual_object.created_at - fake.time_delta(end_datetime='-30h')),
             detail=fake.catch_phrase(),
             outcome=fake.ipv6()
         ))
         object_file.premis_events.append(PremisEvent(
             identifier=uuid4(),
             type="accession",
-            date_time=datetime.now(),
+            date_time=intellectual_object.created_at,
             detail=fake.catch_phrase(),
             outcome=fake.ipv6()
         ))
@@ -210,6 +215,7 @@ def build_object_files_for_canvas(intellectual_object: IntellectualObject, canva
         event_file_identifier = f"{object_identifier}/metadata/{m_fn}.function:source.format:image.function:event.premis.xml"
         possibles.append((event_file_identifier, "application/xml", "function:event"))
     
+    created_at = intellectual_object.created_at
     for file_identifier, file_format, file_function in possibles:
         digest = fake.sha256(raw_output=True)
         object_file = ObjectFile(
@@ -219,16 +225,16 @@ def build_object_files_for_canvas(intellectual_object: IntellectualObject, canva
             size=fake.random_int(min=600),
             digest=digest,
             revision_number=1,
-            created_at=datetime.now(),
-            updated_at=datetime.now(),
+            created_at=created_at,
+            updated_at=created_at,
             last_fixity_check=datetime.now()
         )
 
         checksum = Checksum(
             algorithm="sha256",
             digest=digest,
-            created_at=datetime.now(),
-            updated_at=datetime.now()
+            created_at=created_at,
+            updated_at=created_at
         )
         object_file.checksums.append(checksum)
         object_files.append(object_file)
