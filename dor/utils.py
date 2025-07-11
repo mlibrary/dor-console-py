@@ -58,6 +58,17 @@ def fetch(url: str):
         raise
 
 
+# page.total_items      # total number of items in the query
+# page.total_pages      # total number of pagination pages, based on limit
+# page.offset           # the start offset, starts at 0
+# page.index            # the current "page"
+# page.range            # returns a string of "<start>-<end>" of the current page
+# page.limit            # number of items in each page
+# page.next_offset      # what's the next offset; -1 if not available
+# page.previous_offset  # what's the previous offset; -1 if not available
+# page.items            # query results
+# page.is_useful        # true if # results > limit
+
 @dataclass
 class Page:
     total_items: int = -1

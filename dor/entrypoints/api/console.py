@@ -38,7 +38,7 @@ async def get_objects(request: Request, identifier: UUID, session=Depends(get_db
 
     object = catalog.objects.get(session=session, identifier=identifier)
 
-    # live wire
+    # change to an HTMLResponse when we implement the detail view
     return JSONResponse(status_code=status.HTTP_200_OK, content=converter.unstructure(
         dict(
             identifier=object.identifier,

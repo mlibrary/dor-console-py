@@ -76,10 +76,34 @@ $ uv run dor server start
 $ uv run dor server start --port <port>
 ```
 
+The console is mounted under `http://localhost:8000/admin/console/...`. 
+These are defined in `dor/entrypoints/api/console.py`; check that file
+for what's available.
+
+All the handlers use the catalog service to get data; finding more than one row automatically
+returns a `dor.utils.Page` object that supports paginated presentation.
+
+The `Page` class implements the Digital Collections approach to pagination,
+focusing on next/previous navigation and assuming you'll set up a form to 
+support jumping to another page.
+
+```python
+page.total_items      # total number of items in the query
+page.total_pages      # total number of pagination pages, based on limit
+page.offset           # the start offset, starts at 0
+page.index            # the current "page" 
+page.range            # returns a string of "<start>-<end>" of the current page
+page.limit            # number of items in each page
+page.next_offset      # what's the next offset; -1 if not available
+page.previous_offset  # what's the previous offset; -1 if not available
+page.items            # query results
+page.is_useful        # true if # results > limit
+```
+
 The server uses [Jinja2](https://jinja.palletsprojects.com/en/stable/) templates with [loop controls](https://jinja.palletsprojects.com/en/stable/extensions/#loop-controls). Templates are located in `templates` (for now).
 
 The server will detect changes to files in the repository.
 
-
+To 
 
 
