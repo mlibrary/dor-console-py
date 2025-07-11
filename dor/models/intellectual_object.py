@@ -7,6 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, foreign, remote
 from sqlalchemy.ext.mutable import MutableList
 
 from dor.adapters.sqlalchemy import Base
+from .collection import collection_object_table
 
 class IntellectualObject(Base):
     __tablename__ = "catalog_intellectual_object"
@@ -20,13 +21,6 @@ class IntellectualObject(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     title: Mapped[str] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String, nullable=True)
-
-    # filesets=relationship(
-    #     'IntellectualObject',
-    #     backref="root",
-    #     remote_side=[bin_identifier],
-    #     primaryjoin="IntellectualObject.bin_identifier == IntellectualObject.identifier AND IntellectualObject.type == 'types:fileset'"
-    # )
 
     filesets = relationship(
         "IntellectualObject", 
@@ -43,9 +37,17 @@ class IntellectualObject(Base):
     premis_events: Mapped[List["PremisEvent"]] = relationship(back_populates="intellectual_object")
     revision: Mapped["CurrentRevision"] = relationship(back_populates="intellectual_object", uselist=False)
 
+    collections: Mapped[List["Collection"]] = relationship(
+        secondary=collection_object_table, back_populates="objects"
+    )
+
     __table_args__ = (
         UniqueConstraint('identifier', 'revision_number', name='uq_intellectual_object_revision'),
     )
+
+    @property
+    def collections_summary(self):
+        return '/'.join([ c.alternate_identifiers for c in self.collections ])
 
 
 # because CurrentRevision is taken

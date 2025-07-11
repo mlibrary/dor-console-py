@@ -1,3 +1,6 @@
+from cattrs import Converter
+from uuid import UUID
+from datetime import datetime
 import hashlib
 import json
 import subprocess
@@ -91,3 +94,13 @@ class Page:
         if end > self.total_items:
             end = self.total_items
         return f"{start}-{end}"
+
+
+converter = Converter()
+converter.register_unstructure_hook(
+    datetime, lambda d: d.strftime("%Y-%m-%dT%H:%M:%SZ"))
+converter.register_structure_hook(
+    datetime, lambda d, datetime: datetime.fromisoformat(d))
+
+converter.register_unstructure_hook(UUID, lambda u: str(u))
+converter.register_structure_hook(UUID, lambda u, UUID: UUID(u))

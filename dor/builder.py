@@ -8,12 +8,27 @@ import hashlib
 
 from dor.config import config
 from dor.models.checksum import Checksum
+from dor.models.collection import Collection
 from dor.models.premis_event import PremisEvent
 from dor.utils import fetch, create_uuid_from_string, extract_identifier
 from dor.models.intellectual_object import CurrentRevision, IntellectualObject
 from dor.models.object_file import ObjectFile
 
 fake = Faker()
+
+def build_collection(collection_data: dict, collection_type: str):
+    identifier, alternate_identifier = extract_identifier(collection_data['@id'])
+    collection = Collection(
+        identifier=identifier,
+        alternate_identifiers=alternate_identifier,
+        type=collection_type,
+        created_at=datetime.now(),
+        updated_at=datetime.now(),
+        title=collection_data['label'],
+        description=collection_data['attribution']
+    )
+    return collection
+
 
 def build_intellectual_objects(collid: str, manifest_data: dict, object_type: str):
     intellectual_objects = []

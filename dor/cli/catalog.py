@@ -8,7 +8,7 @@ import typer
 from typing import List
 import json
 
-from dor.builder import build_intellectual_objects, build_object_files_for_canvas, build_object_files_for_intellectual_object
+from dor.builder import build_collection, build_intellectual_objects, build_object_files_for_canvas, build_object_files_for_intellectual_object
 from dor.utils import fetch
 
 from dor.adapters.sqlalchemy import Base
@@ -42,7 +42,7 @@ def initialize():
     console.print(":thumbs_up: database initialized", style="bold green")
 
 @catalog_app.command()
-def collection(collid: str, limit: int = -1, object_type: str = 'types:slide'):
+def collection(collid: str, limit: int = -1, object_type: str = 'types:slide', collection_type: str = 'types:box'):
 
     if not object_type.startswith('types:'):
         object_type = f"types:{types}"
@@ -51,12 +51,17 @@ def collection(collid: str, limit: int = -1, object_type: str = 'types:slide'):
     image_api_url = config.get_dlxs_image_api_url()
 
     collection_url = f"{image_api_url}/collection/{collid}"
+    collection = None
 
     num_processed = 0
     page_index = 0
     seen = {}
     while True:
         collection_data = fetch(collection_url)
+        if not collection:
+            collection = build_collection(collection_data, collection_type)
+            session.add(collection)
+
         total_items = collection_data['total']
         num_items = len(collection_data['manifests'])
         page_index += 1
@@ -76,18 +81,8 @@ def collection(collid: str, limit: int = -1, object_type: str = 'types:slide'):
             )
 
             session.add_all(intellectual_objects)
-            # intellectual_object.object_files.extend(build_object_files_for_intellectual_object(intellectual_object))
+            collection.objects.extend(intellectual_objects)
 
-            # canvases = manifest_data['sequences'][0]['canvases']
-            # for canvas in canvases:
-            #     intellectual_object.object_files.extend(build_object_files_for_canvas(intellectual_object, canvas))
-
-            # revision = CurrentRevision(
-            #     revision_number=intellectual_object.revision_number,
-            #     intellectual_object=intellectual_object,
-            #     intellectual_object_identifier=intellectual_object.identifier
-            # )
-            # session.add(revision)
             session.commit()
 
             console.print(f":frame_with_picture:\t{num_processed} : importing {datum['label']}")
@@ -114,6 +109,7 @@ def objects(object_type: str = None):
     table.add_column("bin", no_wrap=True)
     table.add_column("identifier", no_wrap=True)
     table.add_column("alternate_identifiers", no_wrap=False)
+    table.add_column("collections", no_wrap=False)
     table.add_column("type", no_wrap=True)
     table.add_column("num_fileset_files", no_wrap=True)
     table.add_column("revision_number", no_wrap=True)
@@ -136,6 +132,7 @@ def objects(object_type: str = None):
                 str(intellectual_object.bin_identifier),
                 str(intellectual_object.identifier),
                 intellectual_object.alternate_identifiers,
+                ';'.join([ c.alternate_identifiers for c in intellectual_object.collections ]),
                 intellectual_object.type,
                 str(len(intellectual_object.object_files)),
                 str(intellectual_object.revision_number),

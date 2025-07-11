@@ -5,6 +5,8 @@ separate from workig out the mechanics of capturing that data from ingest.
 
 (And seriously: who wants to ingest thousands of items just to build up sample data?)
 
+(Also seriously: nothing here tries to implement the _repository pattern_. Shameless.)
+
 ## Setup
 
 This project uses [uv](https://github.com/astral-sh/uv) to manage its setup.
