@@ -13,7 +13,7 @@ templates.env.add_extension('jinja2.ext.loopcontrols')
 
 
 @console_router.get("/collections/")
-async def get_objects(request: Request, start: int = 0, collection_type: str = None, session=Depends(get_db_session)) -> HTMLResponse:
+async def get_collections(request: Request, start: int = 0, collection_type: str = None, session=Depends(get_db_session)) -> HTMLResponse:
 
     page = catalog.collections.find(
         session=session, start=start, collection_type=collection_type)

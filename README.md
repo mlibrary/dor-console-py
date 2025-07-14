@@ -104,6 +104,4 @@ The server uses [Jinja2](https://jinja.palletsprojects.com/en/stable/) templates
 
 The server will detect changes to files in the repository.
 
-To 
-
 

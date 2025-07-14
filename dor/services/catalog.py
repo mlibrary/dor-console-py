@@ -32,7 +32,7 @@ class Manager:
 @dataclass(kw_only=True)
 class ObjectsManager(Manager):
     def find(self, session: Session, object_type: str = None, start: int = 0, limit: int = 100):
-        query = select(IntellectualObject)
+        query = select(IntellectualObject).where(IntellectualObject.bin_identifier==IntellectualObject.identifier)
         if object_type:
             query = query.filter_by(type=object_type)
         query = query.join(CurrentRevision)
