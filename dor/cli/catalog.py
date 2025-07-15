@@ -101,8 +101,8 @@ def collection(collid: str, limit: int = -1, object_type: str = 'types:slide', c
 
 @catalog_app.command()
 def objects(object_type: str = None):
-    possible_identifiers = session.execute(
-        sqlalchemy.select(CurrentRevision.intellectual_object_identifier)).all()
+    possible_identifiers = list(session.execute(
+        sqlalchemy.select(CurrentRevision.intellectual_object_identifier)).scalars())
     random.shuffle(possible_identifiers)
 
     table = Table(title="Intellectual Objects")
@@ -111,17 +111,15 @@ def objects(object_type: str = None):
     table.add_column("alternate_identifiers", no_wrap=False)
     table.add_column("collections", no_wrap=False)
     table.add_column("type", no_wrap=True)
-    table.add_column("num_fileset_files", no_wrap=True)
-    table.add_column("revision_number", no_wrap=True)
-    table.add_column("created_at", no_wrap=True)
+    # table.add_column("num_fileset_files", no_wrap=True)
+    table.add_column("revision", no_wrap=True)
+    # table.add_column("created_at", no_wrap=True)
     table.add_column("updated_at", no_wrap=True)
     table.add_column("title", no_wrap=True)
 
     for identifier in random.sample(possible_identifiers, 100):
 
-        identifier = identifier[0]
-
-        query = sqlalchemy.select(IntellectualObject)
+        query = sqlalchemy.select(IntellectualObject).where(IntellectualObject.bin_identifier==IntellectualObject.identifier)
         if object_type:
             query = query.filter_by(type=object_type)
 
@@ -132,14 +130,52 @@ def objects(object_type: str = None):
                 str(intellectual_object.bin_identifier),
                 str(intellectual_object.identifier),
                 intellectual_object.alternate_identifiers,
-                ';'.join([ c.alternate_identifiers for c in intellectual_object.collections ]),
+                intellectual_object.collections_summary,
                 intellectual_object.type,
-                str(len(intellectual_object.object_files)),
                 str(intellectual_object.revision_number),
-                intellectual_object.created_at.strftime("%Y-%m-%d %H:%M:%S"),
                 intellectual_object.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+                str(intellectual_object.total_data_size),
                 intellectual_object.title
             )
+
+    console = config.console
+    console.print(table)
+
+
+@catalog_app.command()
+def filesets(identifier: uuid.UUID):
+
+    table = Table(title="Intellectual Objects")
+    table.add_column("bin", no_wrap=True)
+    table.add_column("identifier", no_wrap=True)
+    table.add_column("alternate_identifiers", no_wrap=False)
+    table.add_column("collections", no_wrap=False)
+    table.add_column("type", no_wrap=True)
+    table.add_column("revision", no_wrap=True)
+    table.add_column("updated_at", no_wrap=True)
+    table.add_column("size", no_wrap=True)
+    table.add_column("title", no_wrap=True)
+    
+    query = sqlalchemy.select(IntellectualObject).where(
+        IntellectualObject.bin_identifier==identifier
+    ).where(
+        IntellectualObject.type == "types:fileset"
+    )
+
+    intellectual_objects = session.execute(query.join(CurrentRevision)).scalars()
+
+    for intellectual_object in intellectual_objects:
+        table.add_row(
+            str(intellectual_object.bin_identifier),
+            str(intellectual_object.identifier),
+            intellectual_object.alternate_identifiers,
+            intellectual_object.collections_summary,
+            intellectual_object.type,
+            str(intellectual_object.revision_number),
+            intellectual_object.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+            str(intellectual_object.total_data_size),
+            intellectual_object.title
+        )
 
     console = config.console
     console.print(table)

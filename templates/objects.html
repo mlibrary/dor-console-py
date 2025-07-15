@@ -11,11 +11,10 @@
       <td>Type</td>
       <td>Revision</td>
       <td>Collections</td>
-      <td>Created</td>
       <td>Updated</td>
       <td>Title</td>
       <td># Filesets</td>
-      <td># Files</td>
+      <td>Size</td>
     </tr>
   </thead>
   <tbody>
@@ -27,11 +26,10 @@
       <td>{{ item.type }}</td>
       <td>{{ item.revision_number }}</td>
       <td>{{ item.collections_summary }}</td>
-      <td>{{ item.created_at }}</td>
       <td>{{ item.updated_at }}</td>
       <td>{{ item.title }}</td>
       <td>{{ item.filesets|length }}</td>
-      <td>{{ item.object_files|length }}</td>
+      <td>{{ item.total_data_size }}</td>
     </tr>
     {% endfor %}
   </tbody>
