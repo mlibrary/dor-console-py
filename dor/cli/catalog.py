@@ -1,14 +1,18 @@
 import hashlib
+import os
 from pathlib import Path
 import random
+import sys
 import time
 import uuid
 import sqlalchemy
+from sqlalchemy import delete, select, join
 import typer
-from typing import List
+from typing import Annotated, List
 import json
 
 from dor.builder import build_collection, build_intellectual_objects, build_object_files_for_canvas, build_object_files_for_intellectual_object
+from dor.models.collection import Collection
 from dor.utils import fetch
 
 from dor.adapters.sqlalchemy import Base
@@ -20,6 +24,11 @@ from dor.models.object_file import ObjectFile
 from dor.models.premis_event import PremisEvent
 
 from rich.table import Table
+
+DEFAULT_OBJECT_TYPE = {
+    'text': 'types:monograph',
+    'image': 'types:slide',
+}
 
 console = config.console
 
@@ -42,16 +51,51 @@ def initialize():
     console.print(":thumbs_up: database initialized", style="bold green")
 
 @catalog_app.command()
-def collection(collid: str, limit: int = -1, object_type: str = 'types:slide', collection_type: str = 'types:box'):
+def collection(
+    collid: str,
+    class_: Annotated[
+        str,
+        typer.Option(
+            "--class",
+            help="DLXS Class Type [image|text]",
+        )
+    ],
+    limit: int = -1, 
+    object_type: str = None, 
+    collection_type: str = 'types:box'
+    ):
+
+    if not object_type:
+        object_type = DEFAULT_OBJECT_TYPE[class_]
 
     if not object_type.startswith('types:'):
-        object_type = f"types:{types}"
+        object_type = f"types:{object_type}"
     object_type = object_type.lower()
-
-    image_api_url = config.get_dlxs_image_api_url()
+    
+    image_api_url = config.get_dlxs_image_api_url(class_)
 
     collection_url = f"{image_api_url}/collection/{collid}"
     collection = None
+
+    # delete all the objects in this collection
+    object_ids_to_delete = (
+        select(IntellectualObject.id)
+        .join(IntellectualObject.collections)
+        .where(Collection.alternate_identifiers==collid)
+    ).scalar_subquery()
+
+    stmt = (
+        delete(IntellectualObject)
+        .where(IntellectualObject.id.in_(object_ids_to_delete))
+    )
+    session.execute(stmt)
+
+    # delete the collection
+    session.execute(delete(Collection).where(Collection.alternate_identifiers==collid))
+    session.commit()
+
+    if os.getenv("EXIT", None):
+        sys.exit()
 
     num_processed = 0
     page_index = 0
@@ -100,9 +144,22 @@ def collection(collid: str, limit: int = -1, object_type: str = 'types:slide', c
 
 
 @catalog_app.command()
-def objects(object_type: str = None):
-    possible_identifiers = list(session.execute(
-        sqlalchemy.select(CurrentRevision.intellectual_object_identifier)).scalars())
+def objects(object_type: str = None, collid: str = None):
+    
+    stmt = (
+        select(CurrentRevision.intellectual_object_identifier)
+        .join(IntellectualObject)
+    )
+
+    if object_type:
+        stmt = stmt.filter_by(type=object_type)
+
+    if collid:
+        stmt = (stmt.join(IntellectualObject.collections)
+                .where(Collection.alternate_identifiers==collid))
+
+    possible_identifiers = list(session.execute(stmt).scalars())
+
     random.shuffle(possible_identifiers)
 
     table = Table(title="Intellectual Objects")
@@ -115,9 +172,10 @@ def objects(object_type: str = None):
     table.add_column("revision", no_wrap=True)
     # table.add_column("created_at", no_wrap=True)
     table.add_column("updated_at", no_wrap=True)
-    table.add_column("title", no_wrap=True)
+    table.add_column("size", no_wrap=True)
+    table.add_column("title", no_wrap=False)
 
-    for identifier in random.sample(possible_identifiers, 100):
+    for identifier in random.sample(possible_identifiers, min([len(possible_identifiers), 100])):
 
         query = sqlalchemy.select(IntellectualObject).where(IntellectualObject.bin_identifier==IntellectualObject.identifier)
         if object_type:

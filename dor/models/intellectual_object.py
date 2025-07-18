@@ -57,12 +57,15 @@ class IntellectualObject(Base):
         lazy='selectin',
     )
 
-    object_files: Mapped[List["ObjectFile"]] = relationship(back_populates="intellectual_object", lazy="dynamic")
-    premis_events: Mapped[List["PremisEvent"]] = relationship(back_populates="intellectual_object")
-    revision: Mapped["CurrentRevision"] = relationship(back_populates="intellectual_object", uselist=False)
+    object_files: Mapped[List["ObjectFile"]] = relationship(back_populates="intellectual_object", lazy="dynamic", cascade="all, delete", passive_deletes=True)
+    premis_events: Mapped[List["PremisEvent"]] = relationship(
+        back_populates="intellectual_object", cascade="all, delete-orphan", passive_deletes=True)
+    revision: Mapped["CurrentRevision"] = relationship(
+        back_populates="intellectual_object", uselist=False, cascade="all, delete-orphan", passive_deletes=True)
 
     collections: Mapped[List["Collection"]] = relationship(
-        secondary=collection_object_table, back_populates="objects"
+        secondary=collection_object_table, back_populates="objects",
+        passive_deletes=True,
     )
 
     __table_args__ = (
@@ -93,7 +96,7 @@ class CurrentRevision(Base):
     intellectual_object_identifier: Mapped[uuid.UUID] = mapped_column(
         Uuid, unique=True, index=True)
     intellectual_object_id: Mapped[int] = mapped_column(ForeignKey(
-        "catalog_intellectual_object.id"), unique=False, nullable=True)
+        "catalog_intellectual_object.id", ondelete="CASCADE"), unique=False, nullable=True)
 
     intellectual_object: Mapped["IntellectualObject"] = relationship(
-        back_populates="revision")
+        back_populates="revision", passive_deletes=True)

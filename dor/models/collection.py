@@ -19,9 +19,9 @@ collection_object_table = Table(
     "catalog_collection_object_membership",
     Base.metadata,
     Column("intellectual_object_id", ForeignKey(
-        "catalog_intellectual_object.id"), primary_key=True),
+        "catalog_intellectual_object.id", ondelete="CASCADE"), primary_key=True),
     Column("collection_id", ForeignKey(
-        "catalog_collection.id"), primary_key=True),
+        "catalog_collection.id", ondelete="CASCADE"), primary_key=True),
 )
 
 class Collection(Base):
@@ -36,5 +36,6 @@ class Collection(Base):
     description: Mapped[str] = mapped_column(String, nullable=True)
 
     objects: Mapped[List["IntellectualObject"]] = relationship(
-        secondary=collection_object_table, back_populates="collections"
+        secondary=collection_object_table, back_populates="collections",
+        cascade="all, delete"
     )

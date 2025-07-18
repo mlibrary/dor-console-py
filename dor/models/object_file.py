@@ -25,7 +25,7 @@ class ObjectFile(Base):
     last_fixity_check: Mapped[datetime] = mapped_column(
         DateTime(timezone=True))
     intellectual_object_id: Mapped[int] = mapped_column(
-        ForeignKey("catalog_intellectual_object.id"), index=True)
+        ForeignKey("catalog_intellectual_object.id", ondelete="CASCADE"), index=True)
 
     intellectual_object: Mapped["IntellectualObject"] = relationship(
         back_populates="object_files")

@@ -19,7 +19,7 @@ class Checksum(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     file_set_file_id: Mapped[int] = mapped_column(ForeignKey(
-        "catalog_object_file.id"), nullable=False, index=True)
+        "catalog_object_file.id", ondelete="CASCADE"), nullable=False, index=True)
 
     object_file: Mapped["ObjectFile"] = relationship(
-        back_populates="checksums")
+        back_populates="checksums", passive_deletes=True)
