@@ -23,9 +23,9 @@ class PremisEvent(Base):
     linking_agent: Mapped[str] = mapped_column(String, nullable=True)
     # foreign key to file set file
     intellectual_object_id: Mapped[int] = mapped_column(ForeignKey(
-        "catalog_intellectual_object.id"), nullable=True, index=True)
+        "catalog_intellectual_object.id", ondelete="CASCADE"), nullable=True, index=True)
     object_file_id: Mapped[int] = mapped_column(ForeignKey(
-        "catalog_object_file.id"), nullable=True, index=True)
+        "catalog_object_file.id", ondelete="CASCADE"), nullable=True, index=True)
 
     intellectual_object: Mapped["IntellectualObject"] = relationship(
         back_populates="premis_events")
