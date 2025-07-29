@@ -131,6 +131,7 @@ def test_sqlalchemy_catalog_adds_object(
         catalog.add(sample_object)
         db_session.commit()
 
+    # Check for object
     rows = list(
         db_session.execute(sqlalchemy.text("""
             select *
@@ -141,6 +142,17 @@ def test_sqlalchemy_catalog_adds_object(
     assert len(rows) == 1
     assert str(rows[0].identifier) == "8e449bbe-7cf5-493c-a782-b752e97fe6e3"
     assert rows[0].revision_number == 1
+
+    # Check for premis object
+    rows = list(
+        db_session.execute(sqlalchemy.text("""
+            select *
+            from catalog_premis_event
+            where identifier = :identifier
+        """), {"identifier": "6ec34c12-4b59-428a-ac12-31e9f956a8ae"})
+    )
+    assert len(rows) == 1
+    assert str(rows[0].identifier) == "6ec34c12-4b59-428a-ac12-31e9f956a8ae"
 
 
 def test_sqlalchemy_catalog_gets_object(
@@ -153,3 +165,5 @@ def test_sqlalchemy_catalog_gets_object(
 
     object = catalog.get(UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"))
     assert object is not None
+
+    assert len(object.premis_events) == 1
