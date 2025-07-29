@@ -1,11 +1,16 @@
 from datetime import datetime, UTC
 from uuid import UUID
+from typing import Generator
 
 import pytest
+import sqlalchemy
 
-from dor.adapters.catalog import MemoryCatalog
+from dor.adapters.catalog import MemoryCatalog, SqlalchemyCatalog
+from dor.adapters.sqlalchemy import Base
+from dor.config import config
 from dor.models.domain import (
-    Checksum, FileSet, IntellectualObject, LinkingAgent, ObjectFile, PremisEvent
+    Checksum, FileSet, IntellectualObject, LinkingAgent,
+    ObjectFile, PremisEvent
 )
 
 # Fixture(s)
@@ -82,6 +87,23 @@ def sample_object(sample_fileset: FileSet) -> IntellectualObject:
         )]
     )
 
+@pytest.fixture
+def db_session() -> Generator[sqlalchemy.orm.Session, None, None]:
+    engine_url = config.get_database_engine_url()
+    engine = sqlalchemy.create_engine(engine_url, echo=False)
+
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+
+    connection = engine.connect()
+    session = sqlalchemy.orm.Session(bind=connection)
+
+    yield session
+
+    session.close()
+    connection.close()
+
+
 # MemoryCatalog
 
 def test_memory_catalog_adds_object(sample_object) -> None:
@@ -97,3 +119,37 @@ def test_memory_catalog_gets_object(sample_object) -> None:
 
     object = catalog.get(UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"))
     assert object == sample_object
+
+
+# SqlalchemyCatalog
+
+def test_sqlalchemy_catalog_adds_object(
+    db_session, sample_object: IntellectualObject
+) -> None:
+    catalog = SqlalchemyCatalog(db_session)
+    with db_session.begin():
+        catalog.add(sample_object)
+        db_session.commit()
+
+    rows = list(
+        db_session.execute(sqlalchemy.text("""
+            select *
+            from catalog_intellectual_object
+            where identifier = :identifier
+        """), {"identifier": "8e449bbe-7cf5-493c-a782-b752e97fe6e3"})
+    )
+    assert len(rows) == 1
+    assert str(rows[0].identifier) == "8e449bbe-7cf5-493c-a782-b752e97fe6e3"
+    assert rows[0].revision_number == 1
+
+
+def test_sqlalchemy_catalog_gets_object(
+    db_session, sample_object
+):
+    catalog = SqlalchemyCatalog(db_session)
+    with db_session.begin():
+        catalog.add(sample_object)
+        db_session.commit()
+
+    object = catalog.get(UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"))
+    assert object is not None
