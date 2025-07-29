@@ -13,14 +13,13 @@ class ObjectFile(Base):
     __tablename__ = "catalog_object_file"
     id: Mapped[int] = mapped_column(primary_key=True)
     identifier: Mapped[str] = mapped_column(String, unique=True)
+    name: Mapped[str] = mapped_column(String)
     file_format: Mapped[str] = mapped_column(String, index=True)
     file_function: Mapped[str] = mapped_column(String, index=True)
     size: Mapped[int] = mapped_column(Integer)
     digest: Mapped[bytes] = mapped_column(
         LargeBinary(32), unique=False, nullable=False)
-    revision_number: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     last_fixity_check: Mapped[datetime] = mapped_column(
         DateTime(timezone=True))
     intellectual_object_id: Mapped[int] = mapped_column(

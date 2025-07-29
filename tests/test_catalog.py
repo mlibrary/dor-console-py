@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime, UTC
 from uuid import UUID
 from typing import Generator
@@ -17,20 +18,42 @@ from dor.models.domain import (
 
 @pytest.fixture
 def source_object_file() -> ObjectFile:
+    some_hash = hashlib.sha512(b"some_hash").digest()
+
     return ObjectFile(
         identifier=UUID('279bcb2e-17b3-4cd1-8d04-8d2d1e670b75'),
+        name="00000001.function:source.format:image.tiff",
         file_format="tiff",
         file_function="source",
         size=1000000,
         created_at=datetime.now(tz=UTC),
-        digest="some-hash",
+        digest=some_hash,
         last_fixity_check=datetime.now(tz=UTC),
-        checksum=Checksum(
-            id=1,
+        checksums=[Checksum(
             algorithm="sha512",
-            digest="some-hash",
+            digest=some_hash,
             created_at=datetime.now(tz=UTC)
-        )
+        )]
+    )
+
+@pytest.fixture
+def descriptor_object_file() -> ObjectFile:
+    some_hash = hashlib.sha512(b"some_hash").digest()
+
+    return ObjectFile(
+        identifier=UUID('6e47540b-9825-436b-b893-348059124b47'),
+        name="monograph.xml",
+        file_format="xml",
+        file_function="",
+        size=1000000,
+        created_at=datetime.now(tz=UTC),
+        digest=some_hash,
+        last_fixity_check=datetime.now(tz=UTC),
+        checksums=[Checksum(
+            algorithm="sha512",
+            digest=some_hash,
+            created_at=datetime.now(tz=UTC)
+        )]
     )
 
 @pytest.fixture
@@ -58,7 +81,9 @@ def sample_fileset(source_object_file: ObjectFile) -> FileSet:
     )
 
 @pytest.fixture
-def sample_object(sample_fileset: FileSet) -> IntellectualObject:
+def sample_object(
+    sample_fileset: FileSet, descriptor_object_file: ObjectFile
+) -> IntellectualObject:
     identifier = UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3")
 
     return IntellectualObject(
@@ -71,7 +96,7 @@ def sample_object(sample_fileset: FileSet) -> IntellectualObject:
         title="Sample Object",
         description="This is a sample monograph object.",
         filesets=[sample_fileset],
-        object_files=[],
+        object_files=[descriptor_object_file],
         premis_events=[PremisEvent(
             identifier=UUID('6ec34c12-4b59-428a-ac12-31e9f956a8ae'),
             type="ingest",
@@ -140,8 +165,17 @@ def test_sqlalchemy_catalog_adds_object(
         """), {"identifier": "8e449bbe-7cf5-493c-a782-b752e97fe6e3"})
     )
     assert len(rows) == 1
-    assert str(rows[0].identifier) == "8e449bbe-7cf5-493c-a782-b752e97fe6e3"
     assert rows[0].revision_number == 1
+
+    # Check for object file
+    rows = list(
+        db_session.execute(sqlalchemy.text("""
+            select *
+            from catalog_object_file
+            where identifier = :identifier
+        """), {"identifier": "6e47540b-9825-436b-b893-348059124b47"})
+    )
+    assert len(rows) == 1
 
     # Check for premis object
     rows = list(
@@ -152,7 +186,6 @@ def test_sqlalchemy_catalog_adds_object(
         """), {"identifier": "6ec34c12-4b59-428a-ac12-31e9f956a8ae"})
     )
     assert len(rows) == 1
-    assert str(rows[0].identifier) == "6ec34c12-4b59-428a-ac12-31e9f956a8ae"
 
 
 def test_sqlalchemy_catalog_gets_object(
@@ -166,4 +199,5 @@ def test_sqlalchemy_catalog_gets_object(
     object = catalog.get(UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"))
     assert object is not None
 
-    assert len(object.premis_events) == 1
+    assert object.premis_events == sample_object.premis_events
+    assert object.object_files == sample_object.object_files

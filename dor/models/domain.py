@@ -23,22 +23,22 @@ class PremisEvent:
 
 @dataclass
 class Checksum:
-    id: int
     algorithm: str
-    digest: str
+    digest: bytes
     created_at: datetime
 
 
 @dataclass
 class ObjectFile:
     identifier: UUID
+    name: str
     file_format: str
     file_function: str
     size: int
-    digest: str
+    digest: bytes
     created_at: datetime
     last_fixity_check: datetime
-    checksum: Checksum
+    checksums: list[Checksum]
 
 
 @dataclass
