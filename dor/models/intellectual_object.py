@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from dor.adapters.sqlalchemy import Base
 from dor.models.object_file import ObjectFile
+from dor.models.fileset import FileSet
 # from .collection import collection_object_table
 
 
@@ -44,18 +45,8 @@ class IntellectualObject(Base):
     title: Mapped[str] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String, nullable=True)
 
-    # filesets = relationship(
-    #     "IntellectualObject", 
-    #     primaryjoin=(
-    #         (foreign(identifier) == remote(bin_identifier)) &
-    #         (remote(type) == "types:fileset")
-    #     ),
-    #     uselist=True,
-    #     viewonly=True,
-    #     lazy='selectin',
-    # )
-
     object_files: Mapped[List[ObjectFile]] = relationship(back_populates="intellectual_object", lazy="dynamic")
+    file_sets: Mapped[List["FileSet"]] = relationship(back_populates="intellectual_object")
     premis_events: Mapped[List["PremisEvent"]] = relationship(back_populates="intellectual_object")
     # revision: Mapped["CurrentRevision"] = relationship(
     #    back_populates="intellectual_object", uselist=False, cascade="all, delete-orphan", passive_deletes=True)

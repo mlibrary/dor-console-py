@@ -22,13 +22,16 @@ class PremisEvent(Base):
     linking_agent_type: Mapped[str] = mapped_column(String, nullable=True)
     linking_agent_role: Mapped[str] = mapped_column(String, nullable=True)
 
-    # foreign key to file set file
     intellectual_object_id: Mapped[int] = mapped_column(ForeignKey(
         "catalog_intellectual_object.id", ondelete="CASCADE"), nullable=True, index=True)
     object_file_id: Mapped[int] = mapped_column(ForeignKey(
         "catalog_object_file.id", ondelete="CASCADE"), nullable=True, index=True)
+    file_set_id: Mapped[int] = mapped_column(
+        ForeignKey("catalog_file_set.id"), nullable=True, index=True
+    )
 
     intellectual_object: Mapped["IntellectualObject"] = relationship(
         back_populates="premis_events")
+    file_set: Mapped["FileSet"] = relationship(back_populates="premis_events")
     object_file: Mapped["ObjectFile"] = relationship(
         back_populates="premis_events")

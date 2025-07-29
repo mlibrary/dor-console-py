@@ -23,10 +23,15 @@ class ObjectFile(Base):
     last_fixity_check: Mapped[datetime] = mapped_column(
         DateTime(timezone=True))
     intellectual_object_id: Mapped[int] = mapped_column(
-        ForeignKey("catalog_intellectual_object.id", ondelete="CASCADE"), index=True)
+        ForeignKey("catalog_intellectual_object.id", ondelete="CASCADE"), index=True, nullable=True
+    )
+    file_set_id: Mapped[int] = mapped_column(
+        ForeignKey("catalog_file_set.id"), index=True, nullable=True
+    )
 
     intellectual_object: Mapped["IntellectualObject"] = relationship(
         back_populates="object_files")
+    file_set: Mapped["FileSet"] = relationship(back_populates="object_files")
     premis_events: Mapped[List[PremisEvent]] = relationship(
         back_populates="object_file")
     checksums: Mapped[List[Checksum]] = relationship(
