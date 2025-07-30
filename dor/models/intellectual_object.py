@@ -71,14 +71,10 @@ class IntellectualObject(Base):
     
     @hybrid_property
     def total_data_size(self):
-        if self.type == 'types:fileset':
-            return sum(
-                (f.size for f in self.object_files.filter_by(file_function="function:source")), start=Decimal("0")
-            )
-        else:
-            return sum(
-                (f.total_data_size for f in self.filesets), start=Decimal("0")
-            )
+        return sum(
+            (f.total_data_size for f in self.file_sets),
+            start=Decimal("0")
+        )
 
 
 # because CurrentRevision is taken

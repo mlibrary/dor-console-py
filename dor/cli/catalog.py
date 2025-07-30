@@ -210,7 +210,7 @@ def filesets(identifier: uuid.UUID):
     table.add_column("type", no_wrap=True)
     table.add_column("revision", no_wrap=True)
     table.add_column("created_at", no_wrap=True)
-    # table.add_column("size", no_wrap=True)
+    table.add_column("size", no_wrap=True)
     table.add_column("title", no_wrap=True)
     
     for file_set in intellectual_object.file_sets:
@@ -222,7 +222,7 @@ def filesets(identifier: uuid.UUID):
             file_set.type,
             str(file_set.revision_number),
             file_set.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            # str(intellectual_object.total_data_size),
+            str(file_set.total_data_size),
             file_set.title
         )
 
