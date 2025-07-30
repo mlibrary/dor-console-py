@@ -1,8 +1,10 @@
 import uuid
 from datetime import datetime
+from decimal import Decimal
 from typing import List
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint, Uuid
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from dor.adapters.sqlalchemy import Base
@@ -31,3 +33,9 @@ class FileSet(Base):
         UniqueConstraint('identifier', 'revision_number', name='uq_fileset_revision'),
     )
 
+    @hybrid_property
+    def total_data_size(self):
+        return sum(
+            (f.size for f in self.object_files.filter_by(file_function="function:source")),
+            start=Decimal("0")
+        )
