@@ -1,29 +1,24 @@
-import hashlib
 import os
-from pathlib import Path
 import random
 import sys
 import time
 import uuid
-import sqlalchemy
-from sqlalchemy import delete, select, join
-import typer
-from typing import Annotated, List
-import json
+from typing import Annotated
 
-from dor.builder import build_collection, build_intellectual_objects, build_object_files_for_canvas, build_object_files_for_intellectual_object
-from dor.models.collection import Collection
-from dor.utils import fetch
+import sqlalchemy
+import typer
+from rich.table import Table
+from sqlalchemy import delete, select
+from sqlalchemy.orm import selectinload
 
 from dor.adapters.sqlalchemy import Base
+from dor.builder import build_collection, build_intellectual_object
 from dor.config import config
-from dor.models.checksum import Checksum
-# from dor.models.collection import Collection
+from dor.models.collection import Collection
+from dor.models.file_set import FileSet
 from dor.models.intellectual_object import IntellectualObject, CurrentRevision
-from dor.models.object_file import ObjectFile
-from dor.models.premis_event import PremisEvent
+from dor.utils import fetch
 
-from rich.table import Table
 
 DEFAULT_OBJECT_TYPE = {
     'text': 'types:monograph',
@@ -118,14 +113,14 @@ def collection(
             manifest_url = datum['@id']
             manifest_data = fetch(manifest_url)
 
-            intellectual_objects = build_intellectual_objects(
+            intellectual_object = build_intellectual_object(
                 collid=collid,
                 manifest_data=manifest_data,
                 object_type=object_type,
             )
 
-            session.add_all(intellectual_objects)
-            collection.objects.extend(intellectual_objects)
+            session.add(intellectual_object)
+            collection.objects.append(intellectual_object)
 
             session.commit()
 
@@ -203,36 +198,32 @@ def objects(object_type: str = None, collid: str = None):
 @catalog_app.command()
 def filesets(identifier: uuid.UUID):
 
-    table = Table(title="Intellectual Objects")
+    intellectual_object = session.query(IntellectualObject).where(
+        IntellectualObject.bin_identifier == identifier
+    ).join(CurrentRevision).one()
+
+    table = Table(title="File Sets")
     table.add_column("bin", no_wrap=True)
     table.add_column("identifier", no_wrap=True)
     table.add_column("alternate_identifiers", no_wrap=False)
     table.add_column("collections", no_wrap=False)
     table.add_column("type", no_wrap=True)
     table.add_column("revision", no_wrap=True)
-    table.add_column("updated_at", no_wrap=True)
-    table.add_column("size", no_wrap=True)
+    table.add_column("created_at", no_wrap=True)
+    # table.add_column("size", no_wrap=True)
     table.add_column("title", no_wrap=True)
     
-    query = sqlalchemy.select(IntellectualObject).where(
-        IntellectualObject.bin_identifier==identifier
-    ).where(
-        IntellectualObject.type == "types:fileset"
-    )
-
-    intellectual_objects = session.execute(query.join(CurrentRevision)).scalars()
-
-    for intellectual_object in intellectual_objects:
+    for file_set in intellectual_object.file_sets:
         table.add_row(
             str(intellectual_object.bin_identifier),
-            str(intellectual_object.identifier),
-            intellectual_object.alternate_identifiers,
+            str(file_set.identifier),
+            file_set.alternate_identifiers,
             intellectual_object.collections_summary,
-            intellectual_object.type,
-            str(intellectual_object.revision_number),
-            intellectual_object.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
-            str(intellectual_object.total_data_size),
-            intellectual_object.title
+            file_set.type,
+            str(file_set.revision_number),
+            file_set.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            # str(intellectual_object.total_data_size),
+            file_set.title
         )
 
     console = config.console
