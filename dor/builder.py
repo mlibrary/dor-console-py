@@ -12,6 +12,7 @@ from dor.models.collection import Collection
 from dor.models.premis_event import PremisEvent
 from dor.utils import fetch, create_uuid_from_string, extract_identifier
 from dor.models.intellectual_object import CurrentRevision, IntellectualObject
+from dor.models.file_set import FileSet
 from dor.models.object_file import ObjectFile
 
 fake = Faker()
@@ -32,9 +33,7 @@ def build_collection(collection_data: dict, collection_type: str):
     return collection
 
 
-def build_intellectual_objects(collid: str, manifest_data: dict, object_type: str):
-    intellectual_objects = []
-
+def build_intellectual_object(collid: str, manifest_data: dict, object_type: str):
     identifier, alternate_identifier = extract_identifier(manifest_data['@id'])
 
     config.console.print(f":stuck_out_tongue_closed_eyes: processing {alternate_identifier}")
@@ -72,9 +71,6 @@ def build_intellectual_objects(collid: str, manifest_data: dict, object_type: st
         outcome=fake.ipv6()
     ))
 
-    intellectual_objects.append(intellectual_object)
-
-
     canvases = manifest_data['sequences'][0]['canvases']
     for canvas in canvases:
 
@@ -84,33 +80,26 @@ def build_intellectual_objects(collid: str, manifest_data: dict, object_type: st
         config.console.print(f":star2: processing {alternate_identifier}")
 
         created_at = fake.past_datetime(start_date="-20y")
-        intellectual_object = IntellectualObject(
-            bin_identifier=bin_identifier,
+        file_set = FileSet(
             identifier=identifier,
             alternate_identifiers=alternate_identifier,
             type="types:fileset",
             revision_number=1,
             created_at=created_at,
-            updated_at=created_at,
             title=manifest_data['label']
         )
-        intellectual_object.revision = CurrentRevision(
-            revision_number=intellectual_object.revision_number,
-            intellectual_object=intellectual_object,
-            intellectual_object_identifier=intellectual_object.identifier
+        file_set.object_files.extend(
+            build_object_files_for_canvas(file_set, canvas)
         )
 
-        intellectual_object.object_files.extend(
-            build_object_files_for_canvas(intellectual_object, canvas))
-    
-        intellectual_object.premis_events.append(PremisEvent(
+        file_set.premis_events.append(PremisEvent(
             identifier=uuid4(),
             type="ingestion start",
             date_time=(created_at - fake.time_delta(end_datetime='-30h')),
             detail=fake.catch_phrase(),
             outcome=fake.ipv6()
         ))
-        intellectual_object.premis_events.append(PremisEvent(
+        file_set.premis_events.append(PremisEvent(
             identifier=uuid4(),
             type="ingestion end",
             date_time=created_at,
@@ -118,9 +107,9 @@ def build_intellectual_objects(collid: str, manifest_data: dict, object_type: st
             outcome=fake.ipv6()
         ))
 
-        intellectual_objects.append(intellectual_object)
+        intellectual_object.file_sets.append(file_set)
 
-    return intellectual_objects
+    return intellectual_object
 
 
 def build_object_files_for_intellectual_object(intellectual_object: IntellectualObject):
@@ -179,10 +168,10 @@ EXTENSIONS = {
     'image/tiff': 'tif'
 }
 
-def build_object_files_for_canvas(intellectual_object: IntellectualObject, canvas: dict):
+def build_object_files_for_canvas(file_set: FileSet, canvas: dict):
     object_files = []
 
-    object_identifier = intellectual_object.identifier
+    object_identifier = file_set.identifier
     resource = canvas['images'][0]['resource']
     resource_id = Path(resource['service']['@id']).name
     mimetype = resource['format']
@@ -214,8 +203,8 @@ def build_object_files_for_canvas(intellectual_object: IntellectualObject, canva
         
         event_file_identifier = f"{object_identifier}/metadata/{m_fn}.function:source.format:image.function:event.premis.xml"
         possibles.append((event_file_identifier, "application/xml", "function:event"))
-    
-    created_at = intellectual_object.created_at
+
+    created_at = file_set.created_at
     for file_identifier, file_format, file_function in possibles:
         digest = fake.sha256(raw_output=True)
         object_file = ObjectFile(

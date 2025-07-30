@@ -1,7 +1,8 @@
+import uuid
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from dor.adapters.sqlalchemy import Base
@@ -11,11 +12,12 @@ from dor.models.object_file import ObjectFile
 class FileSet(Base):
     __tablename__ = "catalog_file_set"
     id: Mapped[int] = mapped_column(primary_key=True)
-    identifier: Mapped[str] = mapped_column(String, unique=False, index=True)
+    identifier: Mapped[uuid.UUID] = mapped_column(Uuid, unique=False, index=True)
     alternate_identifiers: Mapped[str] = mapped_column(String, nullable=True)
     type: Mapped[str] = mapped_column(String, index=True)
     revision_number: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    title: Mapped[str] = mapped_column(String, nullable=False)
 
     intellectual_object_id: Mapped[int] = mapped_column(
         ForeignKey("catalog_intellectual_object.id"), nullable=True, index=True
