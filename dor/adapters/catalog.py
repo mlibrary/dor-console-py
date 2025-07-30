@@ -71,6 +71,51 @@ class SqlalchemyCatalog(Catalog):
             )
         )
 
+    @staticmethod
+    def object_file_to_model(object_file: ObjectFile) -> ObjectFileModel:
+        checksum_models = []
+        for checksum in object_file.checksums:
+            checksum_models.append(ChecksumModel(
+                algorithm=checksum.algorithm,
+                digest=checksum.digest,
+                created_at=checksum.created_at
+            ))
+        object_file_model = ObjectFileModel(
+            identifier=str(object_file.identifier),
+            name=object_file.name,
+            file_format=object_file.file_format,
+            file_function=object_file.file_function,
+            size=object_file.size,
+            digest=object_file.digest,
+            created_at=object_file.created_at,
+            last_fixity_check=object_file.last_fixity_check
+        )
+        for checksum_model in checksum_models:
+            object_file_model.checksums.append(checksum_model)
+        return object_file_model
+
+    @staticmethod
+    def model_to_object_file(model: ObjectFileModel) -> ObjectFile:
+        checksums: list[Checksum] = []
+        for checksum_model in model.checksums:
+            checksums.append(
+                Checksum(
+                    algorithm=checksum_model.algorithm,
+                    digest=checksum_model.digest,
+                    created_at=checksum_model.created_at.replace(tzinfo=UTC)
+                )
+            )
+        return ObjectFile(
+            identifier=UUID(model.identifier),
+            name=model.name,
+            file_format=model.file_format,
+            file_function=model.file_function,
+            size=model.size,
+            digest=model.digest,
+            created_at=model.created_at.replace(tzinfo=UTC),
+            last_fixity_check=model.last_fixity_check.replace(tzinfo=UTC),
+            checksums=checksums
+        )
 
     def add(self, object: IntellectualObject) -> None:
         object_inst = IntellectualObjectModel(
@@ -90,25 +135,7 @@ class SqlalchemyCatalog(Catalog):
             )
 
         for object_file in object.object_files:
-            checksum_models = []
-            for checksum in object_file.checksums:
-                checksum_models.append(ChecksumModel(
-                    algorithm=checksum.algorithm,
-                    digest=checksum.digest,
-                    created_at=checksum.created_at
-                ))
-            object_file_model = ObjectFileModel(
-                identifier=str(object_file.identifier),
-                name=object_file.name,
-                file_format=object_file.file_format,
-                file_function=object_file.file_function,
-                size=object_file.size,
-                digest=object_file.digest,
-                created_at=object_file.created_at,
-                last_fixity_check=object_file.last_fixity_check
-            )
-            for checksum_model in checksum_models:
-                object_file_model.checksums.append(checksum_model)
+            object_file_model = SqlalchemyCatalog.object_file_to_model(object_file)
             object_inst.object_files.append(object_file_model)
 
         self.session.add_all([object_inst])
@@ -126,27 +153,8 @@ class SqlalchemyCatalog(Catalog):
 
             object_files: list[ObjectFile] = []
             for object_file_model in result.object_files:
-                checksums: list[Checksum] = []
-                for checksum_model in object_file_model.checksums:
-                    checksums.append(
-                        Checksum(
-                            algorithm=checksum_model.algorithm,
-                            digest=checksum_model.digest,
-                            created_at=checksum_model.created_at.replace(tzinfo=UTC)
-                        )
-                    )
                 object_files.append(
-                    ObjectFile(
-                        identifier=UUID(object_file_model.identifier),
-                        name=object_file_model.name,
-                        file_format=object_file_model.file_format,
-                        file_function=object_file_model.file_function,
-                        size=object_file_model.size,
-                        digest=object_file_model.digest,
-                        created_at=object_file_model.created_at.replace(tzinfo=UTC),
-                        last_fixity_check=object_file_model.last_fixity_check.replace(tzinfo=UTC),
-                        checksums=checksums
-                    )
+                    SqlalchemyCatalog.model_to_object_file(object_file_model)
                 )
 
             object = IntellectualObject(
