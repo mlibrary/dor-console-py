@@ -46,15 +46,8 @@ class IntellectualObject(Base):
     title: Mapped[str] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String, nullable=True)
 
-    filesets = relationship(
-        "IntellectualObject", 
-        primaryjoin=(
-            (foreign(identifier) == remote(bin_identifier)) &
-            (remote(type) == "types:fileset")
-        ),
-        uselist=True,
-        viewonly=True,
-        lazy='selectin',
+    file_sets: Mapped[List["FileSet"]] = relationship(
+        back_populates="intellectual_object", cascade="all, delete-orphan", passive_deletes=True
     )
 
     object_files: Mapped[List["ObjectFile"]] = relationship(back_populates="intellectual_object", lazy="dynamic", cascade="all, delete", passive_deletes=True)
