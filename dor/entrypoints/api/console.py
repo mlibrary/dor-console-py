@@ -1,11 +1,10 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, Request, status
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from dor.entrypoints.api.dependencies import get_db_session
 from dor.services.catalog import catalog
-from dor.utils import converter
 
 console_router = APIRouter(prefix="/console")
 templates = Jinja2Templates(directory="templates")
@@ -34,14 +33,24 @@ async def get_objects(request: Request, start: int = 0, object_type: str = None,
 
 
 @console_router.get("/objects/{identifier}/")
-async def get_objects(request: Request, identifier: UUID, session=Depends(get_db_session)) -> JSONResponse:
+async def get_object(
+    request: Request, identifier: UUID, session=Depends(get_db_session)
+) -> HTMLResponse:
 
     object = catalog.objects.get(session=session, identifier=identifier)
 
-    # change to an HTMLResponse when we implement the detail view
-    return JSONResponse(status_code=status.HTTP_200_OK, content=converter.unstructure(
-        dict(
-            identifier=object.identifier,
-            title=object.title
-        ), dict
-    ))
+    if not object:
+        return HTMLResponse(status_code=status.HTTP_404_NOT_FOUND)
+
+    object_data = {
+        "title": object.title,
+        "identifier": object.identifier,
+        "alternate_identifier": object.alternate_identifiers,
+        "description": object.description,
+        "total_size": object.total_data_size,
+        "type": object.type
+    }
+
+    return templates.TemplateResponse(
+        request=request, name="object.html", context={"object": object_data}
+    )

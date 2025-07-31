@@ -1,6 +1,8 @@
+from uuid import UUID
 from dataclasses import dataclass
 
-from sqlalchemy import UUID, Select, func, select
+import sqlalchemy
+from sqlalchemy import Select, func, select
 from sqlalchemy.orm import Session
 
 from dor.models.collection import Collection
@@ -38,13 +40,16 @@ class ObjectsManager(Manager):
         query = query.join(CurrentRevision)
         return self._find(session=session, query=query, start=start, limit=limit)
 
-    def get(self, session: Session, identifier: UUID):
+    def get(self, session: Session, identifier: UUID) -> IntellectualObject | None:
         query = select(IntellectualObject)
         query = query.join(CurrentRevision)
         query = query.filter(IntellectualObject.identifier==identifier)
 
-        object = session.execute(query).scalar_one()
-        return object
+        try:
+            object = session.execute(query).scalar_one()
+            return object
+        except sqlalchemy.exc.NoResultFound:
+            return None
     
 
 @dataclass(kw_only=True)
