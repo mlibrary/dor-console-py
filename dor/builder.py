@@ -83,7 +83,6 @@ def build_intellectual_object(collid: str, manifest_data: dict, object_type: str
         file_set = FileSet(
             identifier=identifier,
             alternate_identifiers=alternate_identifier,
-            type="types:fileset",
             revision_number=1,
             created_at=created_at,
             title=manifest_data['label']

@@ -207,7 +207,6 @@ def filesets(identifier: uuid.UUID):
     table.add_column("identifier", no_wrap=True)
     table.add_column("alternate_identifiers", no_wrap=False)
     table.add_column("collections", no_wrap=False)
-    table.add_column("type", no_wrap=True)
     table.add_column("revision", no_wrap=True)
     table.add_column("created_at", no_wrap=True)
     table.add_column("size", no_wrap=True)
@@ -219,7 +218,6 @@ def filesets(identifier: uuid.UUID):
             str(file_set.identifier),
             file_set.alternate_identifiers,
             intellectual_object.collections_summary,
-            file_set.type,
             str(file_set.revision_number),
             file_set.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             str(file_set.total_data_size),
