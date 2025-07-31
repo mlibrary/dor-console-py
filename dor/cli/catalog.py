@@ -9,13 +9,11 @@ import sqlalchemy
 import typer
 from rich.table import Table
 from sqlalchemy import delete, select
-from sqlalchemy.orm import selectinload
 
 from dor.adapters.sqlalchemy import Base
 from dor.builder import build_collection, build_intellectual_object
 from dor.config import config
 from dor.models.collection import Collection
-from dor.models.file_set import FileSet
 from dor.models.intellectual_object import IntellectualObject, CurrentRevision
 from dor.utils import fetch
 
