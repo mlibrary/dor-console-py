@@ -84,8 +84,7 @@ def build_intellectual_object(collid: str, manifest_data: dict, object_type: str
             identifier=identifier,
             alternate_identifiers=alternate_identifier,
             revision_number=1,
-            created_at=created_at,
-            title=manifest_data['label']
+            created_at=created_at
         )
         file_set.object_files.extend(
             build_object_files_for_canvas(file_set, canvas)
