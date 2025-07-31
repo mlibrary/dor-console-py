@@ -18,7 +18,6 @@ class FileSet(Base):
     alternate_identifiers: Mapped[str] = mapped_column(String, nullable=True)
     revision_number: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    title: Mapped[str] = mapped_column(String, nullable=False)
 
     intellectual_object_id: Mapped[int] = mapped_column(
         ForeignKey("catalog_intellectual_object.id"), nullable=True, index=True

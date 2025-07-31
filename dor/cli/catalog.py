@@ -202,24 +202,24 @@ def filesets(identifier: uuid.UUID):
 
     table = Table(title="File Sets")
     table.add_column("bin", no_wrap=True)
+    table.add_column("object title", no_wrap=True)
     table.add_column("identifier", no_wrap=True)
     table.add_column("alternate_identifiers", no_wrap=False)
     table.add_column("collections", no_wrap=False)
     table.add_column("revision", no_wrap=True)
     table.add_column("created_at", no_wrap=True)
     table.add_column("size", no_wrap=True)
-    table.add_column("title", no_wrap=True)
     
     for file_set in intellectual_object.file_sets:
         table.add_row(
             str(intellectual_object.bin_identifier),
+            intellectual_object.title,
             str(file_set.identifier),
             file_set.alternate_identifiers,
             intellectual_object.collections_summary,
             str(file_set.revision_number),
             file_set.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             str(file_set.total_data_size),
-            file_set.title
         )
 
     console = config.console
