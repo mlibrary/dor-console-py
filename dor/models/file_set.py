@@ -16,6 +16,7 @@ class FileSet(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     identifier: Mapped[uuid.UUID] = mapped_column(Uuid, unique=False, index=True)
     alternate_identifiers: Mapped[str] = mapped_column(String, nullable=True)
+    title: Mapped[str] = mapped_column(String)
     revision_number: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 

@@ -80,14 +80,19 @@ def build_intellectual_object(collid: str, manifest_data: dict, object_type: str
         config.console.print(f":star2: processing {alternate_identifier}")
 
         created_at = fake.past_datetime(start_date="-20y")
+
+        file_set_object_files = build_object_files_for_canvas(identifier, created_at, canvas)
+        file_set_source_file = [
+            file_set_object_file for file_set_object_file in file_set_object_files
+            if file_set_object_file.file_function == "function:source"
+        ][0]
+
         file_set = FileSet(
             identifier=identifier,
             alternate_identifiers=alternate_identifier,
+            title=Path(file_set_source_file.identifier).name,
             revision_number=1,
             created_at=created_at
-        )
-        file_set.object_files.extend(
-            build_object_files_for_canvas(file_set, canvas)
         )
 
         file_set.premis_events.append(PremisEvent(
@@ -166,10 +171,12 @@ EXTENSIONS = {
     'image/tiff': 'tif'
 }
 
-def build_object_files_for_canvas(file_set: FileSet, canvas: dict):
+def build_object_files_for_canvas(
+    file_set_identifier: str, created_at: datetime, canvas: dict
+):
     object_files = []
 
-    object_identifier = file_set.identifier
+    object_identifier = file_set_identifier
     resource = canvas['images'][0]['resource']
     resource_id = Path(resource['service']['@id']).name
     mimetype = resource['format']
@@ -202,7 +209,6 @@ def build_object_files_for_canvas(file_set: FileSet, canvas: dict):
         event_file_identifier = f"{object_identifier}/metadata/{m_fn}.function:source.format:image.function:event.premis.xml"
         possibles.append((event_file_identifier, "application/xml", "function:event"))
 
-    created_at = file_set.created_at
     for file_identifier, file_format, file_function in possibles:
         digest = fake.sha256(raw_output=True)
         object_file = ObjectFile(
