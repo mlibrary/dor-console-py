@@ -5,6 +5,8 @@ from fastapi.templating import Jinja2Templates
 
 from dor.entrypoints.api.dependencies import get_db_session
 from dor.services.catalog import catalog
+from dor.utils import Page
+
 
 console_router = APIRouter(prefix="/console")
 templates = Jinja2Templates(directory="templates")
@@ -42,15 +44,17 @@ async def get_object(
     if not object:
         return HTMLResponse(status_code=status.HTTP_404_NOT_FOUND)
 
-    object_data = {
-        "title": object.title,
-        "identifier": object.identifier,
-        "alternate_identifier": object.alternate_identifiers,
-        "description": object.description,
-        "total_size": object.total_data_size,
-        "type": object.type
-    }
+    context = dict(
+        object=object,
+        filesets=Page(
+            items=object.filesets,
+            limit=100,
+            offset=0,
+            total_items=len(object.filesets)
+        ),
+        events=object.premis_events
+    )
 
     return templates.TemplateResponse(
-        request=request, name="object.html", context={"object": object_data}
+        request=request, name="object.html", context=context
     )
