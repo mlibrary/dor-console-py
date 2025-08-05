@@ -47,10 +47,10 @@ async def get_object(
     context = dict(
         object=object,
         filesets=Page(
-            items=object.filesets,
+            items=object.file_sets,
             limit=100,
             offset=0,
-            total_items=len(object.filesets)
+            total_items=len(object.file_sets)
         ),
         events=object.premis_events
     )
