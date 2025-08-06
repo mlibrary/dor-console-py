@@ -19,6 +19,7 @@ class FileSet(Base):
     title: Mapped[str] = mapped_column(String)
     revision_number: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    order_label: Mapped[str] = mapped_column(String)
 
     intellectual_object_id: Mapped[int] = mapped_column(
         ForeignKey("catalog_intellectual_object.id"), nullable=True, index=True

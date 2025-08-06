@@ -33,6 +33,18 @@ def build_collection(collection_data: dict, collection_type: str):
     return collection
 
 
+def make_order_label(label: str, index: int) -> str:
+    if label == "":
+        return f"#{index + 1}"
+
+    new_label = label
+    if new_label.startswith("Page "):
+        new_label = new_label.replace("Page ", "")
+    elif new_label.startswith("Scan "):
+        new_label = new_label.replace("Scan ", "")
+    return new_label
+
+
 def build_intellectual_object(collid: str, manifest_data: dict, object_type: str):
     identifier, alternate_identifier = extract_identifier(manifest_data['@id'])
 
@@ -72,21 +84,24 @@ def build_intellectual_object(collid: str, manifest_data: dict, object_type: str
     ))
 
     canvases = manifest_data['sequences'][0]['canvases']
-    for canvas in canvases:
+    for index, canvas in enumerate(canvases):
 
         # canvas ids are so weird
         canvas_id = canvas['@id'].split('/')[-3]
         identifier, alternate_identifier = extract_identifier(canvas_id)
         config.console.print(f":star2: processing {alternate_identifier}")
 
+        title = alternate_identifier.split(":")[-1]
         created_at = fake.past_datetime(start_date="-20y")
+        order_label = make_order_label(canvas["label"], index)
 
         file_set = FileSet(
             identifier=identifier,
             alternate_identifiers=alternate_identifier,
-            title=alternate_identifier.split(":")[-1],
+            title=title,
             revision_number=1,
-            created_at=created_at
+            created_at=created_at,
+            order_label=order_label
         )
 
         file_set.object_files.extend(build_object_files_for_canvas(file_set=file_set, canvas=canvas))
