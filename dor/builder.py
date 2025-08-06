@@ -34,14 +34,12 @@ def build_collection(collection_data: dict, collection_type: str):
 
 
 def make_order_label(label: str, index: int) -> str:
-    if label == "":
-        return f"#{index + 1}"
-
-    new_label = label
-    if new_label.startswith("Page "):
-        new_label = new_label.replace("Page ", "")
-    elif new_label.startswith("Scan "):
-        new_label = new_label.replace("Scan ", "")
+    if label.startswith("Page "):
+        new_label = label.replace("Page ", "")
+    elif label.startswith("Scan "):
+        new_label = label.replace("Scan ", "")
+    else:
+        new_label = f"#{index + 1}"
     return new_label
 
 
