@@ -39,13 +39,13 @@ To harvest data from DLXS:
 
 ```bash
 # harvest the whole collection
-$ uv run dor catalog collection <collid>
+$ uv run dor catalog collection <collid> --class [image|text]
 
 # harvest <limit>
-$ uv run dor catalog collection <collid> --limit <limit>
+$ uv run dor catalog collection <collid> --class [image|text] --limit <limit>
 
 # to specify an object_type (default: types:slide)
-$ uv run dor catalog collection <collid> --object_type page
+$ uv run dor catalog collection <collid> --class [text|image] --object_type page
 ```
 
 Harvesting uses data from the DLXS Image API so the data has the appearance of migrated data.
