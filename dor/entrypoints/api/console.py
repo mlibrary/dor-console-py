@@ -5,7 +5,6 @@ from fastapi.templating import Jinja2Templates
 
 from dor.entrypoints.api.dependencies import get_db_session
 from dor.services.catalog import catalog
-from dor.utils import Page
 
 
 console_router = APIRouter(prefix="/console")
@@ -36,7 +35,10 @@ async def get_objects(request: Request, start: int = 0, object_type: str = None,
 
 @console_router.get("/objects/{identifier}/")
 async def get_object(
-    request: Request, identifier: UUID, session=Depends(get_db_session)
+    request: Request,
+    identifier: UUID,
+    file_set_start: int = 0,
+    session=Depends(get_db_session)
 ) -> HTMLResponse:
 
     object = catalog.objects.get(session=session, identifier=identifier)
@@ -44,14 +46,13 @@ async def get_object(
     if not object:
         return HTMLResponse(status_code=status.HTTP_404_NOT_FOUND)
 
+    file_sets_page = catalog.file_sets.find(
+        session=session, object_identifier=identifier, start=file_set_start, limit=10
+    )
+
     context = dict(
         object=object,
-        filesets=Page(
-            items=object.file_sets,
-            limit=100,
-            offset=0,
-            total_items=len(object.file_sets)
-        ),
+        file_sets_page=file_sets_page,
         events=object.premis_events
     )
 
