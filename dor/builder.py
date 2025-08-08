@@ -12,7 +12,7 @@ from dor.models.collection import Collection
 from dor.models.premis_event import PremisEvent
 from dor.utils import fetch, create_uuid_from_string, extract_identifier
 from dor.models.intellectual_object import CurrentRevision, IntellectualObject
-from dor.models.file_set import FileSet
+from dor.models.fileset import Fileset
 from dor.models.object_file import ObjectFile
 
 fake = Faker()
@@ -93,7 +93,7 @@ def build_intellectual_object(collid: str, manifest_data: dict, object_type: str
         created_at = fake.past_datetime(start_date="-20y")
         order_label = make_order_label(canvas["label"], index)
 
-        file_set = FileSet(
+        fileset = Fileset(
             identifier=identifier,
             alternate_identifiers=alternate_identifier,
             title=title,
@@ -102,15 +102,15 @@ def build_intellectual_object(collid: str, manifest_data: dict, object_type: str
             order_label=order_label
         )
 
-        file_set.object_files.extend(build_object_files_for_canvas(file_set=file_set, canvas=canvas))
-        file_set.premis_events.append(PremisEvent(
+        fileset.object_files.extend(build_object_files_for_canvas(fileset=fileset, canvas=canvas))
+        fileset.premis_events.append(PremisEvent(
             identifier=uuid4(),
             type="ingestion start",
             date_time=(created_at - fake.time_delta(end_datetime='-30h')),
             detail=fake.catch_phrase(),
             outcome=fake.ipv6()
         ))
-        file_set.premis_events.append(PremisEvent(
+        fileset.premis_events.append(PremisEvent(
             identifier=uuid4(),
             type="ingestion end",
             date_time=created_at,
@@ -118,7 +118,7 @@ def build_intellectual_object(collid: str, manifest_data: dict, object_type: str
             outcome=fake.ipv6()
         ))
 
-        intellectual_object.file_sets.append(file_set)
+        intellectual_object.filesets.append(fileset)
 
     return intellectual_object
 
@@ -179,10 +179,10 @@ EXTENSIONS = {
     'image/tiff': 'tif'
 }
 
-def build_object_files_for_canvas(file_set: FileSet, canvas: dict):
+def build_object_files_for_canvas(fileset: Fileset, canvas: dict):
     object_files = []
 
-    object_identifier = file_set.identifier
+    object_identifier = fileset.identifier
     resource = canvas['images'][0]['resource']
     resource_id = Path(resource['service']['@id']).name
     mimetype = resource['format']
@@ -215,7 +215,7 @@ def build_object_files_for_canvas(file_set: FileSet, canvas: dict):
         event_file_identifier = f"{object_identifier}/metadata/{m_fn}.function:source.format:image.function:event.premis.xml"
         possibles.append((event_file_identifier, "application/xml", "function:event"))
 
-    created_at = file_set.created_at
+    created_at = fileset.created_at
     for file_identifier, file_format, file_function in possibles:
         digest = fake.sha256(raw_output=True)
         object_file = ObjectFile(

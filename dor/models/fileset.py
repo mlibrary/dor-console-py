@@ -11,8 +11,8 @@ from dor.adapters.sqlalchemy import Base
 from dor.models.object_file import ObjectFile
 
 
-class FileSet(Base):
-    __tablename__ = "catalog_file_set"
+class Fileset(Base):
+    __tablename__ = "catalog_fileset"
     id: Mapped[int] = mapped_column(primary_key=True)
     identifier: Mapped[uuid.UUID] = mapped_column(Uuid, unique=False, index=True)
     alternate_identifiers: Mapped[str] = mapped_column(String, nullable=True)
@@ -25,9 +25,9 @@ class FileSet(Base):
         ForeignKey("catalog_intellectual_object.id"), nullable=True, index=True
     )
 
-    intellectual_object: Mapped["IntellectualObject"] = relationship(back_populates="file_sets")
-    object_files: Mapped[List[ObjectFile]] = relationship(back_populates="file_set", lazy="dynamic")
-    premis_events: Mapped[List["PremisEvent"]] = relationship(back_populates="file_set")
+    intellectual_object: Mapped["IntellectualObject"] = relationship(back_populates="filesets")
+    object_files: Mapped[List[ObjectFile]] = relationship(back_populates="fileset", lazy="dynamic")
+    premis_events: Mapped[List["PremisEvent"]] = relationship(back_populates="fileset")
 
     __table_args__ = (
         UniqueConstraint('identifier', 'revision_number', name='uq_fileset_revision'),

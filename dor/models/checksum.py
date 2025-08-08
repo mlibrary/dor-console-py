@@ -18,7 +18,7 @@ class Checksum(Base):
         LargeBinary(32), unique=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    file_set_file_id: Mapped[int] = mapped_column(ForeignKey(
+    object_file_id: Mapped[int] = mapped_column(ForeignKey(
         "catalog_object_file.id", ondelete="CASCADE"), nullable=False, index=True)
 
     object_file: Mapped["ObjectFile"] = relationship(
