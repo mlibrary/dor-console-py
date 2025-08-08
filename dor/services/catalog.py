@@ -73,7 +73,8 @@ class CollectionsManager(Manager):
 class FileSetsManager(Manager):
 
     def find(
-        self, session: Session,
+        self,
+        session: Session,
         object_identifier: UUID,
         start: int = 0,
         limit: int = 100
