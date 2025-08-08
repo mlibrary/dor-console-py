@@ -28,8 +28,19 @@ async def get_objects(request: Request, start: int = 0, object_type: str = None,
 
     page = catalog.objects.find(session=session, start=start, object_type=object_type)
 
+    object_types = catalog.objects.get_types(session)
+    collection_titles = [
+        collection.title for collection in catalog.collections.get_all(session)
+    ]
+
+    context = {
+        "page": page,
+        "object_types": object_types,
+        "collection_titles": collection_titles
+    }
+
     return templates.TemplateResponse(
-        request=request, name="objects.html", context={"page": page}
+        request=request, name="objects.html", context=context
     )
 
 

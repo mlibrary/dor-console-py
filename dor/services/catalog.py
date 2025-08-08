@@ -51,6 +51,10 @@ class ObjectsManager(Manager):
             return object
         except sqlalchemy.exc.NoResultFound:
             return None
+
+    def get_types(self, session: Session) -> list[str]:
+        query = select(IntellectualObject.type).distinct()
+        return list(session.execute(query).scalars())
     
 
 @dataclass(kw_only=True)
@@ -60,6 +64,11 @@ class CollectionsManager(Manager):
         if collection_type:
             query = query.filter_by(type=collection_type)
         return self._find(session=session, query=query, start=start, limit=limit)
+
+    def get_all(self, session: Session) -> list[Collection]:
+        query = select(Collection)
+        collections = list(session.execute(query).scalars())
+        return collections
 
     def get(self, session: Session, identifier: UUID):
         query = select(Collection)
