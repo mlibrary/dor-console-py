@@ -8,7 +8,7 @@ from sqlalchemy.ext.mutable import MutableList
 
 from dor.adapters.sqlalchemy import Base
 # Something weird requiring us to import this
-from dor.models.file_set import FileSet
+from dor.models.fileset import Fileset
 
 
 class PremisEvent(Base):
@@ -28,12 +28,12 @@ class PremisEvent(Base):
         "catalog_intellectual_object.id", ondelete="CASCADE"), nullable=True, index=True)
     object_file_id: Mapped[int] = mapped_column(ForeignKey(
         "catalog_object_file.id", ondelete="CASCADE"), nullable=True, index=True)
-    file_set_id: Mapped[int] = mapped_column(
-        ForeignKey("catalog_file_set.id", ondelete="CASCADE"), nullable=True, index=True
+    fileset_id: Mapped[int] = mapped_column(
+        ForeignKey("catalog_fileset.id", ondelete="CASCADE"), nullable=True, index=True
     )
 
     intellectual_object: Mapped["IntellectualObject"] = relationship(
         back_populates="premis_events")
-    file_set: Mapped["FileSet"] = relationship(back_populates="premis_events")
+    fileset: Mapped["Fileset"] = relationship(back_populates="premis_events")
     object_file: Mapped["ObjectFile"] = relationship(
         back_populates="premis_events")

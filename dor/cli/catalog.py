@@ -200,7 +200,7 @@ def filesets(identifier: uuid.UUID):
         IntellectualObject.bin_identifier == identifier
     ).join(CurrentRevision).one()
 
-    table = Table(title="File Sets")
+    table = Table(title="Filesets")
     table.add_column("bin", no_wrap=True)
     table.add_column("object title", no_wrap=True)
     table.add_column("identifier", no_wrap=True)
@@ -212,18 +212,18 @@ def filesets(identifier: uuid.UUID):
     table.add_column("order_label", no_wrap=True)
     table.add_column("size", no_wrap=True)
     
-    for file_set in intellectual_object.file_sets:
+    for fileset in intellectual_object.filesets:
         table.add_row(
             str(intellectual_object.bin_identifier),
             intellectual_object.title,
-            str(file_set.identifier),
-            file_set.alternate_identifiers,
+            str(fileset.identifier),
+            fileset.alternate_identifiers,
             intellectual_object.collections_summary,
-            file_set.title,
-            str(file_set.revision_number),
-            file_set.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            file_set.order_label,
-            str(file_set.total_data_size),
+            fileset.title,
+            str(fileset.revision_number),
+            fileset.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            fileset.order_label,
+            str(fileset.total_data_size),
         )
 
     console = config.console

@@ -6,7 +6,7 @@ from sqlalchemy import Select, func, select
 from sqlalchemy.orm import Session
 
 from dor.models.collection import Collection
-from dor.models.file_set import FileSet
+from dor.models.fileset import Fileset
 from dor.models.intellectual_object import CurrentRevision, IntellectualObject
 from dor.utils import Page
 
@@ -70,7 +70,7 @@ class CollectionsManager(Manager):
 
 
 @dataclass(kw_only=True)
-class FileSetsManager(Manager):
+class FilesetsManager(Manager):
 
     def find(
         self,
@@ -79,7 +79,7 @@ class FileSetsManager(Manager):
         start: int = 0,
         limit: int = 100
     ):
-        query = select(FileSet) \
+        query = select(Fileset) \
             .join(IntellectualObject) \
             .join(CurrentRevision) \
             .filter(IntellectualObject.identifier==object_identifier)
@@ -89,10 +89,10 @@ class FileSetsManager(Manager):
 class Catalog:
     objects: ObjectsManager
     collections: CollectionsManager
-    file_sets: FileSetsManager
+    filesets: FilesetsManager
 
 catalog = Catalog(
     objects=ObjectsManager(),
     collections=CollectionsManager(),
-    file_sets=FileSetsManager()
+    filesets=FilesetsManager()
 )
