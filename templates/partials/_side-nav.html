@@ -1,0 +1,20 @@
+<aside class="page-aside">
+    {% set side_nav_items = [
+      {'name': 'Dashboard', 'page': 'dashboard', 'url': '/admin/console/'}, 
+      {'name': 'Objects', 'page': 'objects', 'url': '/admin/console/objects/'}, 
+      {'name': 'Collections', 'page': 'collections', 'url': '/admin/console/collections/'}, 
+      {'name': 'Files', 'page': 'files', 'url': '/admin/console/files/'}, 
+      {'name': 'Storage', 'page': 'storage', 'url': '/admin/console/storage/'}, 
+      {'name': 'PREMIS events', 'page': 'premis', 'url': '/admin/console/premis/'}, 
+      {'name': 'Settings', 'page': 'settings', 'url': '/admin/console/settings/'}
+      ] %} 
+      <nav aria-label="Site navigation" class="side-nav">
+        <ul>
+          {%- for item in side_nav_items %}
+            <li {% if page_title == item.name %} class="active-side-nav-page" {% endif %}>
+              <a href="{{ item.url }}">{{ item.name }}</a>
+            </li>
+          {%- endfor %}
+        </ul>
+      </nav>
+</aside>

@@ -1,37 +1,92 @@
+{% extends "base.html" %}
+{% set page_name = 'objects' %}
+{% set page_title = 'Objects' %}
+
 {% block content %}
+
+<div class="flex-layout">
+{% include '/partials/_side-nav.html' %}
+<div class="main-content">
+<h1 class="title"> {{ page_title }}</h1>
+  <p class="mb-2">View a list of the content objects. Click into an object's title to see more details about its contents.</p>
+
+  <form>
+    <h3 class="subtle-heading">Filter by</h3>
+    <div class="input-group-inline">
+      <div class="input-container">
+        <label class="select-label" for="type-select">Type</label>
+          <select id="type-select" class="select">
+              <option value="">Select Type</option>
+               <option value="slide">Slide</option>
+          </select>
+      </div>
+        
+        <div class="input-container">
+            <label class="select-label" for="alt-id-select">Alt ID</label>
+            <select id="alt-id-select" class="select">
+                <option value="">Select Alt ID</option>
+                <option value="12345">12345</option>
+            </select>
+        </div>
+        
+        <div class="input-container">
+            <label class="select-label" for="collection-select">Collection</label>
+            <select id="collection-select" class="select">
+                <option value="">Select Collection</option>
+                <option value="apis">apis</option>
+            </select>
+        </div>
+     <button type="submit" class="button button--primary">Apply filters</button>
+  </div>
+
+  <div class="tag-group">
+  <button class="tag"><span>Category: Option</span>
+  <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 0 24 24" width="20px" fill="#212B36">
+    <path d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />
+  </svg>
+  </button>
+  <button class="tag"><span>Category: Option</span>
+  <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 0 24 24" width="20px" fill="#212B36">
+    <path d="M0 0h24v24H0z" fill="none" />
+    <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />
+  </svg>
+  </button>
+  <button class="button--clear">Clear all active filters</button>
+  </div>
+ </form>
+
 <p>
   Showing {{ page.range }} of {{ page.total_items }} of Intellectual Objects.
 </p>
-<table>
+<div class="table-wrapper">
+<table class="m-table objects-table">
   <thead>
-    <tr>
-      <td>Bin</td>
-      <td>Identifier</td>
-      <td>Alternate Identifiers</td>
-      <td>Type</td>
-      <td>Revision</td>
-      <td>Collections</td>
-      <td>Updated</td>
-      <td>Title</td>
-      <td># Filesets</td>
-      <td>Size</td>
+    <tr>    
+      <th scope="col">Title</td>
+      <th scope="col">Alternate Identifiers</td>
+      <th scope="col">Type</td>
+      <th scope="col">Collection</td>
+      <th scope="col">Size</td>
+      <th scope="col"># Filesets</td>
+      <th scope="col">Updated</td>
     </tr>
   </thead>
   <tbody>
     {% for item in page.items %}
     <tr>
-      <td>{{ item.bin_identifier }}</td>
-      <td>{{ item.identifier }}</td>
-      <td>{{ item.alternate_identifiers }}</td>
+      <th scope="row">{{ item.title }}</th>
+      <td><a href="{{ item.identifier }}">{{ item.alternate_identifiers }}</a></td>
       <td>{{ item.type }}</td>
-      <td>{{ item.revision_number }}</td>
       <td>{{ item.collections_summary }}</td>
-      <td>{{ item.updated_at }}</td>
-      <td>{{ item.title }}</td>
-      <td>{{ item.filesets|length }}</td>
       <td>{{ item.total_data_size }}</td>
+      <td>{{ item.file_sets|length }}</td>
+      <td>{{ item.updated_at.strftime("%Y-%m-%d %H:%M") }}</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+</div>
+</div>
+</div>
 {% endblock %}

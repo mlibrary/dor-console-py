@@ -1,0 +1,328 @@
+/*
+==================================================
+  DOR CONSOLE - STYLESHEET
+==================================================
+
+Table of Contents:
+1. Typography
+2. Layouts
+3. Pages 
+4. Components
+5. Utilities
+
+==================================================
+*/
+
+/* 1. Typography */
+
+h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.mono {
+  font-family: monospace;
+}
+
+/* 2. Layouts */
+
+.container {
+  margin-top: 2.5rem;
+  margin-bottom: 3rem;
+}
+
+.flex-layout {
+  display: flex;
+  flex-flow: row;
+  gap: 3rem;
+  justify-content: start;
+  align-items: stretch;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Layout for Object page */
+.object-flex-layout {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 3rem;
+}
+
+.object-flex-layout > :first-child {
+  min-width: 65%;
+}
+
+/* Layout for entire site- kees footer anchored to bottom */
+.page-container {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+} 
+
+/* 3. Pages */
+/* Objects Page */
+
+.back-link {
+  display: flex;
+  color: var(--color-teal-400);
+  margin: 1rem 0 3rem;
+}
+
+/* 4. Components */
+
+/* Inputs */
+
+.input-group-inline {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  color: var(--color-neutral-300);
+  font-size: 1rem;
+  display: block;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Select */
+:root {
+  --icon-arrow-down: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z"/></svg>');
+}
+
+select {
+  min-width: 28ch;
+  padding: 0 1.75rem 0 1.5rem;
+  height: 44px;
+  font-size: 1rem;
+  font-family: var(--font-base-family);
+  color: #262626;
+  line-height: 1.5;
+  box-shadow: none;
+  cursor: pointer;
+  max-width: 100%;
+  border: solid 1px var(--color-neutral-200);
+  border-radius: 2px;
+  text-overflow: ellipsis;
+  background-color: white;
+  background-image: var(--icon-arrow-down);
+  background-repeat: no-repeat;
+  background-size: 1rem 1rem;
+  background-position: center right 0.5rem;
+  appearance: none;
+}
+
+/* Side Nav */
+
+aside.page-aside {
+   flex: 0 0 175px;
+}
+
+.side-nav {
+  position: sticky;
+  top: 1.5rem;
+}
+
+.side-nav ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0;
+ }
+ 
+ .side-nav li {
+   display: block;
+ }
+ 
+ .side-nav li a {
+   color: var(--color-neutral-400);
+   text-decoration: none;
+   display: block;
+   padding: 1rem 0 1rem 1rem;
+ }
+
+ .side-nav ul li:first-child > a {
+   padding-top: 0;
+ } 
+ 
+  .side-nav li a :hover {
+     text-decoration: underline;
+     text-decoration-thickness: 0.125rem;
+  }
+
+ .side-nav li:not(:last-child){
+  border-bottom: solid 1px var(--color-neutral-100);
+}
+ 
+ .side-nav li.active-side-nav-page a {
+   color: var(--color-teal-400);
+   font-weight: var(--bold);
+   border-left: solid 4px var(--color-teal-400);
+ }
+
+ /* Details */
+
+details > summary::before {
+  font-family: "Material Symbols Rounded";
+  font-size: 24px;
+  content: "\e313";
+  color: var(--color-teal-400);
+}
+
+details[open] > summary::before {
+  font-family: "Material Symbols Rounded";
+  content: "\e316";
+  color: var(--color-teal-400);
+}
+
+details > summary::marker {
+  display: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0 .5rem;
+  border-left: 2px solid transparent;
+  padding: 0.25em 0.5em;
+  list-style: none;
+  cursor: pointer;
+  border-top: solid 1px var(--color-neutral-100);
+  border-bottom: solid 1px var(--color-neutral-100);
+}
+
+details[open] > summary:first-of-type {
+  font-weight: var(--semibold);
+  color: var(--color-teal-400);
+  border-left: 2px solid var(--color-teal-400);
+  padding: 0.25em 0.5em;
+}
+
+.details-contents-wrapper {
+  padding: 0 2rem;
+}
+
+.order-label {
+  background-color: var(--color-maize-100);
+  border-radius: 4;
+  padding: .25rem .5rem;
+}
+
+/* Tables */
+
+/*
+.table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+  max-width: 100vw;
+}
+  */
+
+table.m-table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.m-table > thead > tr > th {
+  white-space: nowrap;
+}
+
+.m-table  caption,
+.m-table th {
+  text-align: left;
+}
+.m-table  caption {
+  color: var(--color-neutral-300);
+}
+.m-table tr > * {
+  border-bottom: solid 1px var(--color-neutral-100);
+  padding: var(--space-medium) 0;
+  vertical-align: top;
+}
+.m-table tr > *:not(:last-child) {
+  padding-right: var(--space-x-large);
+}
+.m-table.objects-table td:first-child,
+.m-table.objects-table th:first-child {
+  width: 300px; 
+  min-width: 300px; 
+}
+
+.m-table th[scope^="col"] {
+  font-weight: var(--extrabold);
+  vertical-align: middle;
+}
+
+.m-table th[scope^="row"] {
+  font-weight: 400;
+  width: 25px;
+}
+
+.m-table  td {
+  vertical-align: middle;
+}
+.m-table thead {
+  border-bottom: solid var(--space-xxx-small) var(--color-maize-400);
+}
+
+.m-table tbody > tr:nth-child(even) {
+  background-color: var(--color-blue-100);
+}
+
+.m-table td:first-child,
+.m-table th:first-child {
+  padding-left: var(--space-medium); 
+}
+
+.m-table td:last-child,
+.m-table th:last-child {
+  padding-right: var(--space-medium);
+}
+
+/* 5. Utilities */
+
+/* Margin */
+.m-0 { margin: 0; }
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+
+/* Padding */
+.p-0 { padding: 0; }
+.p-1 { padding: 1rem; }
+.pt-1 { padding: 1rem; }
+.pb-1 { padding: 1rem; }
+
+/* Display */
+.block { display: block; }
+.inline { display: inline; }
+.inline-block { display: inline-block; }
+.flex { display: flex; }
+.grid { display: grid; }
+.hidden { display: none; }

@@ -1,3 +1,120 @@
+{% extends "base.html" %}
+
 {% block content %}
-<h1>{{ object.title }}</h1>
+
+<div class="back-link">
+<span class="material-symbols-rounded">chevron_backward</span>
+<a href="../">Back to objects</a>
+</div>
+
+<p class="subtle-heading">Object</p>
+
+<h1 class="mb-2">{{ object.title }}</h1>
+
+<div class="object-flex-layout">
+<section>
+<h2>About this object</h2>
+<dl class="object-list">
+  <dt>Identifier</dt>
+  <dd>{{ object.identifier }}</dd>
+
+  <dt>Alternate identifier</dt>
+  <dd>{{ object.alternate_identifiers }}</dd>
+
+  <dt>Description</dt>
+  <dd>{{ object.description }}</dd>
+
+  <dt>Date ingested:</dt>
+  <dd>{{ object.created_at }}</dd>
+
+  <dt>Total size: </dt>
+  <dd>{{ object.total_data_size }}</dd>
+
+  <dt>Number of filesets:</dt>
+  <dd>{{ object.file_sets|length }}</dd>
+
+  <dt>Number of files:</dt>
+  <dd></dd>
+
+  <dt>Type</dt>
+  <dd>{{ object.type }}</dd>
+
+  <dt>Revisions</dt>
+  <dd>{{ object.revision_number}}</dd>
+</dl>
+
+<button class="button button--link">View source metadata</button>
+</section>
+<section>
+<h2>Object event history</h2>
+</section>
+</div>
+
+<h2>Object descriptor and metadata</h2>
+<div class="table-wrapper">
+<table class="m-table">
+  <thead>
+    <tr>
+      <th>File name</td>
+      <th>Size</td>
+      <th>Action</td>
+    </tr>
+  </thead>
+  <tbody>
+   <!--Add table loop--> 
+    <tr>
+      <td class="mono">hereisafakefilename0000.jpg</td>
+      <td>1GB</td>
+      <td>Download file</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<button class="button button--ghost">View metadata files (PREMIS, json)</button>
+
+<h2>Source Files</h2>
+<p>A list of the data source files in this object. Select one to view details about the entire fileset associated with it, including service files, descriptor files, and event metadata. </p>
+<!--Add the source file loop-->
+<details>
+  <summary class="mono">source file name <span class="order-label">#</span></summary>
+  <div class="details-contents-wrapper">
+    <h3>About this fileset</h3>
+    <dl>
+      <dt>Total size:</dt>
+      <dd></dd>
+      <dt>Type:</dt>
+      <dd></dd>
+      <dt>Ingested:</dt>
+      <dd></dd>
+      <dt>Last fixity:</dt>
+      <dd></dd>
+    </dl>
+    <h3>Fileset contents</h3>
+    <div class="table-wrapper">
+    <table class="m-table">
+      <thead>
+        <tr>
+          <th>File name</td>
+          <th>Size</td>
+          <th>Action</td>
+        </tr>
+      </thead>
+      <tbody>
+      <!--Add table loop--> 
+        <tr>
+          <td class="mono">hereisafakefilename0000.jpg</td>
+          <td>1GB</td>
+          <td>Download file</td>
+        </tr>
+      </tbody>
+    </table>
+    <button class="button button--ghost mb-2">View descriptor and metadata files</button>
+    </div>
+    <button class="button button--secondary">Download fileset</button>
+  </div>
+</details>
+
+<h2>Actions</h2>
+<button class="button button--primary">Download object</button>
+<button class="button button--delete">Delete object</button>
 {% endblock %}
