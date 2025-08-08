@@ -1,29 +1,41 @@
+{% extends "base.html" %}
+{% set page_name = 'collections' %}
+{% set page_title = 'Collections' %}
+
 {% block content %}
+<div class="flex-layout">
+{% include '/partials/_side-nav.html' %}
+<div class="content">
+  <h1 class="title"> {{ page_title }} </h1>
 <p>
   Showing {{ page.range }} of {{ page.total_items }} of Collections.
 </p>
-<table>
+<div class="table-wrapper">
+<table class="m-table">
   <thead>
     <tr>
-      <td>Identifier</td>
-      <td>Alternate Identifiers</td>
-      <td>Type</td>
-      <td>Created</td>
-      <td>Updated</td>
-      <td>Title</td>
+      <th scope="col">Title</th>
+      <th scope="col">Identifier</th>
+      <th scope="col">Alternate Identifiers</th>
+      <th scope="col">Type</th>
+      <th scope="col">Created</th>
+      <th scope="col">Updated</th>
     </tr>
   </thead>
   <tbody>
     {% for item in page.items %}
     <tr>
+      <td>{{ item.title }}</td>
       <td>{{ item.identifier }}</td>
       <td>{{ item.alternate_identifiers }}</td>
       <td>{{ item.type }}</td>
       <td>{{ item.created_at }}</td>
       <td>{{ item.updated_at }}</td>
-      <td>{{ item.title }}</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+</div>
+</div>
+</div>
 {% endblock %}
