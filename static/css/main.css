@@ -16,8 +16,13 @@ Table of Contents:
 /* 1. Typography */
 
 h2 {
-  font-size: 28px;
+  font-size: 1.75rem;
   font-weight: 600;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 400;
 }
 
 .mono {
@@ -216,6 +221,10 @@ details[open] > summary:first-of-type {
   padding: 0.25em 0.5em;
 }
 
+.details-contents-wrapper {
+  padding: 0 2rem;
+}
+
 .order-label {
   background-color: var(--color-maize-100);
   border-radius: 4;
@@ -258,8 +267,8 @@ table.m-table {
 .m-table tr > *:not(:last-child) {
   padding-right: var(--space-x-large);
 }
-.m-table td:first-child,
-.m-table th:first-child {
+.m-table.objects-table td:first-child,
+.m-table.objects-table th:first-child {
   width: 300px; 
   min-width: 300px; 
 }

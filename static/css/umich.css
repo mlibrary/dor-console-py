@@ -136,14 +136,10 @@ a:hover {
 
 h1 {
     font-size: 2rem;
-    line-height: var(--line-height-page-heading);
+    line-height: 1.25;
     margin: 0;
 }
 
-h3 {
-    font-size: var(--text-small);
-    font-weight: var(--bold);
-}
 .subtle-heading {
     color: var(--color-neutral-300);
     letter-spacing: 1.25px;

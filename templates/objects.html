@@ -60,11 +60,10 @@
   Showing {{ page.range }} of {{ page.total_items }} of Intellectual Objects.
 </p>
 <div class="table-wrapper">
-<table class="m-table">
+<table class="m-table objects-table">
   <thead>
     <tr>    
       <th scope="col">Title</td>
-      <th scope="col">Identifier</td>
       <th scope="col">Alternate Identifiers</td>
       <th scope="col">Type</td>
       <th scope="col">Collection</td>
@@ -77,13 +76,12 @@
     {% for item in page.items %}
     <tr>
       <th scope="row">{{ item.title }}</th>
-      <td>{{ item.alternate_identifiers }}</td>
-      <td><a href="{{ item.identifier }}">{{ item.identifier }}</a></td>
+      <td><a href="{{ item.identifier }}">{{ item.alternate_identifiers }}</a></td>
       <td>{{ item.type }}</td>
       <td>{{ item.collections_summary }}</td>
       <td>{{ item.total_data_size }}</td>
       <td>{{ item.file_sets|length }}</td>
-      <td>{{ item.updated_at }}</td>
+      <td>{{ item.updated_at.strftime("%Y-%m-%d %H:%M") }}</td>
     </tr>
     {% endfor %}
   </tbody>
