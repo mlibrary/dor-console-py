@@ -37,7 +37,7 @@ async def get_objects(request: Request, start: int = 0, object_type: str = None,
 async def get_object(
     request: Request,
     identifier: UUID,
-    file_set_start: int = 0,
+    fileset_start: int = 0,
     session=Depends(get_db_session)
 ) -> HTMLResponse:
 
@@ -46,13 +46,13 @@ async def get_object(
     if not object:
         return HTMLResponse(status_code=status.HTTP_404_NOT_FOUND)
 
-    file_sets_page = catalog.file_sets.find(
-        session=session, object_identifier=identifier, start=file_set_start, limit=10
+    filesets_page = catalog.filesets.find(
+        session=session, object_identifier=identifier, start=fileset_start, limit=10
     )
 
     context = dict(
         object=object,
-        file_sets_page=file_sets_page,
+        filesets_page=filesets_page,
         events=object.premis_events
     )
 

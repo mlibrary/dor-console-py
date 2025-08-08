@@ -46,7 +46,7 @@ class IntellectualObject(Base):
     title: Mapped[str] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String, nullable=True)
 
-    file_sets: Mapped[List["FileSet"]] = relationship(
+    filesets: Mapped[List["Fileset"]] = relationship(
         back_populates="intellectual_object", cascade="all, delete-orphan", passive_deletes=True
     )
 
@@ -72,7 +72,7 @@ class IntellectualObject(Base):
     @hybrid_property
     def total_data_size(self):
         return sum(
-            (f.total_data_size for f in self.file_sets),
+            (f.total_data_size for f in self.filesets),
             start=Decimal("0")
         )
 
