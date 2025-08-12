@@ -22,7 +22,6 @@ class PremisEvent(Base):
     outcome: Mapped[str] = mapped_column(String, nullable=True)
     outcome_detail_note: Mapped[str] = mapped_column(String, nullable=True)
     linking_agent: Mapped[str] = mapped_column(String, nullable=True)
-    linking_agent: Mapped[str] = mapped_column(String, nullable=True)
 
     intellectual_object_id: Mapped[int] = mapped_column(ForeignKey(
         "catalog_intellectual_object.id", ondelete="CASCADE"), nullable=True, index=True)
