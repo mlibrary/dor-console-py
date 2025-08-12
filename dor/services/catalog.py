@@ -34,11 +34,24 @@ class Manager:
 
 @dataclass(kw_only=True)
 class ObjectsManager(Manager):
-    def find(self, session: Session, object_type: str = None, start: int = 0, limit: int = 100):
-        query = select(IntellectualObject).where(IntellectualObject.bin_identifier==IntellectualObject.identifier)
+
+    def find(
+        self,
+        session: Session,
+        object_type: str | None = None,
+        collection_title: str | None = None,
+        start: int = 0,
+        limit: int = 100
+    ):
+        query = select(IntellectualObject) \
+            .join(Collection, IntellectualObject.collections) \
+            .join(CurrentRevision) \
+            .where(IntellectualObject.bin_identifier==IntellectualObject.identifier)
         if object_type:
-            query = query.filter_by(type=object_type)
-        query = query.join(CurrentRevision)
+            query = query.filter(IntellectualObject.type == object_type)
+        if collection_title:
+            query = query.filter(Collection.title == collection_title)
+
         return self._find(session=session, query=query, start=start, limit=limit)
 
     def get(self, session: Session, identifier: UUID) -> IntellectualObject | None:

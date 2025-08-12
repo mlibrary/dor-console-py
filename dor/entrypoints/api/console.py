@@ -1,4 +1,7 @@
+from dataclasses import dataclass
+from urllib.parse import urlencode
 from uuid import UUID
+
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -23,20 +26,47 @@ async def get_collections(request: Request, start: int = 0, collection_type: str
     )
 
 
-@console_router.get("/objects/")
-async def get_objects(request: Request, start: int = 0, object_type: str = None, session=Depends(get_db_session)) -> HTMLResponse:
+@dataclass
+class FilterLabel:
+    title: str
+    remove_url: str
 
-    page = catalog.objects.find(session=session, start=start, object_type=object_type)
+
+@console_router.get("/objects/")
+async def get_objects(
+    request: Request,
+    start: int = 0,
+    object_type: str | None = None,
+    collection_title: str | None = None,
+    session=Depends(get_db_session)
+) -> HTMLResponse:
+
+    page = catalog.objects.find(
+        session=session, start=start, object_type=object_type, collection_title=collection_title
+    )
 
     object_types = catalog.objects.get_types(session)
     collection_titles = [
         collection.title for collection in catalog.collections.get_all(session)
     ]
 
+    labels: list[FilterLabel] = []
+    if object_type:
+        remove_url = "?" + (urlencode({"collection_title": collection_title}) if collection_title else "")
+        labels.append(FilterLabel(
+            title=f'Object Type: "{object_type}"', remove_url=remove_url
+        ))
+    if collection_title:
+        remove_url = "?" + (urlencode({"object_type": object_type}) if object_type else "")
+        labels.append(FilterLabel(
+            title=f'Collection: "{collection_title}"', remove_url=remove_url
+        ))
+
     context = {
         "page": page,
         "object_types": object_types,
-        "collection_titles": collection_titles
+        "collection_titles": collection_titles,
+        "filter_labels": labels
     }
 
     return templates.TemplateResponse(
