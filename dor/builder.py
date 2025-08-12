@@ -66,19 +66,23 @@ def build_intellectual_object(collid: str, manifest_data: dict, object_type: str
         intellectual_object_identifier=intellectual_object.identifier
     )
     intellectual_object.object_files.extend(build_object_files_for_intellectual_object(intellectual_object))
+
+    linking_agent = fake.email()
     intellectual_object.premis_events.append(PremisEvent(
         identifier=uuid4(),
         type="ingestion start",
-        date_time=(created_at - fake.time_delta(end_datetime='-30h')),
+        date_time=(created_at + fake.time_delta(end_datetime='-30h')),
         detail=fake.catch_phrase(),
-        outcome=fake.ipv6()
+        outcome=fake.ipv6(),
+        linking_agent=linking_agent
     ))
     intellectual_object.premis_events.append(PremisEvent(
         identifier=uuid4(),
         type="ingestion end",
         date_time=created_at,
         detail=fake.catch_phrase(),
-        outcome=fake.ipv6()
+        outcome=fake.ipv6(),
+        linking_agent=linking_agent
     ))
 
     canvases = manifest_data['sequences'][0]['canvases']
