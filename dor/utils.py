@@ -115,3 +115,9 @@ converter.register_structure_hook(
 
 converter.register_unstructure_hook(UUID, lambda u: str(u))
 converter.register_structure_hook(UUID, lambda u, UUID: UUID(u))
+
+
+def remove_parameter(
+    current_params: dict[str, str], key_to_remove: str
+) -> dict[str, str]:
+    return { k: v for k, v in current_params.items() if k != key_to_remove }
