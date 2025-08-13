@@ -37,12 +37,17 @@ async def get_objects(
     request: Request,
     start: int = 0,
     object_type: str | None = None,
+    alt_identifier: str | None = None,
     collection_title: str | None = None,
     session=Depends(get_db_session)
 ) -> HTMLResponse:
 
     page = catalog.objects.find(
-        session=session, start=start, object_type=object_type, collection_title=collection_title
+        session=session,
+        start=start,
+        object_type=object_type,
+        alt_identifier=alt_identifier,
+        collection_title=collection_title
     )
 
     object_types = catalog.objects.get_types(session)
