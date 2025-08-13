@@ -39,7 +39,7 @@ async def get_objects(
     start: int = 0,
     object_type: str | None = None,
     alt_identifier: str | None = None,
-    collection_title: str | None = None,
+    collection_alt_identifier: str | None = None,
     session=Depends(get_db_session)
 ) -> HTMLResponse:
 
@@ -48,12 +48,12 @@ async def get_objects(
         start=start,
         object_type=object_type,
         alt_identifier=alt_identifier,
-        collection_title=collection_title
+        collection_alt_identifier=collection_alt_identifier
     )
 
     object_types = catalog.objects.get_types(session)
-    collection_titles = [
-        collection.title for collection in catalog.collections.get_all(session)
+    collection_alt_identifiers = [
+        collection.alternate_identifiers for collection in catalog.collections.get_all(session)
     ]
 
     labels: list[FilterLabel] = []
@@ -61,13 +61,13 @@ async def get_objects(
     filter_titles = {
         "object_type": "Object Type",
         "alt_identifier": "Alternate Identifier",
-        "collection_title": "Collection"
+        "collection_alt_identifier": "Collection"
     }
 
     query_params = {
         "object_type": object_type,
         "alt_identifier": alt_identifier,
-        "collection_title": collection_title
+        "collection_alt_identifier": collection_alt_identifier
     }
     active_query_parameters = { k: v for k, v in query_params.items() if v }
 
@@ -80,7 +80,7 @@ async def get_objects(
     context = {
         "page": page,
         "object_types": object_types,
-        "collection_titles": collection_titles,
+        "collection_alt_identifiers": collection_alt_identifiers,
         "filter_labels": labels
     }
 

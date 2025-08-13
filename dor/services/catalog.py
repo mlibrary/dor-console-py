@@ -40,7 +40,7 @@ class ObjectsManager(Manager):
         session: Session,
         object_type: str | None = None,
         alt_identifier: str | None = None,
-        collection_title: str | None = None,
+        collection_alt_identifier: str | None = None,
         start: int = 0,
         limit: int = 100
     ):
@@ -53,8 +53,8 @@ class ObjectsManager(Manager):
         if alt_identifier:
             # What happens if alternate_identifiers looks like id_one,id_two?
             query = query.filter(IntellectualObject.alternate_identifiers.startswith(alt_identifier))
-        if collection_title:
-            query = query.filter(Collection.title == collection_title)
+        if collection_alt_identifier:
+            query = query.filter(Collection.alternate_identifiers == collection_alt_identifier)
 
         return self._find(session=session, query=query, start=start, limit=limit)
 

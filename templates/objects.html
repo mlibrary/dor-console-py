@@ -30,10 +30,10 @@
 
       <div class="input-container">
         <label class="select-label" for="collection-select">Collection</label>
-        <select id="collection-select" class="select" name="collection_title">
+        <select id="collection-select" class="select" name="collection_alt_identifier">
           <option value="">Select Collection</option>
-          {% for collection_title in collection_titles %}
-          <option value="{{ collection_title }}">{{ collection_title }}</option>
+          {% for collection_alt_identifier in collection_alt_identifiers %}
+          <option value="{{ collection_alt_identifier }}">{{ collection_alt_identifier }}</option>
           {% endfor %}
         </select>
       </div>
