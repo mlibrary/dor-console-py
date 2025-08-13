@@ -8,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from dor.entrypoints.api.dependencies import get_db_session
 from dor.services.catalog import catalog
+from dor.utils import remove_parameter
 
 
 console_router = APIRouter(prefix="/console")
@@ -56,15 +57,24 @@ async def get_objects(
     ]
 
     labels: list[FilterLabel] = []
-    if object_type:
-        remove_url = "?" + (urlencode({"collection_title": collection_title}) if collection_title else "")
+
+    filter_titles = {
+        "object_type": "Object Type",
+        "alt_identifier": "Alternate Identifier",
+        "collection_title": "Collection"
+    }
+
+    query_params = {
+        "object_type": object_type,
+        "alt_identifier": alt_identifier,
+        "collection_title": collection_title
+    }
+    active_query_parameters = { k: v for k, v in query_params.items() if v }
+
+    for key, value in active_query_parameters.items():
+        remove_url = "?" + (urlencode(remove_parameter(active_query_parameters, key)))
         labels.append(FilterLabel(
-            title=f'Object Type: "{object_type}"', remove_url=remove_url
-        ))
-    if collection_title:
-        remove_url = "?" + (urlencode({"object_type": object_type}) if object_type else "")
-        labels.append(FilterLabel(
-            title=f'Collection: "{collection_title}"', remove_url=remove_url
+            title=f'{filter_titles[key]}: "{value}"', remove_url=remove_url
         ))
 
     context = {
