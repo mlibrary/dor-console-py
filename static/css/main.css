@@ -96,6 +96,15 @@ h3 {
   flex-direction: column;
 }
 
+input[type="text"] {
+  border: solid 1px var(--color-neutral-200);
+  padding: 0.5rem 0.75rem;
+  border-radius: 2px;
+  accent-color: var(--color-teal-400);
+  height: 44px;
+  font-size: 1rem;
+}
+
 label {
   color: var(--color-neutral-300);
   font-size: 1rem;
