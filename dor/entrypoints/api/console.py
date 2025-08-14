@@ -1,5 +1,3 @@
-from dataclasses import dataclass
-from urllib.parse import urlencode
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, status
@@ -8,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 
 from dor.entrypoints.api.dependencies import get_db_session
 from dor.services.catalog import catalog
-from dor.utils import remove_parameter
+from dor.utils import Filter
 
 
 console_router = APIRouter(prefix="/console")
@@ -27,10 +25,7 @@ async def get_collections(request: Request, start: int = 0, collection_type: str
     )
 
 
-@dataclass
-class FilterLabel:
-    title: str
-    remove_url: str
+
 
 
 @console_router.get("/objects/")
@@ -56,26 +51,13 @@ async def get_objects(
         collection.alternate_identifiers for collection in catalog.collections.get_all(session)
     ]
 
-    labels: list[FilterLabel] = []
-
-    filter_titles = {
-        "object_type": "Object Type",
-        "alt_identifier": "Alternate Identifier",
-        "collection_alt_identifier": "Collection"
-    }
-
-    query_params = {
-        "object_type": object_type,
-        "alt_identifier": alt_identifier,
-        "collection_alt_identifier": collection_alt_identifier
-    }
-    active_query_parameters = { k: v for k, v in query_params.items() if v }
-
-    for key, value in active_query_parameters.items():
-        remove_url = "?" + (urlencode(remove_parameter(active_query_parameters, key)))
-        labels.append(FilterLabel(
-            title=f'{filter_titles[key]}: "{value}"', remove_url=remove_url
-        ))
+    filters: list[Filter] = [
+        Filter(key="object_type", value=object_type, name="Object Type"),
+        Filter(key="alt_identifier", value=alt_identifier, name="Alternative Identifier"),
+        Filter(key="collection_alt_identifier", value=collection_alt_identifier, name="Collection")
+    ]
+    active_query_parameters = { filter.key: filter.value for filter in filters if filter.value }
+    labels = [filter.make_label(active_query_parameters) for filter in filters if filter.value]
 
     context = {
         "page": page,
