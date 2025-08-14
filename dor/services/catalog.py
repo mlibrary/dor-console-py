@@ -67,7 +67,7 @@ class ObjectsManager(Manager):
         except sqlalchemy.exc.NoResultFound:
             return None
 
-    def get_types(self, session: Session) -> list[str]:
+    def get_distinct_types(self, session: Session) -> list[str]:
         query = select(IntellectualObject.type).distinct()
         return list(session.execute(query).scalars())
     
