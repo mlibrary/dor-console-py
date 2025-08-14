@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session
 from dor.models.collection import Collection
 from dor.models.fileset import Fileset
 from dor.models.intellectual_object import CurrentRevision, IntellectualObject
+from dor.models.premis_event import PremisEvent
+
 from dor.utils import Page
 
 def calculate_totals_query(query):
@@ -105,14 +107,29 @@ class FilesetsManager(Manager):
         return self._find(session=session, query=query, start=start, limit=limit)
 
 
+@dataclass(kw_only=True)
+class EventsManager():
+
+    def get(self, session: Session, identifier: UUID) -> PremisEvent | None:
+        query = select(PremisEvent).filter_by(identifier=identifier)
+
+        try:
+            event = session.execute(query).scalar_one()
+            return event
+        except sqlalchemy.exc.NoResultFound:
+            return None
+
+
 @dataclass
 class Catalog:
     objects: ObjectsManager
     collections: CollectionsManager
     filesets: FilesetsManager
+    events: EventsManager
 
 catalog = Catalog(
     objects=ObjectsManager(),
     collections=CollectionsManager(),
-    filesets=FilesetsManager()
+    filesets=FilesetsManager(),
+    events=EventsManager()
 )
