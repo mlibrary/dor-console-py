@@ -44,8 +44,10 @@ async def get_objects(
     )
 
     object_types = catalog.objects.get_distinct_types(session)
+
     collection_alt_identifiers = [
-        collection.alternate_identifiers for collection in catalog.collections.get_all(session)
+        collection.alternate_identifiers
+        for collection in catalog.collections.find(session, limit=10000).items
     ]
 
     filters: list[Filter] = [
