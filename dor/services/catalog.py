@@ -74,16 +74,11 @@ class ObjectsManager(Manager):
 
 @dataclass(kw_only=True)
 class CollectionsManager(Manager):
-    def find(self, session: Session, collection_type: str = None, start: int = 0, limit: int = 100):
+    def find(self, session: Session, collection_type: str | None = None, start: int = 0, limit: int = 100):
         query = select(Collection)
         if collection_type:
             query = query.filter_by(type=collection_type)
         return self._find(session=session, query=query, start=start, limit=limit)
-
-    def get_all(self, session: Session) -> list[Collection]:
-        query = select(Collection)
-        collections = list(session.execute(query).scalars())
-        return collections
 
     def get(self, session: Session, identifier: UUID):
         query = select(Collection)
