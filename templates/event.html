@@ -3,4 +3,11 @@
 {% block content %}
 <p class="subtle-heading">Event</p>
 <h1 class="mb-2">{{ event.identifier }}</h1>
+
+{% if event.intellectual_object %}
+<p>Object Identifier</p>
+<a href="/admin/console/objects/{{ event.intellectual_object.identifier }}">
+  {{ event.intellectual_object.identifier }}
+</a>
+{% endif %}
 {% endblock %}
