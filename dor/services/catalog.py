@@ -46,12 +46,10 @@ class ObjectsManager(Manager):
     ):
         query = select(IntellectualObject) \
             .join(Collection, IntellectualObject.collections) \
-            .join(CurrentRevision) \
-            .where(IntellectualObject.bin_identifier==IntellectualObject.identifier)
+            .join(CurrentRevision)
         if object_type:
             query = query.filter(IntellectualObject.type == object_type)
         if alt_identifier:
-            # What happens if alternate_identifiers looks like id_one,id_two?
             query = query.filter(IntellectualObject.alternate_identifiers.startswith(alt_identifier))
         if collection_alt_identifier:
             query = query.filter(Collection.alternate_identifiers == collection_alt_identifier)
@@ -110,6 +108,7 @@ class FilesetsManager(Manager):
             .join(CurrentRevision) \
             .filter(IntellectualObject.identifier==object_identifier)
         return self._find(session=session, query=query, start=start, limit=limit)
+
 
 @dataclass
 class Catalog:
