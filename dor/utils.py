@@ -138,4 +138,4 @@ class Filter:
 
     def make_label(self, query_params: dict[str, str]) -> FilterLabel:
         remove_url = "?" + (urlencode(remove_parameter(query_params, self.key)))
-        return FilterLabel(title=f'{self.name}: "{self.value}"', remove_url=remove_url)
+        return FilterLabel(title=f"{self.name}: {self.value}", remove_url=remove_url)

@@ -24,7 +24,7 @@ def test_remove_parameter_returns_parameters_minus_key(parameters: dict[str, str
 def test_filter_makes_label(parameters: dict[str, str]):
     filter = Filter(key="object_type", value="types:monograph", name="Object Type")
     expected_label = FilterLabel(
-        title='Object Type: "types:monograph"',
+        title='Object Type: types:monograph',
         remove_url="?alt_identifier=amjewess%3A&collection_alt_identifier=amjewess"
     )
     assert expected_label == filter.make_label(parameters)
