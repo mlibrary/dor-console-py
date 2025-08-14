@@ -112,10 +112,8 @@ class EventsManager():
 
     def get(self, session: Session, identifier: UUID) -> PremisEvent | None:
         query = select(PremisEvent).filter_by(identifier=identifier)
-
         try:
-            event = session.execute(query).scalar_one()
-            return event
+            return session.execute(query).scalar_one()
         except sqlalchemy.exc.NoResultFound:
             return None
 
