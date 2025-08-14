@@ -1,6 +1,7 @@
 from cattrs import Converter
 from uuid import UUID
 from datetime import datetime
+from urllib.parse import urlencode
 import hashlib
 import json
 import subprocess
@@ -121,3 +122,20 @@ def remove_parameter(
     current_params: dict[str, str], key_to_remove: str
 ) -> dict[str, str]:
     return { k: v for k, v in current_params.items() if k != key_to_remove }
+
+
+@dataclass
+class FilterLabel:
+    title: str
+    remove_url: str
+
+
+@dataclass
+class Filter:
+    key: str
+    value: str | None
+    name: str
+
+    def make_label(self, query_params: dict[str, str]) -> FilterLabel:
+        remove_url = "?" + (urlencode(remove_parameter(query_params, self.key)))
+        return FilterLabel(title=f'{self.name}: "{self.value}"', remove_url=remove_url)
