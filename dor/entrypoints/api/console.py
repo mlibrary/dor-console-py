@@ -25,9 +25,6 @@ async def get_collections(request: Request, start: int = 0, collection_type: str
     )
 
 
-
-
-
 @console_router.get("/objects/")
 async def get_objects(
     request: Request,
