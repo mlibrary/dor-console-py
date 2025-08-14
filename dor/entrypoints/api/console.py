@@ -43,7 +43,7 @@ async def get_objects(
         collection_alt_identifier=collection_alt_identifier
     )
 
-    object_types = catalog.objects.get_types(session)
+    object_types = catalog.objects.get_distinct_types(session)
     collection_alt_identifiers = [
         collection.alternate_identifiers for collection in catalog.collections.get_all(session)
     ]
