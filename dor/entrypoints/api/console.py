@@ -96,3 +96,16 @@ async def get_object(
     return templates.TemplateResponse(
         request=request, name="object.html", context=context
     )
+
+
+@console_router.get("/events/{identifier}")
+async def get_event(
+    request: Request, identifier: UUID, session=Depends(get_db_session)
+) -> HTMLResponse:
+    event = catalog.events.get(session=session, identifier=identifier)
+    if not event:
+        return HTMLResponse(status_code=status.HTTP_404_NOT_FOUND)
+
+    return templates.TemplateResponse(
+        request=request, name="event.html", context={"event": event}
+    )
