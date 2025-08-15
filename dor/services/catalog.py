@@ -9,8 +9,8 @@ from dor.models.collection import Collection
 from dor.models.fileset import Fileset
 from dor.models.intellectual_object import CurrentRevision, IntellectualObject
 from dor.models.premis_event import PremisEvent
-
 from dor.utils import Page
+
 
 def calculate_totals_query(query):
     subquery_alias = query.alias("count_query")
