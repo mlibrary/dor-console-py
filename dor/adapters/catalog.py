@@ -6,9 +6,10 @@ from pathlib import Path
 import sqlalchemy
 
 from dor.domain import (
-    Checksum, IntellectualObject, LinkingAgent, ObjectFile, PremisEvent
+    Checksum, Fileset, IntellectualObject, LinkingAgent, ObjectFile, PremisEvent
 )
 from dor.models.checksum import Checksum as ChecksumModel
+from dor.models.fileset import Fileset as FilesetModel
 from dor.models.intellectual_object import IntellectualObject as IntellectualObjectModel
 from dor.models.object_file import ObjectFile as ObjectFileModel
 from dor.models.premis_event import PremisEvent as PremisEventModel
@@ -133,6 +134,25 @@ class SqlalchemyCatalog(Catalog):
             description=object.description
         )
 
+        for fileset in object.filesets:
+            fileset_inst = FilesetModel(
+                identifier=fileset.identifier,
+                alternate_identifiers=",".join(fileset.alternate_identifiers),
+                title=fileset.title,
+                revision_number=fileset.revision_number,
+                created_at=fileset.created_at,
+                order_label=fileset.order_label
+            )
+            for object_file in fileset.object_files:
+                fileset_inst.object_files.append(
+                    SqlalchemyCatalog.object_file_to_model(object_file)
+                )
+            for premis_event in fileset.premis_events:
+                fileset_inst.premis_events.append(
+                    SqlalchemyCatalog.premis_event_to_model(premis_event)
+                )
+            object_inst.filesets.append(fileset_inst)
+
         for premis_event in object.premis_events:
             object_inst.premis_events.append(
                 SqlalchemyCatalog.premis_event_to_model(premis_event)
@@ -161,6 +181,26 @@ class SqlalchemyCatalog(Catalog):
                     SqlalchemyCatalog.model_to_object_file(object_file_model)
                 )
 
+            filesets: list[Fileset] = []
+            for fileset_model in result.filesets:
+                fileset = Fileset(
+                    identifier=fileset_model.identifier,
+                    alternate_identifiers=fileset_model.alternate_identifiers.split(","),
+                    title=fileset_model.title,
+                    revision_number=fileset_model.revision_number,
+                    created_at=fileset_model.created_at.replace(tzinfo=UTC),
+                    order_label=fileset_model.order_label,
+                    object_files=[
+                        SqlalchemyCatalog.model_to_object_file(object_file_model)
+                        for object_file_model in fileset_model.object_files
+                    ],
+                    premis_events=[
+                        SqlalchemyCatalog.model_to_premis_event(premis_event_model)
+                        for premis_event_model in fileset_model.premis_events
+                    ]
+                )
+                filesets.append(fileset)
+
             object = IntellectualObject(
                 identifier=result.identifier,
                 bin_identifier=result.identifier,
@@ -171,7 +211,7 @@ class SqlalchemyCatalog(Catalog):
                 updated_at=result.updated_at.replace(tzinfo=UTC),
                 title=result.title,
                 description=result.description,
-                filesets=[],
+                filesets=filesets,
                 object_files=object_files,
                 premis_events=premis_events
             )

@@ -44,12 +44,13 @@ class ObjectFile:
 
 
 @dataclass
-class FileSet:
+class Fileset:
     identifier: UUID
     alternate_identifiers: list[str]
-    type: str
+    title: str
     revision_number: int
     created_at: datetime
+    order_label: str
     object_files: list[ObjectFile]
     premis_events: list[PremisEvent]
 
@@ -65,6 +66,6 @@ class IntellectualObject:
     updated_at: datetime
     title: str
     description: str
-    filesets: list[FileSet]
+    filesets: list[Fileset]
     object_files: list[ObjectFile]
     premis_events: list[PremisEvent]
