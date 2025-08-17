@@ -11,7 +11,7 @@ from dor.adapters.catalog import MemoryCatalog, SqlalchemyCatalog
 from dor.adapters.sqlalchemy import Base
 from dor.config import config
 from dor.domain import (
-    Checksum, FileSet, IntellectualObject, LinkingAgent,
+    Checksum, Fileset, IntellectualObject, LinkingAgent,
     ObjectFile, PremisEvent
 )
 
@@ -27,8 +27,8 @@ def source_object_file() -> ObjectFile:
         file_format="tiff",
         file_function="source",
         size=1000000,
-        created_at=datetime.now(tz=UTC),
-        updated_at=datetime.now(tz=UTC),
+        created_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
+        updated_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
         digest=some_hash,
         last_fixity_check=datetime.now(tz=UTC),
         checksums=[Checksum(
@@ -48,8 +48,8 @@ def descriptor_object_file() -> ObjectFile:
         file_format="xml",
         file_function="",
         size=1000000,
-        created_at=datetime.now(tz=UTC),
-        updated_at=datetime.now(tz=UTC),
+        created_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
+        updated_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
         digest=some_hash,
         last_fixity_check=datetime.now(tz=UTC),
         checksums=[Checksum(
@@ -60,11 +60,12 @@ def descriptor_object_file() -> ObjectFile:
     )
 
 @pytest.fixture
-def sample_fileset(source_object_file: ObjectFile) -> FileSet:
-    return FileSet(
+def sample_fileset(source_object_file: ObjectFile) -> Fileset:
+    return Fileset(
         identifier=UUID('0b65c631-e0da-444f-ad6d-80af949a11a0'),
         alternate_identifiers=["something or other"],
-        type="Page",
+        title="some title",
+        order_label="Page 1",
         revision_number=1,
         created_at=datetime.now(tz=UTC),
         object_files=[source_object_file],
@@ -85,7 +86,7 @@ def sample_fileset(source_object_file: ObjectFile) -> FileSet:
 
 @pytest.fixture
 def sample_object(
-    sample_fileset: FileSet, descriptor_object_file: ObjectFile
+    sample_fileset: Fileset, descriptor_object_file: ObjectFile
 ) -> IntellectualObject:
     identifier = UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3")
 
@@ -204,4 +205,5 @@ def test_sqlalchemy_catalog_gets_object(
     assert object is not None
 
     assert object.premis_events == sample_object.premis_events
+    assert object.filesets == sample_object.filesets
     assert object.object_files == sample_object.object_files
