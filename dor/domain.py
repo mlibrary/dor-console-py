@@ -41,6 +41,7 @@ class ObjectFile:
     updated_at: datetime
     last_fixity_check: datetime
     checksums: list[Checksum]
+    premis_events: list[PremisEvent]
 
 
 @dataclass

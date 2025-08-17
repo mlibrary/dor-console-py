@@ -75,13 +75,6 @@ class SqlalchemyCatalog(Catalog):
 
     @staticmethod
     def object_file_to_model(object_file: ObjectFile) -> ObjectFileModel:
-        checksum_models = []
-        for checksum in object_file.checksums:
-            checksum_models.append(ChecksumModel(
-                algorithm=checksum.algorithm,
-                digest=checksum.digest,
-                created_at=checksum.created_at
-            ))
         object_file_model = ObjectFileModel(
             identifier=object_file.identifier,
             path=str(object_file.path),
@@ -93,8 +86,18 @@ class SqlalchemyCatalog(Catalog):
             updated_at=object_file.updated_at,
             last_fixity_check=object_file.last_fixity_check
         )
-        for checksum_model in checksum_models:
-            object_file_model.checksums.append(checksum_model)
+        for checksum in object_file.checksums:
+            object_file_model.checksums.append(
+                ChecksumModel(
+                    algorithm=checksum.algorithm,
+                    digest=checksum.digest,
+                    created_at=checksum.created_at
+                )
+            )
+        for premis_event in object_file.premis_events:
+            object_file_model.premis_events.append(
+                SqlalchemyCatalog.premis_event_to_model(premis_event)
+            )
         return object_file_model
 
     @staticmethod
@@ -118,7 +121,18 @@ class SqlalchemyCatalog(Catalog):
             created_at=model.created_at.replace(tzinfo=UTC),
             updated_at=model.created_at.replace(tzinfo=UTC),
             last_fixity_check=model.last_fixity_check.replace(tzinfo=UTC),
-            checksums=checksums
+            checksums=[
+                Checksum(
+                    algorithm=checksum_model.algorithm,
+                    digest=checksum_model.digest,
+                    created_at=checksum_model.created_at.replace(tzinfo=UTC)
+                )
+                for checksum_model in model.checksums
+            ],
+            premis_events=[
+                SqlalchemyCatalog.model_to_premis_event(event_model)
+                for event_model in model.premis_events
+            ]
         )
 
     def add(self, object: IntellectualObject) -> None:
