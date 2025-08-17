@@ -35,6 +35,19 @@ def source_object_file() -> ObjectFile:
             algorithm="sha512",
             digest=some_hash,
             created_at=datetime.now(tz=UTC)
+        )],
+        premis_events=[PremisEvent(
+            identifier=UUID('4a1e3052-fca8-49ec-9343-86d17141898e'),
+            type="fixity",
+            detail="File fixity checked",
+            datetime=datetime.now(tz=UTC),
+            outcome="success",
+            outcome_detail_note="something's happening here.",
+            linking_agent=LinkingAgent(
+                value="someone@org.edu",
+                type="???",
+                role="collection manager"
+            )
         )]
     )
 
@@ -56,7 +69,8 @@ def descriptor_object_file() -> ObjectFile:
             algorithm="sha512",
             digest=some_hash,
             created_at=datetime.now(tz=UTC)
-        )]
+        )],
+        premis_events=[]
     )
 
 @pytest.fixture
