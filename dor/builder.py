@@ -1,19 +1,18 @@
 from pathlib import Path
-from faker import Faker
-import json
-import random
 from uuid import uuid4
-from datetime import datetime, timedelta
-import hashlib
+from datetime import datetime
+
+from faker import Faker
 
 from dor.config import config
 from dor.models.checksum import Checksum
 from dor.models.collection import Collection
-from dor.models.premis_event import PremisEvent
-from dor.utils import fetch, create_uuid_from_string, extract_identifier
-from dor.models.intellectual_object import CurrentRevision, IntellectualObject
 from dor.models.fileset import Fileset
+from dor.models.premis_event import PremisEvent
+from dor.models.intellectual_object import CurrentRevision, IntellectualObject
 from dor.models.object_file import ObjectFile
+from dor.utils import extract_identifier
+
 
 fake = Faker()
 
@@ -67,14 +66,16 @@ def build_intellectual_object(collid: str, manifest_data: dict, object_type: str
     )
     intellectual_object.object_files.extend(build_object_files_for_intellectual_object(intellectual_object))
 
-    linking_agent = fake.email()
+    linking_agent_value = fake.email()
+    linking_agent_role = "collection_manager"
     intellectual_object.premis_events.append(PremisEvent(
         identifier=uuid4(),
         type="ingestion start",
         date_time=(created_at + fake.time_delta(end_datetime='-30h')),
         detail=fake.catch_phrase(),
         outcome=fake.ipv6(),
-        linking_agent=linking_agent
+        linking_agent_value=linking_agent_value,
+        linking_agent_role=linking_agent_role
     ))
     intellectual_object.premis_events.append(PremisEvent(
         identifier=uuid4(),
@@ -82,7 +83,8 @@ def build_intellectual_object(collid: str, manifest_data: dict, object_type: str
         date_time=created_at,
         detail=fake.catch_phrase(),
         outcome=fake.ipv6(),
-        linking_agent=linking_agent
+        linking_agent_value=linking_agent_value,
+        linking_agent_role=linking_agent_role
     ))
 
     canvases = manifest_data['sequences'][0]['canvases']
@@ -130,7 +132,7 @@ def build_intellectual_object(collid: str, manifest_data: dict, object_type: str
 def build_object_files_for_intellectual_object(intellectual_object: IntellectualObject):
     object_files = []
     identifier = intellectual_object.identifier
-    for file_identifier, file_format, file_function in [
+    for file_path, file_format, file_function in [
         (f"{identifier}/descriptor/{identifier}.{intellectual_object.type}.mets2.xml", "application/xml", "function:descriptor"),
         (f"{identifier}/metadata/{identifier}.function:source.json", "application/json", "function:source"),
         (f"{identifier}/metadata/{identifier}.function:service.json", "application/json", "function:service"),
@@ -140,12 +142,12 @@ def build_object_files_for_intellectual_object(intellectual_object: Intellectual
         
         digest = fake.sha256(raw_output=True)
         object_file = ObjectFile(
-            identifier=file_identifier,
+            identifier=uuid4(),
+            path=file_path,
             file_format=file_format,
             file_function=file_function,
             size=fake.random_int(min=600),
             digest=digest,
-            revision_number=1,
             created_at=intellectual_object.created_at,
             updated_at=intellectual_object.created_at,
             last_fixity_check=datetime.now()
@@ -154,24 +156,30 @@ def build_object_files_for_intellectual_object(intellectual_object: Intellectual
         checksum = Checksum(
             algorithm="sha256",
             digest=digest,
-            created_at=intellectual_object.created_at + fake.time_delta(end_datetime="+1h"),
-            updated_at=intellectual_object.created_at + fake.time_delta(end_datetime="+1h"),
+            created_at=intellectual_object.created_at + fake.time_delta(end_datetime="+1h")
         )
         object_file.checksums.append(checksum)
+
+        linking_agent_value = fake.email()
+        linking_agent_role = "collection_manager"
 
         object_file.premis_events.append(PremisEvent(
             identifier=uuid4(),
             type="virus check",
             date_time=(intellectual_object.created_at - fake.time_delta(end_datetime='-30h')),
             detail=fake.catch_phrase(),
-            outcome=fake.ipv6()
+            outcome=fake.ipv6(),
+            linking_agent_value=linking_agent_value,
+            linking_agent_role=linking_agent_role
         ))
         object_file.premis_events.append(PremisEvent(
             identifier=uuid4(),
             type="accession",
             date_time=intellectual_object.created_at,
             detail=fake.catch_phrase(),
-            outcome=fake.ipv6()
+            outcome=fake.ipv6(),
+            linking_agent_value=linking_agent_value,
+            linking_agent_role=linking_agent_role
         ))
 
         object_files.append(object_file)
@@ -223,12 +231,12 @@ def build_object_files_for_canvas(fileset: Fileset, canvas: dict):
     for file_identifier, file_format, file_function in possibles:
         digest = fake.sha256(raw_output=True)
         object_file = ObjectFile(
-            identifier=file_identifier,
+            identifier=uuid4(),
+            path=file_identifier,
             file_format=file_format,
             file_function=file_function,
             size=fake.random_int(min=600),
             digest=digest,
-            revision_number=1,
             created_at=created_at,
             updated_at=created_at,
             last_fixity_check=datetime.now()
@@ -237,8 +245,7 @@ def build_object_files_for_canvas(fileset: Fileset, canvas: dict):
         checksum = Checksum(
             algorithm="sha256",
             digest=digest,
-            created_at=created_at,
-            updated_at=created_at
+            created_at=created_at
         )
         object_file.checksums.append(checksum)
         object_files.append(object_file)

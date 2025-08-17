@@ -13,11 +13,9 @@ class Checksum(Base):
     __tablename__ = "catalog_checksum"
     id: Mapped[int] = mapped_column(primary_key=True)
     algorithm: Mapped[str] = mapped_column(String)
-    # xdatetime: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     digest: Mapped[bytes] = mapped_column(
         LargeBinary(32), unique=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     object_file_id: Mapped[int] = mapped_column(ForeignKey(
         "catalog_object_file.id", ondelete="CASCADE"), nullable=False, index=True)
 
