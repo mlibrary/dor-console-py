@@ -75,8 +75,10 @@
 <h2>Source Files</h2>
 <p>A list of the data source files in this object. Select one to view details about the entire fileset associated with it, including service files, descriptor files, and event metadata. </p>
 <!--Add the source file loop-->
+<div class="mb-1">
+{% for fileset in filesets_page.items %}
 <details>
-  <summary class="mono">source file name <span class="order-label">#</span></summary>
+  <summary class="mono">source file name <span class="order-label">{{ fileset.order_label }}</span></summary>
   <div class="details-contents-wrapper">
     <h3>About this fileset</h3>
     <dl>
@@ -113,6 +115,89 @@
     <button class="button button--secondary">Download fileset</button>
   </div>
 </details>
+{% endfor %}
+</div>
+<div id="pagination">
+  <div id="data" data-url="{{ request.url }}" data-limit="{{ filesets_page.limit }}" data-total="{{ filesets_page.total_items }}"></div>
+  <div class="input-group-inline">
+    <div class="input-group-inline" style="float: left">
+      <div class="input-container mr-1">
+        <button
+          id="pagePreviousButton"
+          class="button--ghost"
+          {% if filesets_page.previous_offset == -1 %} disabled {% endif %}
+        >
+          <span class="material-symbols-rounded">chevron_backward</span>
+          <span>Previous</span>
+        </button>
+      </div>
+      <div class="input-container">
+        <button
+          id="pageNextButton"
+          class="button--ghost"
+          {% if filesets_page.next_offset == -1 %} disabled {% endif %}
+        >
+          <span>Next</span>
+          <span class="material-symbols-rounded">chevron_right</span>
+        </button>
+      </div>
+    </div>
+    <div class="input-group-inline" style="float: right">
+      <div class="input-container mr-1">
+        <span>
+          Go to page&nbsp;
+          <input
+            type="number"
+            id="pageNumberInput"
+            name="number"
+            min="1"
+            max="{{ filesets_page.total_pages }}"
+            value="{{ filesets_page.index }}"
+            step="1"
+          />
+          of {{ filesets_page.total_pages }}
+        </span>
+      </div>
+      <div class="input-container">
+        <button id="pageGoButton" class="button--primary">Go</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const dataElem = document.getElementById("data");
+  const urlString = dataElem.dataset.url;
+  const limit = Number(dataElem.dataset.limit);
+  const total = Number(dataElem.dataset.total);
+
+  const url = new URL(urlString);
+  const path = url.pathname;
+  const searchParams = new URLSearchParams(url.search);
+  const currentStart = Number(searchParams.get("fileset_start") ?? 0);
+  console.log(searchParams.toString())
+  console.log(currentStart)
+
+  document.getElementById('pagePreviousButton').onclick = function() {
+    if (currentStart <= 0) return;
+    searchParams.set("fileset_start", currentStart - limit > 0 ? currentStart - limit : 0);
+    window.location.href = path + "?" + searchParams.toString();
+  };
+
+  document.getElementById('pageNextButton').onclick = function() {
+    console.log("next click")
+    if (currentStart + limit > total) return;
+    searchParams.set("fileset_start", currentStart + limit);
+    window.location.href = path + "?" + searchParams.toString();
+  };
+
+  document.getElementById('pageGoButton').onclick = function() {
+    const pageNumValue = document.getElementById("pageNumberInput").value;
+    const start = limit * (Number(pageNumValue) - 1);
+    searchParams.set("fileset_start", start)
+    window.location.href = path + "?" + searchParams.toString()
+  };
+</script>
+
 
 <h2>Actions</h2>
 <button class="button button--primary">Download object</button>
