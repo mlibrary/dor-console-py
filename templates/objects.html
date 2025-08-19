@@ -87,6 +87,77 @@
   </tbody>
 </table>
 </div>
+<div id="pagination">
+  <div id="data" data-url="{{ request.url }}" data-limit="{{ page.limit }}" data-total="{{ page.total_items }}"></div>
+  <div class="input-group-inline">
+    <div class="input-group-inline" style="float: left">
+      <div class="input-container mr-1">
+        <button id="pagePreviousButton" class="button--ghost">
+          <span class="material-symbols-rounded">chevron_backward</span>
+          <span>Previous</span>
+        </button>
+      </div>
+      <div class="input-container">
+        <button id="pageNextButton" class="button--ghost">
+          <span>Next</span>
+          <span class="material-symbols-rounded">chevron_right</span>
+        </button>
+      </div>
+    </div>
+    <div class="input-group-inline" style="float: right">
+      <div class="input-container mr-1">
+        <span>
+          Go to page&nbsp;
+          <input
+            type="number"
+            id="pageNumberInput"
+            name="number"
+            min="1"
+            max="{{ page.total_pages }}"
+            value="{{ page.index }}"
+            step="1"
+          />
+          of {{ page.total_pages }}
+        </span>
+      </div>
+      <div class="input-container">
+        <button id="pageGoButton" class="button--primary" data-url="{{ url_for('get_objects') }}">Go</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const dataElem = document.getElementById("data");
+  const urlString = dataElem.dataset.url;
+  const limit = Number(dataElem.dataset.limit);
+  const total = Number(dataElem.dataset.total);
+
+  const url = new URL(urlString);
+  const path = url.pathname;
+  const searchParams = new URLSearchParams(url.search);
+  const currentStart = Number(searchParams.get("start") ?? 0);
+
+  document.getElementById('pagePreviousButton').onclick = function() {
+    if (currentStart <= 0) return;
+    searchParams.set("start", currentStart - limit > 0 ? currentStart - limit : 0);
+    window.location.href = path + "?" + searchParams.toString();
+  }
+
+  document.getElementById('pageNextButton').onclick = function() {
+    if (currentStart + limit > total) return;
+    searchParams.set("start", currentStart + limit);
+    window.location.href = path + "?" + searchParams.toString();
+  }
+
+  document.getElementById('pageGoButton').onclick = function() {
+    const pageNumValue = document.getElementById("pageNumberInput").value;
+    const start = limit * (Number(pageNumValue) - 1);
+    searchParams.set("start", start)
+    window.location.href = path + "?" + searchParams.toString()
+  };
+</script>
+
+</div>
 </div>
 </div>
 {% endblock %}
