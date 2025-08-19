@@ -92,13 +92,21 @@
   <div class="input-group-inline">
     <div class="input-group-inline" style="float: left">
       <div class="input-container mr-1">
-        <button id="pagePreviousButton" class="button--ghost">
+        <button
+          id="pagePreviousButton"
+          class="button--ghost"
+          {% if page.previous_offset == -1 %} disabled {% endif %}
+        >
           <span class="material-symbols-rounded">chevron_backward</span>
           <span>Previous</span>
         </button>
       </div>
       <div class="input-container">
-        <button id="pageNextButton" class="button--ghost">
+        <button
+          id="pageNextButton"
+          class="button--ghost"
+          {% if page.next_offset == -1 %} disabled {% endif %}
+        >
           <span>Next</span>
           <span class="material-symbols-rounded">chevron_right</span>
         </button>
