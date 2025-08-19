@@ -40,7 +40,8 @@ async def get_objects(
         start=start,
         object_type=object_type,
         alt_identifier=alt_identifier,
-        collection_alt_identifier=collection_alt_identifier
+        collection_alt_identifier=collection_alt_identifier,
+        limit=10
     )
 
     object_types = catalog.objects.get_distinct_types(session)
