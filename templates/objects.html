@@ -129,7 +129,7 @@
         </span>
       </div>
       <div class="input-container">
-        <button id="pageGoButton" class="button--primary" data-url="{{ url_for('get_objects') }}">Go</button>
+        <button id="pageGoButton" class="button--primary">Go</button>
       </div>
     </div>
   </div>
@@ -149,13 +149,13 @@
     if (currentStart <= 0) return;
     searchParams.set("start", currentStart - limit > 0 ? currentStart - limit : 0);
     window.location.href = path + "?" + searchParams.toString();
-  }
+  };
 
   document.getElementById('pageNextButton').onclick = function() {
     if (currentStart + limit > total) return;
     searchParams.set("start", currentStart + limit);
     window.location.href = path + "?" + searchParams.toString();
-  }
+  };
 
   document.getElementById('pageGoButton').onclick = function() {
     const pageNumValue = document.getElementById("pageNumberInput").value;
