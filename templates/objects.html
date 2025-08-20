@@ -1,3 +1,4 @@
+{% from 'macros/pagination.html' import pagination %}
 {% extends "base.html" %}
 {% set page_name = 'objects' %}
 {% set page_title = 'Objects' %}
@@ -87,55 +88,25 @@
   </tbody>
 </table>
 </div>
-<div id="pagination">
-  <div id="data" data-url="{{ request.url }}" data-limit="{{ page.limit }}" data-total="{{ page.total_items }}"></div>
-  <div class="input-group-inline">
-    <div class="input-group-inline" style="float: left">
-      <div class="input-container mr-1">
-        <button
-          id="pagePreviousButton"
-          class="button--ghost"
-          {% if page.previous_offset == -1 %} disabled {% endif %}
-        >
-          <span class="material-symbols-rounded">chevron_backward</span>
-          <span>Previous</span>
-        </button>
-      </div>
-      <div class="input-container">
-        <button
-          id="pageNextButton"
-          class="button--ghost"
-          {% if page.next_offset == -1 %} disabled {% endif %}
-        >
-          <span>Next</span>
-          <span class="material-symbols-rounded">chevron_right</span>
-        </button>
-      </div>
-    </div>
-    <div class="input-group-inline" style="float: right">
-      <div class="input-container mr-1">
-        <span>
-          Go to page&nbsp;
-          <input
-            type="number"
-            id="pageNumberInput"
-            name="number"
-            min="1"
-            max="{{ page.total_pages }}"
-            value="{{ page.index }}"
-            step="1"
-          />
-          of {{ page.total_pages }}
-        </span>
-      </div>
-      <div class="input-container">
-        <button id="pageGoButton" class="button--primary">Go</button>
-      </div>
-    </div>
-  </div>
+<div
+  id="pagination-data"
+  data-url="{{ request.url }}"
+  data-limit="{{ page.limit }}"
+  data-total="{{ page.total_items }}"
+>
 </div>
+{{ pagination(
+  page_index=page.index,
+  num_pages=page.total_pages,
+  previous_button_id='pagePreviousButton',
+  previous_button_disabled=page.previous_offset == -1,
+  next_button_id='pageNextButton',
+  next_button_disabled=page.next_offset == -1,
+  page_number_input_id='pageNumberInput',
+  go_button_id='pageGoButton'
+) }}
 <script>
-  const dataElem = document.getElementById("data");
+  const dataElem = document.getElementById("pagination-data");
   const urlString = dataElem.dataset.url;
   const limit = Number(dataElem.dataset.limit);
   const total = Number(dataElem.dataset.total);
