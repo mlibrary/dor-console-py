@@ -154,7 +154,6 @@
   };
 
   document.getElementById('pageNextButton').onclick = function() {
-    console.log("next click")
     if (currentStart + limit > total) return;
     searchParams.set("fileset_start", currentStart + limit);
     window.location.href = path + "?" + searchParams.toString();
