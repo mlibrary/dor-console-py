@@ -76,6 +76,7 @@
 <p>A list of the data source files in this object. Select one to view details about the entire fileset associated with it, including service files, descriptor files, and event metadata. </p>
 <!--Add the source file loop-->
 <div class="mb-1">
+<p>Showing {{ filesets_page.range }} of {{ filesets_page.total_items }} filesets</p>
 {% for fileset in filesets_page.items %}
 <details>
   <summary class="mono">source file name <span class="order-label">{{ fileset.order_label }}</span></summary>
