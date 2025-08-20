@@ -148,13 +148,11 @@
   const currentStart = Number(searchParams.get("fileset_start") ?? 0);
 
   document.getElementById('pagePreviousButton').onclick = function() {
-    if (currentStart <= 0) return;
     searchParams.set("fileset_start", currentStart - limit > 0 ? currentStart - limit : 0);
     window.location.href = path + "?" + searchParams.toString();
   };
 
   document.getElementById('pageNextButton').onclick = function() {
-    if (currentStart + limit > total) return;
     searchParams.set("fileset_start", currentStart + limit);
     window.location.href = path + "?" + searchParams.toString();
   };
