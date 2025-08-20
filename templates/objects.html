@@ -88,13 +88,6 @@
   </tbody>
 </table>
 </div>
-<div
-  id="pagination-data"
-  data-url="{{ request.url }}"
-  data-limit="{{ page.limit }}"
-  data-total="{{ page.total_items }}"
->
-</div>
 {{ pagination(
   page_index=page.index,
   num_pages=page.total_pages,
@@ -105,8 +98,15 @@
   page_number_input_id='pageNumberInput',
   go_button_id='pageGoButton'
 ) }}
+<div
+  id="paginationData"
+  data-url="{{ request.url }}"
+  data-limit="{{ page.limit }}"
+  data-total="{{ page.total_items }}"
+>
+</div>
 <script>
-  const dataElem = document.getElementById("pagination-data");
+  const dataElem = document.getElementById("paginationData");
   const urlString = dataElem.dataset.url;
   const limit = Number(dataElem.dataset.limit);
   const total = Number(dataElem.dataset.total);
@@ -117,21 +117,24 @@
   const startKey = "start";
   const currentStart = Number(searchParams.get(startKey) ?? 0);
 
-  document.getElementById('pagePreviousButton').onclick = function() {
+  function goTo(path, searchParams) {
+    window.location.href = path + "?" + searchParams.toString();
+  }
+
+  document.getElementById("pagePreviousButton").onclick = function() {
     searchParams.set(startKey, currentStart - limit);
-    window.location.href = path + "?" + searchParams.toString();
+    goTo(path, searchParams);
   };
 
-  document.getElementById('pageNextButton').onclick = function() {
+  document.getElementById("pageNextButton").onclick = function() {
     searchParams.set(startKey, currentStart + limit);
-    window.location.href = path + "?" + searchParams.toString();
+    goTo(path, searchParams);
   };
 
-  document.getElementById('pageGoButton').onclick = function() {
+  document.getElementById("pageGoButton").onclick = function() {
     const pageNumValue = document.getElementById("pageNumberInput").value;
-    const start = limit * (Number(pageNumValue) - 1);
-    searchParams.set(startKey, start)
-    window.location.href = path + "?" + searchParams.toString()
+    searchParams.set(startKey, limit * (Number(pageNumValue) - 1))
+    goTo(path, searchParams);
   };
 </script>
 </div>
