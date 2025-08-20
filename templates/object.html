@@ -1,3 +1,4 @@
+{% from 'macros/pagination.html' import pagination %}
 {% extends "base.html" %}
 
 {% block content %}
@@ -118,55 +119,25 @@
 </details>
 {% endfor %}
 </div>
-<div id="pagination">
-  <div id="data" data-url="{{ request.url }}" data-limit="{{ filesets_page.limit }}" data-total="{{ filesets_page.total_items }}"></div>
-  <div class="input-group-inline">
-    <div class="input-group-inline" style="float: left">
-      <div class="input-container mr-1">
-        <button
-          id="pagePreviousButton"
-          class="button--ghost"
-          {% if filesets_page.previous_offset == -1 %} disabled {% endif %}
-        >
-          <span class="material-symbols-rounded">chevron_backward</span>
-          <span>Previous</span>
-        </button>
-      </div>
-      <div class="input-container">
-        <button
-          id="pageNextButton"
-          class="button--ghost"
-          {% if filesets_page.next_offset == -1 %} disabled {% endif %}
-        >
-          <span>Next</span>
-          <span class="material-symbols-rounded">chevron_right</span>
-        </button>
-      </div>
-    </div>
-    <div class="input-group-inline" style="float: right">
-      <div class="input-container mr-1">
-        <span>
-          Go to page&nbsp;
-          <input
-            type="number"
-            id="pageNumberInput"
-            name="number"
-            min="1"
-            max="{{ filesets_page.total_pages }}"
-            value="{{ filesets_page.index }}"
-            step="1"
-          />
-          of {{ filesets_page.total_pages }}
-        </span>
-      </div>
-      <div class="input-container">
-        <button id="pageGoButton" class="button--primary">Go</button>
-      </div>
-    </div>
-  </div>
+<div
+  id="pagination-data"
+  data-url="{{ request.url }}"
+  data-limit="{{ filesets_page.limit }}"
+  data-total="{{ filesets_page.total_items }}"
+>
 </div>
+{{ pagination(
+  page_index=filesets_page.index,
+  num_pages=filesets_page.total_pages,
+  previous_button_id='pagePreviousButton',
+  previous_button_disabled=filesets_page.previous_offset == -1,
+  next_button_id='pageNextButton',
+  next_button_disabled=filesets_page.next_offset == -1,
+  page_number_input_id='pageNumberInput',
+  go_button_id='pageGoButton'
+) }}
 <script>
-  const dataElem = document.getElementById("data");
+  const dataElem = document.getElementById("pagination-data");
   const urlString = dataElem.dataset.url;
   const limit = Number(dataElem.dataset.limit);
   const total = Number(dataElem.dataset.total);
@@ -175,8 +146,6 @@
   const path = url.pathname;
   const searchParams = new URLSearchParams(url.search);
   const currentStart = Number(searchParams.get("fileset_start") ?? 0);
-  console.log(searchParams.toString())
-  console.log(currentStart)
 
   document.getElementById('pagePreviousButton').onclick = function() {
     if (currentStart <= 0) return;
@@ -198,8 +167,6 @@
     window.location.href = path + "?" + searchParams.toString()
   };
 </script>
-
-
 <h2>Actions</h2>
 <button class="button button--primary">Download object</button>
 <button class="button button--delete">Delete object</button>

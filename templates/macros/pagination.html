@@ -1,0 +1,57 @@
+{% macro pagination(
+    page_index,
+    num_pages,
+    previous_button_id,
+    previous_button_disabled,
+    next_button_id,
+    next_button_disabled,
+    page_number_input_id,
+    go_button_id
+) %}
+<div id="pagination">
+  <div class="input-group-inline">
+    <div class="input-group-inline" style="float: left">
+      <div class="input-container mr-1">
+        <button
+          id="{{ previous_button_id }}"
+          class="button--ghost"
+          {% if previous_button_disabled %} disabled {% endif %}
+        >
+          <span class="material-symbols-rounded">chevron_backward</span>
+          <span>Previous</span>
+        </button>
+      </div>
+      <div class="input-container">
+        <button
+          id="{{ next_button_id }}"
+          class="button--ghost"
+          {% if next_button_disabled %} disabled {% endif %}
+        >
+          <span>Next</span>
+          <span class="material-symbols-rounded">chevron_right</span>
+        </button>
+      </div>
+    </div>
+    <div class="input-group-inline" style="float: right">
+      <div class="input-container mr-1">
+        <span>
+          Go to page&nbsp;
+          <input
+            type="number"
+            id="{{ page_number_input_id }}"
+            name="number"
+            min="1"
+            max="{{ num_pages }}"
+            value="{{ page_index }}"
+            step="1"
+          />
+          of {{ num_pages }}
+        </span>
+      </div>
+      <div class="input-container">
+        <button id="{{ go_button_id }}" class="button--primary">Go</button>
+      </div>
+    </div>
+  </div>
+</div>
+{%- endmacro %}
