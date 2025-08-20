@@ -164,7 +164,7 @@
 
   document.getElementById("pageGoButton").onclick = function() {
     const pageNumValue = document.getElementById("pageNumberInput").value;
-    searchParams.set(startKey, limit * (Number(pageNumValue) - 1))
+    searchParams.set(startKey, limit * (Number(pageNumValue) - 1));
     goTo(path, searchParams);
   };
 </script>
