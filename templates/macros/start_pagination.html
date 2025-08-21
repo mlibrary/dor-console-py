@@ -1,0 +1,46 @@
+{% from 'macros/pagination.html' import pagination %}
+{% macro start_pagination(page, id_suffix, url, start_key) %}
+
+{{ pagination(
+  page_index=page.index,
+  num_pages=page.total_pages,
+  previous_button_id='pagePreviousButton' + id_suffix,
+  previous_button_disabled=page.previous_offset == -1,
+  next_button_id='pageNextButton' + id_suffix,
+  next_button_disabled=page.next_offset == -1,
+  page_number_input_id='pageNumberInput' + id_suffix,
+  go_button_id='pageGoButton' + id_suffix
+) }}
+<script>
+  const urlString = "{{ url }}";
+  const limit = Number("{{ page.limit }}");
+  const total = Number("{{ page.total_pages }}");
+  const idSuffix = "{{ id_suffix }}";
+  const startKey = "{{ start_key }}";
+
+  const urlObj = new URL(urlString);
+  const path = urlObj.pathname;
+  const searchParams = new URLSearchParams(urlObj.search);
+  const currentStart = Number(searchParams.get(startKey) ?? 0);
+
+  function goTo(path, searchParams) {
+    window.location.href = path + "?" + searchParams.toString();
+  }
+
+  document.getElementById("pagePreviousButton" + idSuffix).onclick = function() {
+    searchParams.set(startKey, currentStart - limit);
+    goTo(path, searchParams);
+  };
+
+  document.getElementById("pageNextButton" + idSuffix).onclick = function() {
+    searchParams.set(startKey, currentStart + limit);
+    goTo(path, searchParams);
+  };
+
+  document.getElementById("pageGoButton" + idSuffix).onclick = function() {
+    const pageNumValue = document.getElementById("pageNumberInput" + idSuffix).value;
+    searchParams.set(startKey, limit * (Number(pageNumValue) - 1));
+    goTo(path, searchParams);
+  };
+</script>
+{%- endmacro %}
