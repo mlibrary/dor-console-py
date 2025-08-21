@@ -54,7 +54,7 @@ def dummy_items() -> list[DummyItem]:
     ]
 
 
-def test_page_sets_total_pages(dummy_items):
+def test_page_sets_total_pages(dummy_items: list[DummyItem]):
     page = Page(total_items=len(dummy_items), offset=0, limit=2, items=dummy_items[0:2])
 
     assert page.total_pages == 4
