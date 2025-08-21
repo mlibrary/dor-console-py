@@ -23,18 +23,18 @@
 
   document.getElementById("pagePreviousButton" + idSuffix).onclick = function() {
     searchParams.set(startKey, currentStart - limit);
-    location.assign("?" + searchParams.toString())
+    location.assign("?" + searchParams.toString());
   };
 
   document.getElementById("pageNextButton" + idSuffix).onclick = function() {
     searchParams.set(startKey, currentStart + limit);
-    location.assign("?" + searchParams.toString())
+    location.assign("?" + searchParams.toString());
   };
 
   document.getElementById("pageGoButton" + idSuffix).onclick = function() {
     const pageNumValue = document.getElementById("pageNumberInput" + idSuffix).value;
     searchParams.set(startKey, limit * (Number(pageNumValue) - 1));
-    location.assign("?" + searchParams.toString())
+    location.assign("?" + searchParams.toString());
   };
 </script>
 {%- endmacro %}
