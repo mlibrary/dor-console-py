@@ -88,6 +88,9 @@ class Page:
         self.total_pages = math.ceil(self.total_items / self.limit)
         if self.offset - self.limit >= 0:
             self.previous_offset = self.offset - self.limit
+        elif self.offset > 0:
+            self.previous_offset = 0
+
         if self.offset + self.limit < self.total_items:
             self.next_offset = self.offset + self.limit
 
