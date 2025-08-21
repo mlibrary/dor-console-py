@@ -18,28 +18,23 @@
   const startKey = "{{ start_key }}";
 
   const urlObj = new URL(urlString);
-  const path = urlObj.pathname;
   const searchParams = new URLSearchParams(urlObj.search);
   const currentStart = Number(searchParams.get(startKey) ?? 0);
 
-  function goTo(path, searchParams) {
-    window.location.href = path + "?" + searchParams.toString();
-  }
-
   document.getElementById("pagePreviousButton" + idSuffix).onclick = function() {
     searchParams.set(startKey, currentStart - limit);
-    goTo(path, searchParams);
+    location.assign("?" + searchParams.toString())
   };
 
   document.getElementById("pageNextButton" + idSuffix).onclick = function() {
     searchParams.set(startKey, currentStart + limit);
-    goTo(path, searchParams);
+    location.assign("?" + searchParams.toString())
   };
 
   document.getElementById("pageGoButton" + idSuffix).onclick = function() {
     const pageNumValue = document.getElementById("pageNumberInput" + idSuffix).value;
     searchParams.set(startKey, limit * (Number(pageNumValue) - 1));
-    goTo(path, searchParams);
+    location.assign("?" + searchParams.toString())
   };
 </script>
 {%- endmacro %}
