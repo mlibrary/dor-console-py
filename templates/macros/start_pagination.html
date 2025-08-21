@@ -14,6 +14,8 @@
 <script>
   const urlString = "{{ url | safe }}";
   const limit = Number("{{ page.limit }}");
+  const previousOffset = Number("{{ page.previous_offset }}")
+  const nextOffset = Number("{{ page.next_offset }}")
   const idSuffix = "{{ id_suffix }}";
   const startKey = "{{ start_key }}";
 
@@ -22,12 +24,12 @@
   const currentStart = Number(searchParams.get(startKey) ?? 0);
 
   document.getElementById("pagePreviousButton" + idSuffix).onclick = function() {
-    searchParams.set(startKey, currentStart - limit);
+    searchParams.set(startKey, previousOffset);
     location.assign("?" + searchParams.toString());
   };
 
   document.getElementById("pageNextButton" + idSuffix).onclick = function() {
-    searchParams.set(startKey, currentStart + limit);
+    searchParams.set(startKey, nextOffset);
     location.assign("?" + searchParams.toString());
   };
 
