@@ -1,4 +1,4 @@
-{% from 'macros/pagination.html' import pagination %}
+{% from 'macros/start_pagination.html' import start_pagination %}
 {% extends "base.html" %}
 {% set page_name = 'objects' %}
 {% set page_title = 'Objects' %}
@@ -88,55 +88,12 @@
   </tbody>
 </table>
 </div>
-{{ pagination(
-  page_index=page.index,
-  num_pages=page.total_pages,
-  previous_button_id='pagePreviousButton',
-  previous_button_disabled=page.previous_offset == -1,
-  next_button_id='pageNextButton',
-  next_button_disabled=page.next_offset == -1,
-  page_number_input_id='pageNumberInput',
-  go_button_id='pageGoButton'
+{{ start_pagination(
+  page=page,
+  url=request.url,
+  id_suffix="Objects",
+  start_key="start"
 ) }}
-<div
-  id="paginationData"
-  data-url="{{ request.url }}"
-  data-limit="{{ page.limit }}"
-  data-total="{{ page.total_items }}"
->
-</div>
-<script>
-  const dataElem = document.getElementById("paginationData");
-  const urlString = dataElem.dataset.url;
-  const limit = Number(dataElem.dataset.limit);
-  const total = Number(dataElem.dataset.total);
-
-  const url = new URL(urlString);
-  const path = url.pathname;
-  const searchParams = new URLSearchParams(url.search);
-  const startKey = "start";
-  const currentStart = Number(searchParams.get(startKey) ?? 0);
-
-  function goTo(path, searchParams) {
-    window.location.href = path + "?" + searchParams.toString();
-  }
-
-  document.getElementById("pagePreviousButton").onclick = function() {
-    searchParams.set(startKey, currentStart - limit);
-    goTo(path, searchParams);
-  };
-
-  document.getElementById("pageNextButton").onclick = function() {
-    searchParams.set(startKey, currentStart + limit);
-    goTo(path, searchParams);
-  };
-
-  document.getElementById("pageGoButton").onclick = function() {
-    const pageNumValue = document.getElementById("pageNumberInput").value;
-    searchParams.set(startKey, limit * (Number(pageNumValue) - 1));
-    goTo(path, searchParams);
-  };
-</script>
 </div>
 </div>
 </div>
