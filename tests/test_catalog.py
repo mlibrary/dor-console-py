@@ -11,7 +11,7 @@ from dor.adapters.catalog import MemoryCatalog, SqlalchemyCatalog
 from dor.adapters.sqlalchemy import Base
 from dor.config import config
 from dor.domain import (
-    Checksum, Fileset, IntellectualObject, LinkingAgent,
+    Checksum, Collection, Fileset, IntellectualObject, LinkingAgent,
     ObjectFile, PremisEvent
 )
 
@@ -128,7 +128,18 @@ def sample_object(
                 type="???",
                 role="collection manager"
             )
-        )]
+        )],
+        collections=[
+            Collection(
+                identifier=UUID('72edf6b9-7964-43f8-8e93-8c04f1190402'),
+                alternate_identifiers=["collid_one"],
+                title="Collection 1",
+                description="Collection 1 description",
+                type="types:box",
+                created_at=datetime.now(tz=UTC),
+                updated_at=datetime.now(tz=UTC)
+            )
+        ]
     )
 
 @pytest.fixture
@@ -206,6 +217,33 @@ def test_sqlalchemy_catalog_adds_object(
     )
     assert len(rows) == 1
 
+    # Check for collection object and membership
+    rows = list(
+        db_session.execute(sqlalchemy.text("""
+            select *
+            from catalog_collection
+            where identifier = :identifier
+        """), {"identifier": "72edf6b9796443f88e938c04f1190402"})
+    )
+    assert len(rows) == 1
+
+    rows = list(
+        db_session.execute(sqlalchemy.text("""
+            select *
+            from catalog_collection c
+            left join catalog_collection_object_membership cm
+                on cm.collection_id = c.id
+            left join catalog_intellectual_object io
+                on cm.intellectual_object_id = io.id
+            where c.identifier = :collection_identifier
+                and io.identifier = :object_identifier
+        """), {
+            "collection_identifier": "72edf6b9796443f88e938c04f1190402",
+            "object_identifier": "8e449bbe7cf5493ca782b752e97fe6e3"
+        })
+    )
+    assert len(rows) == 1
+
 
 def test_sqlalchemy_catalog_gets_object(
     db_session, sample_object
@@ -218,6 +256,4 @@ def test_sqlalchemy_catalog_gets_object(
     object = catalog.get(UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"))
     assert object is not None
 
-    assert object.premis_events == sample_object.premis_events
-    assert object.filesets == sample_object.filesets
-    assert object.object_files == sample_object.object_files
+    assert object == sample_object

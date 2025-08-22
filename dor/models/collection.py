@@ -27,7 +27,7 @@ collection_object_table = Table(
 class Collection(Base):
     __tablename__ = "catalog_collection"
     id: Mapped[int] = mapped_column(primary_key=True)
-    identifier: Mapped[uuid.UUID] = mapped_column(Uuid, unique=False, index=True)
+    identifier: Mapped[uuid.UUID] = mapped_column(Uuid, unique=True, index=True)
     alternate_identifiers: Mapped[str] = mapped_column(String, nullable=True)
     type: Mapped[str] = mapped_column(String, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
