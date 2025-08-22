@@ -6,9 +6,11 @@ from pathlib import Path
 import sqlalchemy
 
 from dor.domain import (
-    Checksum, Fileset, IntellectualObject, LinkingAgent, ObjectFile, PremisEvent
+    Checksum, Collection, Fileset, IntellectualObject, LinkingAgent,
+    ObjectFile, PremisEvent
 )
 from dor.models.checksum import Checksum as ChecksumModel
+from dor.models.collection import Collection as CollectionModel
 from dor.models.fileset import Fileset as FilesetModel
 from dor.models.intellectual_object import IntellectualObject as IntellectualObjectModel
 from dor.models.object_file import ObjectFile as ObjectFileModel
@@ -135,8 +137,38 @@ class SqlalchemyCatalog(Catalog):
             ]
         )
 
+    def upsert_collection(self, collection: Collection) -> CollectionModel:
+        statement = sqlalchemy.select(CollectionModel).where(
+            CollectionModel.identifier == collection.identifier
+        )
+        try:
+            collection_model = self.session.scalars(statement).one()
+        except sqlalchemy.exc.NoResultFound:
+            collection_model = None
+
+        if collection_model:
+            collection_model.alternate_identifiers = ",".join(collection.alternate_identifiers)
+            collection_model.title = collection.title
+            collection_model.description = collection.description
+            collection_model.type = collection.type
+            collection.updated_at = collection.updated_at
+            self.session.add(collection_model)
+            return collection_model
+
+        collection_model = CollectionModel(
+            identifier=collection.identifier,
+            alternate_identifiers=",".join(collection.alternate_identifiers),
+            title=collection.title,
+            description=collection.description,
+            type=collection.type,
+            created_at=collection.created_at,
+            updated_at=collection.updated_at
+        )
+        self.session.add(collection_model)
+        return collection_model
+
     def add(self, object: IntellectualObject) -> None:
-        object_inst = IntellectualObjectModel(
+        object_model = IntellectualObjectModel(
             identifier=object.identifier,
             bin_identifier=object.bin_identifier,
             alternate_identifiers=",".join(object.alternate_identifiers),
@@ -165,18 +197,21 @@ class SqlalchemyCatalog(Catalog):
                 fileset_inst.premis_events.append(
                     SqlalchemyCatalog.premis_event_to_model(premis_event)
                 )
-            object_inst.filesets.append(fileset_inst)
+            object_model.filesets.append(fileset_inst)
 
         for premis_event in object.premis_events:
-            object_inst.premis_events.append(
+            object_model.premis_events.append(
                 SqlalchemyCatalog.premis_event_to_model(premis_event)
             )
 
         for object_file in object.object_files:
             object_file_model = SqlalchemyCatalog.object_file_to_model(object_file)
-            object_inst.object_files.append(object_file_model)
+            object_model.object_files.append(object_file_model)
 
-        self.session.add_all([object_inst])
+        for collection in object.collections:
+            collection_model = self.upsert_collection(collection)
+            object_model.collections.append(collection_model)
+        self.session.add_all([object_model])
 
     def get(self, identifier: UUID) -> IntellectualObject | None:
         statement = sqlalchemy.select(IntellectualObjectModel).where(
@@ -215,6 +250,19 @@ class SqlalchemyCatalog(Catalog):
                 )
                 filesets.append(fileset)
 
+            collections: list[Collection] = []
+            for collection_model in result.collections:
+                collection = Collection(
+                    identifier=collection_model.identifier,
+                    alternate_identifiers=collection_model.alternate_identifiers.split(","),
+                    title=collection_model.title,
+                    description=collection_model.description,
+                    type=collection_model.type,
+                    created_at=collection_model.created_at.replace(tzinfo=UTC),
+                    updated_at=collection_model.updated_at.replace(tzinfo=UTC)
+                )
+                collections.append(collection)
+
             object = IntellectualObject(
                 identifier=result.identifier,
                 bin_identifier=result.identifier,
@@ -227,7 +275,8 @@ class SqlalchemyCatalog(Catalog):
                 description=result.description,
                 filesets=filesets,
                 object_files=object_files,
-                premis_events=premis_events
+                premis_events=premis_events,
+                collections=collections
             )
             return object
         except sqlalchemy.exc.NoResultFound:

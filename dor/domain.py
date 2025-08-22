@@ -57,6 +57,17 @@ class Fileset:
 
 
 @dataclass
+class Collection:
+    identifier: UUID
+    alternate_identifiers: list[str]
+    title: str
+    description: str
+    type: str
+    created_at: datetime
+    updated_at: datetime
+
+
+@dataclass
 class IntellectualObject:
     identifier: UUID
     bin_identifier: UUID
@@ -70,3 +81,4 @@ class IntellectualObject:
     filesets: list[Fileset]
     object_files: list[ObjectFile]
     premis_events: list[PremisEvent]
+    collections: list[Collection]
