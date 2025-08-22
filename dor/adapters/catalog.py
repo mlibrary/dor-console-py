@@ -298,10 +298,27 @@ class SqlalchemyCatalog(Catalog):
         except sqlalchemy.exc.NoResultFound:
             return None
 
-    def find(self, start: int = 0, limit: int = 10) -> list[IntellectualObject]:
+    def find(
+        self,
+        alt_identifier: str | None = None,
+        collection_alt_identifier: str | None = None,
+        object_type: str | None = None,
+        start: int = 0,
+        limit: int = 10
+    ) -> list[IntellectualObject]:
         statement = sqlalchemy.select(IntellectualObjectModel) \
-            .offset(start) \
-            .limit(limit)
+            .join(CollectionModel, IntellectualObjectModel.collections) \
+            .offset(start).limit(limit)
+
+        if object_type:
+            statement = statement.filter(IntellectualObjectModel.type == object_type)
+        if alt_identifier:
+            statement = statement.filter(IntellectualObjectModel.alternate_identifiers.startswith(alt_identifier))
+        if collection_alt_identifier:
+            statement = statement.filter(
+                CollectionModel.alternate_identifiers == collection_alt_identifier
+            )
+
         results = self.session.execute(statement).scalars()
         objects = [
             SqlalchemyCatalog.model_to_intellectual_object(result)
