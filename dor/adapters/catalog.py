@@ -16,12 +16,16 @@ from dor.models.intellectual_object import IntellectualObject as IntellectualObj
 from dor.models.object_file import ObjectFile as ObjectFileModel
 from dor.models.premis_event import PremisEvent as PremisEventModel
 
+
 class Catalog(ABC):
 
     def add(self, object: IntellectualObject) -> None:
         raise NotImplementedError
 
     def get(self, identifier: UUID) -> IntellectualObject | None:
+        raise NotImplementedError
+
+    def find(self, start: int = 0, limit: int = 10) -> list[IntellectualObject]:
         raise NotImplementedError
 
 
@@ -38,6 +42,13 @@ class MemoryCatalog(Catalog):
             if object.identifier == identifier:
                 return object
         return None
+
+    def find(self, start: int = 0, limit: int = 10) -> list[IntellectualObject]:
+        objects_beginning_at_start = self.objects[start:]
+        if len(objects_beginning_at_start) > limit:
+            return objects_beginning_at_start[:limit]
+        else:
+            return objects_beginning_at_start
     
 
 class SqlalchemyCatalog(Catalog):
@@ -137,6 +148,68 @@ class SqlalchemyCatalog(Catalog):
             ]
         )
 
+    @staticmethod
+    def model_to_intellectual_object(model: IntellectualObjectModel) -> IntellectualObject:
+        premis_events: list[PremisEvent] = []
+        for event_result in model.premis_events:
+            premis_events.append(SqlalchemyCatalog.model_to_premis_event(event_result))
+
+        object_files: list[ObjectFile] = []
+        for object_file_model in model.object_files:
+            object_files.append(
+                SqlalchemyCatalog.model_to_object_file(object_file_model)
+            )
+
+        filesets: list[Fileset] = []
+        for fileset_model in model.filesets:
+            fileset = Fileset(
+                identifier=fileset_model.identifier,
+                alternate_identifiers=fileset_model.alternate_identifiers.split(","),
+                title=fileset_model.title,
+                revision_number=fileset_model.revision_number,
+                created_at=fileset_model.created_at.replace(tzinfo=UTC),
+                order_label=fileset_model.order_label,
+                object_files=[
+                    SqlalchemyCatalog.model_to_object_file(object_file_model)
+                    for object_file_model in fileset_model.object_files
+                ],
+                premis_events=[
+                    SqlalchemyCatalog.model_to_premis_event(premis_event_model)
+                    for premis_event_model in fileset_model.premis_events
+                ]
+            )
+            filesets.append(fileset)
+
+        collections: list[Collection] = []
+        for collection_model in model.collections:
+            collection = Collection(
+                identifier=collection_model.identifier,
+                alternate_identifiers=collection_model.alternate_identifiers.split(","),
+                title=collection_model.title,
+                description=collection_model.description,
+                type=collection_model.type,
+                created_at=collection_model.created_at.replace(tzinfo=UTC),
+                updated_at=collection_model.updated_at.replace(tzinfo=UTC)
+            )
+            collections.append(collection)
+
+        object = IntellectualObject(
+            identifier=model.identifier,
+            bin_identifier=model.identifier,
+            alternate_identifiers=model.alternate_identifiers.split(","),
+            type=model.type,
+            revision_number=model.revision_number,
+            created_at=model.created_at.replace(tzinfo=UTC),
+            updated_at=model.updated_at.replace(tzinfo=UTC),
+            title=model.title,
+            description=model.description,
+            filesets=filesets,
+            object_files=object_files,
+            premis_events=premis_events,
+            collections=collections
+        )
+        return object
+
     def upsert_collection(self, collection: Collection) -> CollectionModel:
         statement = sqlalchemy.select(CollectionModel).where(
             CollectionModel.identifier == collection.identifier
@@ -220,64 +293,18 @@ class SqlalchemyCatalog(Catalog):
         try:
             result = self.session.scalars(statement).one()
 
-            premis_events: list[PremisEvent] = []
-            for event_result in result.premis_events:
-                premis_events.append(SqlalchemyCatalog.model_to_premis_event(event_result))
-
-            object_files: list[ObjectFile] = []
-            for object_file_model in result.object_files:
-                object_files.append(
-                    SqlalchemyCatalog.model_to_object_file(object_file_model)
-                )
-
-            filesets: list[Fileset] = []
-            for fileset_model in result.filesets:
-                fileset = Fileset(
-                    identifier=fileset_model.identifier,
-                    alternate_identifiers=fileset_model.alternate_identifiers.split(","),
-                    title=fileset_model.title,
-                    revision_number=fileset_model.revision_number,
-                    created_at=fileset_model.created_at.replace(tzinfo=UTC),
-                    order_label=fileset_model.order_label,
-                    object_files=[
-                        SqlalchemyCatalog.model_to_object_file(object_file_model)
-                        for object_file_model in fileset_model.object_files
-                    ],
-                    premis_events=[
-                        SqlalchemyCatalog.model_to_premis_event(premis_event_model)
-                        for premis_event_model in fileset_model.premis_events
-                    ]
-                )
-                filesets.append(fileset)
-
-            collections: list[Collection] = []
-            for collection_model in result.collections:
-                collection = Collection(
-                    identifier=collection_model.identifier,
-                    alternate_identifiers=collection_model.alternate_identifiers.split(","),
-                    title=collection_model.title,
-                    description=collection_model.description,
-                    type=collection_model.type,
-                    created_at=collection_model.created_at.replace(tzinfo=UTC),
-                    updated_at=collection_model.updated_at.replace(tzinfo=UTC)
-                )
-                collections.append(collection)
-
-            object = IntellectualObject(
-                identifier=result.identifier,
-                bin_identifier=result.identifier,
-                alternate_identifiers=result.alternate_identifiers.split(","),
-                type=result.type,
-                revision_number=result.revision_number,
-                created_at=result.created_at.replace(tzinfo=UTC),
-                updated_at=result.updated_at.replace(tzinfo=UTC),
-                title=result.title,
-                description=result.description,
-                filesets=filesets,
-                object_files=object_files,
-                premis_events=premis_events,
-                collections=collections
-            )
-            return object
+            intellectual_object = SqlalchemyCatalog.model_to_intellectual_object(result)
+            return intellectual_object
         except sqlalchemy.exc.NoResultFound:
             return None
+
+    def find(self, start: int = 0, limit: int = 10) -> list[IntellectualObject]:
+        statement = sqlalchemy.select(IntellectualObjectModel) \
+            .offset(start) \
+            .limit(limit)
+        results = self.session.execute(statement).scalars()
+        objects = [
+            SqlalchemyCatalog.model_to_intellectual_object(result)
+            for result in results
+        ]
+        return objects
