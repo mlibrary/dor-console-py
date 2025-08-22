@@ -129,18 +129,46 @@ def sample_object(
                 role="collection manager"
             )
         )],
-        collections=[
-            Collection(
-                identifier=UUID('72edf6b9-7964-43f8-8e93-8c04f1190402'),
-                alternate_identifiers=["collid_one"],
-                title="Collection 1",
-                description="Collection 1 description",
-                type="types:box",
-                created_at=datetime.now(tz=UTC),
-                updated_at=datetime.now(tz=UTC)
-            )
-        ]
+        collections=[Collection(
+            identifier=UUID('72edf6b9-7964-43f8-8e93-8c04f1190402'),
+            alternate_identifiers=["collid_one"],
+            title="Collection 1",
+            description="Collection 1 description",
+            type="types:box",
+            created_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
+            updated_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC)
+        )]
     )
+
+
+@pytest.fixture
+def sample_object_two() -> IntellectualObject:
+    identifier = UUID("62732bdb-25e9-47a4-8236-0f41a7c29267")
+
+    return IntellectualObject(
+        identifier=identifier,
+        bin_identifier=identifier,
+        alternate_identifiers=["something something or other"],
+        type="Monograph",
+        revision_number=1,
+        created_at=datetime.now(tz=UTC),
+        updated_at=datetime.now(tz=UTC),
+        title="Sample Object Two",
+        description="This is a sample monograph object.",
+        filesets=[],
+        object_files=[],
+        premis_events=[],
+        collections=[Collection(
+            identifier=UUID('72edf6b9-7964-43f8-8e93-8c04f1190402'),
+            alternate_identifiers=["collid_one"],
+            title="Collection 1",
+            description="Collection 1 description",
+            type="types:box",
+            created_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
+            updated_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC)
+        )]
+    )
+
 
 @pytest.fixture
 def db_session() -> Generator[sqlalchemy.orm.Session, None, None]:
@@ -168,12 +196,49 @@ def test_memory_catalog_adds_object(sample_object) -> None:
     assert len(catalog.objects) == 1
     assert catalog.objects[0] == sample_object
 
+
 def test_memory_catalog_gets_object(sample_object) -> None:
     catalog = MemoryCatalog()
     catalog.add(sample_object)
 
     object = catalog.get(UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"))
     assert object == sample_object
+
+
+def test_memory_catalog_finds_all_objects(
+    sample_object: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = MemoryCatalog()
+    catalog.add(sample_object)
+    catalog.add(sample_object_two)
+
+    objects = catalog.find()
+    assert len(objects) == 2
+    assert objects == [sample_object, sample_object_two]
+
+
+def test_memory_catalog_finds_objects_with_limit(
+    sample_object: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = MemoryCatalog()
+    catalog.add(sample_object)
+    catalog.add(sample_object_two)
+
+    objects = catalog.find(limit=1)
+    assert len(objects) == 1
+    assert objects == [sample_object]
+
+
+def test_memory_catalog_finds_objects_with_start(
+    sample_object: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = MemoryCatalog()
+    catalog.add(sample_object)
+    catalog.add(sample_object_two)
+
+    objects = catalog.find(start=1)
+    assert len(objects) == 1
+    assert objects == [sample_object_two]
 
 
 # SqlalchemyCatalog
@@ -257,3 +322,39 @@ def test_sqlalchemy_catalog_gets_object(
     assert object is not None
 
     assert object == sample_object
+
+
+def test_sqlalchemy_catalog_finds_all_objects(
+    db_session, sample_object: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = SqlalchemyCatalog(db_session)
+    catalog.add(sample_object)
+    catalog.add(sample_object_two)
+
+    objects = catalog.find()
+    assert len(objects) == 2
+    assert objects == [sample_object, sample_object_two]
+
+
+def test_sqlalchemy_catalog_finds_objects_with_limit(
+    db_session, sample_object: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = SqlalchemyCatalog(db_session)
+    catalog.add(sample_object)
+    catalog.add(sample_object_two)
+
+    objects = catalog.find(limit=1)
+    assert len(objects) == 1
+    assert objects == [sample_object]
+
+
+def test_sqlalchemy_catalog_finds_objects_with_start(
+    db_session, sample_object: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = SqlalchemyCatalog(db_session)
+    catalog.add(sample_object)
+    catalog.add(sample_object_two)
+
+    objects = catalog.find(start=1)
+    assert len(objects) == 1
+    assert objects == [sample_object_two]
