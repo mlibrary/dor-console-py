@@ -25,7 +25,14 @@ class Catalog(ABC):
     def get(self, identifier: UUID) -> IntellectualObject | None:
         raise NotImplementedError
 
-    def find(self, start: int = 0, limit: int = 10) -> list[IntellectualObject]:
+    def find(
+        self,
+        alt_identifier: str | None = None,
+        collection_alt_identifier: str | None = None,
+        object_type: str | None = None,
+        start: int = 0,
+        limit: int = 10
+    ) -> list[IntellectualObject]:
         raise NotImplementedError
 
 
@@ -43,8 +50,38 @@ class MemoryCatalog(Catalog):
                 return object
         return None
 
-    def find(self, start: int = 0, limit: int = 10) -> list[IntellectualObject]:
-        objects_beginning_at_start = self.objects[start:]
+    def find(
+        self,
+        alt_identifier: str | None = None,
+        collection_alt_identifier: str | None = None,
+        object_type: str | None = None,
+        start: int = 0,
+        limit: int = 10
+    ) -> list[IntellectualObject]:
+
+        def has_alt_identifier(object: IntellectualObject) -> bool:
+            return alt_identifier in object.alternate_identifiers
+
+        def has_collection_alt_identifier(object: IntellectualObject) -> bool:
+            collection_alternate_identifiers = [
+                collection_alternate_identifier
+                for collection in object.collections
+                for collection_alternate_identifier in collection.alternate_identifiers
+            ]
+            return collection_alt_identifier in collection_alternate_identifiers
+
+        def has_object_type(object: IntellectualObject) -> bool:
+            return object.type == object_type
+
+        matching_objects = self.objects
+        if alt_identifier:
+            matching_objects = list(filter(has_alt_identifier, matching_objects))
+        if collection_alt_identifier:
+            matching_objects = list(filter(has_collection_alt_identifier, matching_objects))
+        if object_type:
+            matching_objects = list(filter(has_object_type, matching_objects))
+
+        objects_beginning_at_start = matching_objects[start:]
         if len(objects_beginning_at_start) > limit:
             return objects_beginning_at_start[:limit]
         else:
