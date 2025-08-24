@@ -335,6 +335,43 @@ class SqlalchemyCatalog(Catalog):
         except sqlalchemy.exc.NoResultFound:
             return None
 
+    @staticmethod
+    def get_find_query(
+        alt_identifier: str | None = None,
+        collection_alt_identifier: str | None = None,
+        object_type: str | None = None
+    ) -> sqlalchemy.Select:
+        query = sqlalchemy.select(IntellectualObjectModel) \
+            .join(CollectionModel, IntellectualObjectModel.collections)
+        if object_type:
+            query = query.filter(IntellectualObjectModel.type == object_type)
+        if alt_identifier:
+            query = query.filter(IntellectualObjectModel.alternate_identifiers.startswith(alt_identifier))
+        if collection_alt_identifier:
+            query = query.filter(
+                CollectionModel.alternate_identifiers == collection_alt_identifier
+            )
+        return query
+
+    def find_total(
+        self,
+        alt_identifier: str | None = None,
+        collection_alt_identifier: str | None = None,
+        object_type: str | None = None
+    ) -> int:
+        query = SqlalchemyCatalog.get_find_query(
+            alt_identifier=alt_identifier,
+            collection_alt_identifier=collection_alt_identifier,
+            object_type=object_type
+        )
+        from_clause = query.alias("count_query")
+        count_query = sqlalchemy.select(sqlalchemy.func.count()).select_from(from_clause)
+        return self.session.execute(count_query).scalar_one()
+
+    def get_distinct_types(self) -> list[str]:
+        query = sqlalchemy.select(IntellectualObjectModel.type).distinct()
+        return list(self.session.execute(query).scalars())
+
     def find(
         self,
         alt_identifier: str | None = None,
@@ -343,20 +380,14 @@ class SqlalchemyCatalog(Catalog):
         start: int = 0,
         limit: int = 10
     ) -> list[IntellectualObject]:
-        statement = sqlalchemy.select(IntellectualObjectModel) \
-            .join(CollectionModel, IntellectualObjectModel.collections) \
-            .offset(start).limit(limit)
+        query = SqlalchemyCatalog.get_find_query(
+            alt_identifier=alt_identifier,
+            collection_alt_identifier=collection_alt_identifier,
+            object_type=object_type
+        )
+        query = query.offset(start).limit(limit)
 
-        if object_type:
-            statement = statement.filter(IntellectualObjectModel.type == object_type)
-        if alt_identifier:
-            statement = statement.filter(IntellectualObjectModel.alternate_identifiers.startswith(alt_identifier))
-        if collection_alt_identifier:
-            statement = statement.filter(
-                CollectionModel.alternate_identifiers == collection_alt_identifier
-            )
-
-        results = self.session.execute(statement).scalars()
+        results = self.session.execute(query).scalars()
         objects = [
             SqlalchemyCatalog.model_to_intellectual_object(result)
             for result in results
