@@ -437,3 +437,32 @@ def test_sqlalchemy_catalog_finds_objects_filtering_on_alt_identifier(
     assert len(objects) == 1
     assert objects == [sample_object_one]
 
+
+def test_sqlalchemy_catalog_finds_total_with_all(
+    db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = SqlalchemyCatalog(db_session)
+    catalog.add(sample_object_one)
+    catalog.add(sample_object_two)
+
+    assert catalog.find_total() == 2
+
+
+def test_sqlalchemy_catalog_finds_total_with_some(
+    db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = SqlalchemyCatalog(db_session)
+    catalog.add(sample_object_one)
+    catalog.add(sample_object_two)
+
+    assert catalog.find_total(alt_identifier="some-identifier-two") == 1
+
+def test_sqlalchemy_catalog_gets_distinct_object_types(
+    db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = SqlalchemyCatalog(db_session)
+    catalog.add(sample_object_one)
+    catalog.add(sample_object_two)
+
+    print(catalog.get_distinct_types())
+    assert catalog.get_distinct_types() == ["Monograph", "Slide"]
