@@ -15,6 +15,7 @@ from dor.domain import (
     ObjectFile, PremisEvent
 )
 
+
 # Fixture(s)
 
 @pytest.fixture
@@ -249,6 +250,39 @@ def test_memory_catalog_finds_objects_with_start(
     objects = catalog.find(start=1)
     assert len(objects) == 1
     assert objects == [sample_object_two]
+
+def test_memory_catalog_finds_objects_filtering_on_collection_alt_identifier(
+    sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = MemoryCatalog()
+    catalog.add(sample_object_one)
+    catalog.add(sample_object_two)
+
+    objects = catalog.find(collection_alt_identifier="collid_one")
+    assert len(objects) == 1
+    assert objects == [sample_object_one]
+
+def test_memory_catalog_finds_objects_filtering_on_object_type(
+    sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = MemoryCatalog()
+    catalog.add(sample_object_one)
+    catalog.add(sample_object_two)
+
+    objects = catalog.find(object_type="Slide")
+    assert len(objects) == 1
+    assert objects == [sample_object_two]
+
+def test_memory_catalog_finds_objects_filtering_on_alt_identifier(
+    sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = MemoryCatalog()
+    catalog.add(sample_object_one)
+    catalog.add(sample_object_two)
+
+    objects = catalog.find(alt_identifier="some-identifier-one")
+    assert len(objects) == 1
+    assert objects == [sample_object_one]
 
 
 # SqlalchemyCatalog
