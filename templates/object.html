@@ -12,87 +12,104 @@
 
 <h1 class="mb-2">{{ object.title }}</h1>
 
-<div class="object-flex-layout">
+<div class="object-flex-layout mb-2">
 <section>
-<h2>About this object</h2>
-<dl class="object-list">
-  <dt>Identifier</dt>
-  <dd>{{ object.identifier }}</dd>
+  <h2 class="mt-0 pt-1_5">About this object</h2>
+  <dl class="object-list">
+    <dt>Identifier</dt>
+    <dd>{{ object.identifier }}</dd>
 
-  <dt>Alternate identifier</dt>
-  <dd>{{ object.alternate_identifiers }}</dd>
+    <dt>Alternate identifier</dt>
+    <dd>{{ object.alternate_identifiers }}</dd>
 
-  <dt>Description</dt>
-  <dd>{{ object.description }}</dd>
+    <dt>Description</dt>
+    <dd>{{ object.description }}</dd>
 
-  <dt>Date ingested:</dt>
-  <dd>{{ object.created_at }}</dd>
+    <dt>Date ingested:</dt>
+    <dd>{{ object.created_at }}</dd>
 
-  <dt>Total size: </dt>
-  <dd>{{ object.total_data_size }}</dd>
+    <dt>Total size: </dt>
+    <dd>{{ object.total_data_size }}</dd>
 
-  <dt>Number of filesets:</dt>
-  <dd>{{ object.filesets|length }}</dd>
+    <dt>Number of filesets:</dt>
+    <dd>{{ object.filesets|length }}</dd>
 
-  <dt>Number of files:</dt>
-  <dd></dd>
+    <dt>Type</dt>
+    <dd>{{ object.type }}</dd>
 
-  <dt>Type</dt>
-  <dd>{{ object.type }}</dd>
+    <dt>Revisions</dt>
+    <dd>{{ object.revision_number}}</dd>
+  </dl>
 
-  <dt>Revisions</dt>
-  <dd>{{ object.revision_number}}</dd>
-</dl>
-
-<button class="button button--link">View source metadata</button>
+  <details class="details-with-border">
+    <summary>View object descriptor and metadata files</summary>
+    <div class="details-contents-wrapper">
+      <h3>Object descriptor and metadata</h3>
+        <div class="table-wrapper">
+          <table class="m-table">
+            <thead>
+            <tr>
+              <th>File name</td>
+              <th>Size</td>
+              <th>Action</td>
+            </tr>
+            </thead>
+            <tbody>
+              <!--Add table loop--> 
+             <tr>
+              <td class="mono">Descriptor</td>
+              <td>1GB</td>
+              <td><button class="button--link">Download file</button></td>
+            </tr>
+            <tr>
+              <td class="mono">Metadata</td>
+              <td>1GB</td>
+              <td><button class="button--link">Download file</button></td>
+            </tr>
+            <tr>
+              <td class="mono">Metadata</td>
+              <td>1GB</td>
+              <td><button class="button--link">Download file</button></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+    </div>
+  </details>
 </section>
+
 <section>
-<h2>Object event history</h2>
+  <div class="object-event-history--container">
+    <h2 class="mt-0 pt-1_5">Object event history</h2>
+    <div class="button-group-column">
+      <button class="button-outline-variant ingest-start"><span class="label">Ingestion start</span> <span>2021-07-06 9:44:31</span></button>
+      <button class="button-outline-variant ingest-end"><span class="label">Ingestion end</span> <span>2021-07-06 9:44:31</span></button>
+      <button class="button-outline-variant ingest-start"><span class="label">Ingestion start</span> <span>2021-07-06 9:44:31</span></button>
+      <button class="button-outline-variant ingest-end"><span class="label">Ingestion end</span> <span>2021-07-06 9:44:31</span></button>
+    </div>
+  </div>
 </section>
 </div>
 
-<h2>Object descriptor and metadata</h2>
-<div class="table-wrapper">
-<table class="m-table">
-  <thead>
-    <tr>
-      <th>File name</td>
-      <th>Size</td>
-      <th>Action</td>
-    </tr>
-  </thead>
-  <tbody>
-   <!--Add table loop--> 
-    <tr>
-      <td class="mono">hereisafakefilename0000.jpg</td>
-      <td>1GB</td>
-      <td>Download file</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-<button class="button button--ghost">View metadata files (PREMIS, json)</button>
-
-<h2>Source Files</h2>
-<p>A list of the data source files in this object. Select one to view details about the entire fileset associated with it, including service files, descriptor files, and event metadata. </p>
-<!--Add the source file loop-->
+<h2>Filesets</h2>
+<p class="prose pb-1">
+  A list of filesets in this object, labeled by source file name, and listed in order. 
+  To view the metadata for and complete fileset, select the caret to the left of the filename. 
+  Expanded details will appear, along with the ability to download individual files or entire filesets.
+</p>
 <div class="mb-1">
 <p>Showing {{ filesets_page.range }} of {{ filesets_page.total_items }} filesets</p>
 {% for fileset in filesets_page.items %}
 <details>
   <summary class="mono">source file name <span class="order-label">{{ fileset.order_label }}</span></summary>
   <div class="details-contents-wrapper">
-    <h3>About this fileset</h3>
-    <dl>
-      <dt>Total size:</dt>
-      <dd></dd>
-      <dt>Type:</dt>
-      <dd></dd>
-      <dt>Ingested:</dt>
-      <dd></dd>
-      <dt>Last fixity:</dt>
-      <dd></dd>
-    </dl>
+    <h3 class="mt-0 pt-1">About this fileset</h3>
+    <ul class="two-column">
+      <li>Total size:</li>
+      <li>Ingested:</li>
+       <li>Type:</li>
+      <li>Last fixity:</li>
+    </ul>
     <h3>Fileset contents</h3>
     <div class="table-wrapper">
     <table class="m-table">
@@ -106,13 +123,18 @@
       <tbody>
       <!--Add table loop--> 
         <tr>
-          <td class="mono">hereisafakefilename0000.jpg</td>
+          <td class="mono"><span class="file-name-flex"><span class="badge badge--source">source</span>hereisafakefilename0000.jpg</span></td>
           <td>1GB</td>
-          <td>Download file</td>
+          <td><button class="button--link">Download file</button></td>
+        </tr>
+        <tr>
+          <td class="mono"><span class="file-name-flex"><span class="badge badge--service">service</span>hereisafakefilename0001.jpg</span></td>
+          <td>1GB</td>
+          <td><button class="button--link">Download file</button></td>
         </tr>
       </tbody>
     </table>
-    <button class="button button--ghost mb-2">View descriptor and metadata files</button>
+    <button class="button button--ghost mb-2">View fileset descriptor and metadata files</button>
     </div>
     <button class="button button--secondary">Download fileset</button>
   </div>
@@ -125,7 +147,10 @@
   id_suffix="Filesets",
   start_key="fileset_start"
 ) }}
+
+<section class="mb-2">
 <h2>Actions</h2>
 <button class="button button--primary">Download object</button>
 <button class="button button--delete">Delete object</button>
+</section>
 {% endblock %}

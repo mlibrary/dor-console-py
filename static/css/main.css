@@ -29,6 +29,10 @@ h3 {
   font-family: monospace;
 }
 
+.prose {
+  max-width: 70ch;
+}
+
 /* 2. Layouts */
 
 .container {
@@ -54,13 +58,17 @@ h3 {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 3rem;
 }
 
 .object-flex-layout > :first-child {
-  min-width: 65%;
+  width: 50%;
 }
+
+.object-flex-layout > :nth-child(2) {
+  width: 35%;
+} 
 
 /* Layout for entire site- kees footer anchored to bottom */
 .page-container {
@@ -70,15 +78,119 @@ h3 {
 } 
 
 /* 3. Pages */
-/* Objects Page */
+
+/* Object Page */
 
 .back-link {
   display: flex;
   color: var(--color-teal-400);
+  font-weight: var(--bold);
   margin: 1rem 0 3rem;
 }
 
+.back-link a {
+  text-decoration: none;
+}
+
+.object-event-history--container {
+  background-color: #F7F7F7;
+  padding: 0 2rem 3rem;
+  border-radius: 4px;
+}
+
+.button-group-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem 0;
+}
+
+.button-outline-variant {
+  background-color: #fff;
+  border: solid 1px var(--color-neutral-200);
+  min-height: 3rem;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: .25rem;
+  padding: 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: normal;
+  font-family: var(--font-base-family);
+  border-radius: var(--radius-default);
+}
+
+.button-outline-variant:hover {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--color-neutral-400);
+}
+
+.button-outline-variant > .label {
+  padding-right: .5rem;
+}
+
+.button-outline-variant.ingest-start > .label::before {
+  content: ""; 
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="%231C1B1F"><path d="M440-727 256-544l-56-56 280-280 280 280-56 57-184-184v287h-80v-287Zm0 487v-120h80v120h-80Zm0 160v-80h80v80h-80Z"/></svg>');
+  background-repeat: no-repeat;
+  background-size: contain;
+  margin-right: 8px;
+}
+
+.button-outline-variant.ingest-end > .label::before  {
+  content: ""; 
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  margin-right: 8px;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="%231C1B1F"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>');
+}
+
+/* About Fileset List */
+
+.two-column {
+  width: 50vw;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  list-style: none;
+  padding-left: 0;
+}
+
+.two-column > li {
+  font-weight: var(--bold);
+}
+
 /* 4. Components */
+
+/* Badges */
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  color: var(--color-neutral-400);
+  background-color: var(--color-neutral-100);
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+}
+
+.badge--source {
+  background-color: var(--color-green-200);
+}
+
+.badge--service {
+  background-color: var(--color-maize-200);
+}
+
+.badge--critical {
+  background-color: var(--color-pink-200);
+}
 
 /* Inputs */
 
@@ -206,11 +318,35 @@ aside.page-aside {
 
  /* Details */
 
+ details {
+  --bg-even: var(--color-blue-100);
+  padding: .145rem 0;
+  border-top: solid 1px var(--color-neutral-100);
+}
+
+details:last-of-type {
+   border-bottom: solid 1px var(--color-neutral-100);
+}
+
+details:nth-child(even) {
+  background-color: var(--bg-even);
+}
+
+.details-with-border {
+  border-left: solid 1px var(--color-neutral-100);
+  border-right: solid 1px var(--color-neutral-100);
+  border-radius: var(--radius-default);
+}
+
 details > summary::before {
   font-family: "Material Symbols Rounded";
   font-size: 24px;
   content: "\e313";
   color: var(--color-teal-400);
+}
+
+.details-with-border[open] > summary {
+  border-bottom: solid 1px var(--color-neutral-100);
 }
 
 details[open] > summary::before {
@@ -236,8 +372,6 @@ summary {
   padding: 0.25em 0.5em;
   list-style: none;
   cursor: pointer;
-  border-top: solid 1px var(--color-neutral-100);
-  border-bottom: solid 1px var(--color-neutral-100);
 }
 
 details[open] > summary:first-of-type {
@@ -248,7 +382,8 @@ details[open] > summary:first-of-type {
 }
 
 .details-contents-wrapper {
-  padding: 0 2rem;
+  padding: 1rem 2rem 1.5rem;
+  background-color: #fff
 }
 
 .order-label {
@@ -330,6 +465,12 @@ table.m-table {
   padding-right: var(--space-medium);
 }
 
+.file-name-flex {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
 /* 5. Utilities */
 
 /* Margin */
@@ -353,8 +494,10 @@ table.m-table {
 /* Padding */
 .p-0 { padding: 0; }
 .p-1 { padding: 1rem; }
-.pt-1 { padding: 1rem; }
-.pb-1 { padding: 1rem; }
+.pt-1 { padding-top: 1rem; }
+.pt-1_5 { padding-top: 1.5rem}
+.pb-1 { padding-bottom: 1rem; }
+.pb-2 { padding-bottom: 2rem; }
 
 /* Display */
 .block { display: block; }

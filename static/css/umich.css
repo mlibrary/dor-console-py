@@ -390,6 +390,11 @@ button:focus,
  padding: 0;
 }
 
+.button--link:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 0.125rem;
+}
+
 .button--pagination {
  background: #fff;
  border: solid 1px var(--color-neutral-300);
