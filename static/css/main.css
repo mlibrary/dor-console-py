@@ -175,6 +175,7 @@ h3 {
 
 .two-column > li {
   font-weight: var(--bold);
+  padding: .5rem 0;
 }
 
 /* 4. Components */
@@ -484,7 +485,7 @@ details[open] > summary:first-of-type {
   width: 100%;
   max-width: 100vw;
 }
-  */
+*/
 
 table.m-table {
   border-collapse: collapse;
@@ -501,17 +502,21 @@ table.m-table {
 .m-table th {
   text-align: left;
 }
+
 .m-table  caption {
   color: var(--color-neutral-300);
 }
+
 .m-table tr > * {
   border-bottom: solid 1px var(--color-neutral-100);
   padding: var(--space-medium) 0;
   vertical-align: top;
 }
+
 .m-table tr > *:not(:last-child) {
   padding-right: var(--space-x-large);
 }
+
 .m-table.objects-table td:first-child,
 .m-table.objects-table th:first-child {
   width: 300px; 
@@ -541,7 +546,7 @@ table.m-table {
 
 .m-table td:first-child,
 .m-table th:first-child {
-  padding-left: var(--space-medium); 
+  padding-left: 4px;
 }
 
 .m-table td:last-child,
@@ -564,6 +569,8 @@ table.m-table {
 .mt-2 { margin-top: 2rem; }
 .mb-1 { margin-bottom: 1rem; }
 .mb-2 { margin-bottom: 2rem; }
+.mb-3 { margin-bottom: 3rem; }
+.mb-4 { margin-bottom: 4rem; }
 .ml-0_5 { margin-left: .5rem }
 .ml-1 { margin-left: 1rem; }
 .ml-2 { margin-left: 2rem; }
