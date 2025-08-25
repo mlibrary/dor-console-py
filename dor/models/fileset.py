@@ -39,3 +39,14 @@ class Fileset(Base):
             (f.size for f in self.object_files.filter_by(file_function="function:source")),
             start=Decimal("0")
         )
+
+    @property
+    def source_object_file(self) -> ObjectFile | None:
+        source_object_files = [
+            object_file
+            for object_file in self.object_files
+            if object_file.file_function == "function:source"
+        ]
+        if source_object_files:
+            return source_object_files[0]
+        return None
