@@ -331,6 +331,7 @@ button,
  font-weight: 700;
  font-family: var(--font-base-family);
  border-radius: var(--radius-default);
+ cursor: pointer;
 }
 
 button:focus,

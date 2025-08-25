@@ -227,6 +227,10 @@ dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.6); 
 }
 
+body:has(dialog[open]) {
+    overflow: hidden;
+}
+
 #dialog-heading {
   margin-top: 0;
 }
