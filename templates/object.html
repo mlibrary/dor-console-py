@@ -82,10 +82,16 @@
   <div class="object-event-history--container">
     <h2 class="mt-0 pt-1_5">Object event history</h2>
     <div class="button-group-column">
-      <button id="openDialogBtn1" type="button" class="button-outline-variant ingest-start"><span class="label">Ingestion start</span> <span>2021-07-06 9:44:31</span></button>
-      <button class="button-outline-variant ingest-end"><span class="label">Ingestion end</span> <span>2021-07-06 9:44:31</span></button>
-      <button class="button-outline-variant ingest-start"><span class="label">Ingestion start</span> <span>2021-07-06 9:44:31</span></button>
-      <button class="button-outline-variant ingest-end"><span class="label">Ingestion end</span> <span>2021-07-06 9:44:31</span></button>
+      {% for event in events %}
+        <button 
+          data-action="open-modal" 
+          data-modal-href="{{ url_for('get_event', identifier=event.identifier) }}" 
+          type="button" 
+          class="button-outline-variant"
+          data-event-type="{{ event.type.lower() }}">
+            <span class="label">{{ event.type }}</span> 
+            <span>{{ event.date_time.strftime("%Y-%m-%d %H:%M:%S") }}</span></button>
+      {% endfor %}
     </div>
     {% include '/partials/_dialog.html' %}
   </div>

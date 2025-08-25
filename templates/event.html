@@ -4,10 +4,32 @@
 <p class="subtle-heading">Event</p>
 <h1 class="mb-2">{{ event.identifier }}</h1>
 
-{% if event.intellectual_object %}
-<p>Object Identifier</p>
-<a href="/admin/console/objects/{{ event.intellectual_object.identifier }}">
-  {{ event.intellectual_object.identifier }}
-</a>
-{% endif %}
+<div class="object-flex-layout mb-2">
+  <section>
+    <h2>{{ event.type }}</h2>
+    <dl class="object-list">
+      <dt>Identifier</dt>
+      <dd>{{ event.identifier }}</dd>
+      <dt>Event Type</dt>
+      <dd>{{ event.type }}</dd>
+      <dt>Outcome</dt>
+      <dd>{{ event.outcome }}</dd>
+      <dt>Date and time</dt>
+      <dd>{{ event.date_time.strftime("%Y-%m-%d %H:%M:%S") }}</dd>
+      <dt>Object</dt>
+      <dd>
+        <a href="/admin/console/objects/{{ event.intellectual_object.identifier }}">
+          {{- event.intellectual_object.title -}}
+        </a>
+      </dd>
+      {% if event.object_file %}
+      <dt>File</dt>
+      <dd>{{ event.object_file.identifier }}</dd>
+      {% endif %}
+      <dt>Details</dt>
+      <dd>{{ event.detail }}</dd>
+    </dl>
+  </section>
+</div>
+
 {% endblock %}

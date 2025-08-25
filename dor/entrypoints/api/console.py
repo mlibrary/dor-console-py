@@ -1,12 +1,12 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, status
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
 from dor.entrypoints.api.dependencies import get_db_session
 from dor.services.catalog import catalog
-from dor.utils import Filter
+from dor.utils import Filter, converter
 
 
 console_router = APIRouter(prefix="/console")
@@ -106,6 +106,10 @@ async def get_event(
     event = catalog.events.get(session=session, identifier=identifier)
     if not event:
         return HTMLResponse(status_code=status.HTTP_404_NOT_FOUND)
+    
+    # probably not useful in the UI but an example of how we could return JSON
+    if "application/json" in request.headers.get("accept", ""):
+        return JSONResponse(converter.unstructure(event.to_dict()))
 
     return templates.TemplateResponse(
         request=request, name="event.html", context={"event": event}
