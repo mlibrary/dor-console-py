@@ -63,12 +63,24 @@ h3 {
 }
 
 .object-flex-layout > :first-child {
-  width: 50%;
+  min-width: 50%;
 }
 
 .object-flex-layout > :nth-child(2) {
-  width: 35%;
+  min-width: 35%;
 } 
+
+@media screen and (max-width: 640px) {
+  .object-flex-layout > :nth-child(2) {
+    width: 100%;
+  } 
+}
+
+@media screen and (max-width: 960px) {
+  .object-flex-layout > :first-child {
+    width: 100%;
+  }
+}
 
 /* Layout for entire site- kees footer anchored to bottom */
 .page-container {
@@ -180,6 +192,14 @@ h3 {
   padding: 4px 10px;
 }
 
+.badge--success {
+  background-color: var(--color-green-200);
+}
+
+.badge--warning {
+  background-color: var(--color-maize-200);
+}
+
 .badge--source {
   background-color: var(--color-green-200);
 }
@@ -190,6 +210,69 @@ h3 {
 
 .badge--critical {
   background-color: var(--color-pink-200);
+}
+
+/* Dialog/Modal */
+
+.dialog {
+  padding: 2rem;
+  width: 60vw;
+  border: solid 2px transparent;
+  border-radius: 4px;
+}
+
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.6); 
+}
+
+#dialog-heading {
+  margin-top: 0;
+}
+
+.dialog-heading-container {
+  display: flex;
+  gap: 0 1rem;
+  align-items: center;
+}
+
+.dialog-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 1rem;
+}
+
+.dialog-list > dt {
+  grid-column: 1;
+  font-weight: var(--bold);
+}
+
+.dialog-list> dd {
+  grid-column: 1;
+  margin: 0;
+}
+
+.dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+@media screen and (max-width: 640px) {
+  .dialog-heading-container {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: .5rem;
+  }
+}
+
+@media screen and (max-width: 960px) {
+  .dialog {
+    width: 90vw;
+  }
 }
 
 /* Inputs */
