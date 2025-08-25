@@ -99,14 +99,14 @@
 <p>Showing {{ filesets_page.range }} of {{ filesets_page.total_items }} filesets</p>
 {% for fileset in filesets_page.items %}
 <details>
-  <summary class="mono">source file name <span class="order-label">{{ fileset.order_label }}</span></summary>
+  <summary class="mono">{{ fileset.source_object_file.name }} <span class="order-label">{{ fileset.order_label }}</span></summary>
   <div class="details-contents-wrapper">
     <h3 class="mt-0 pt-1">About this fileset</h3>
     <ul class="two-column">
-      <li>Total size:</li>
-      <li>Ingested:</li>
-       <li>Type:</li>
-      <li>Last fixity:</li>
+      <li>Total size: {{ fileset.total_data_size }}</li>
+      <li>Ingested: {{ fileset.created_at }}</li>
+      <!-- <li>Type:</li> -->
+      <!-- <li>Last fixity:</li> -->
     </ul>
     <h3>Fileset contents</h3>
     <div class="table-wrapper">
@@ -119,17 +119,22 @@
         </tr>
       </thead>
       <tbody>
-      <!--Add table loop--> 
+        {% for fileset_object_file in fileset.object_files %}
         <tr>
-          <td class="mono"><span class="file-name-flex"><span class="badge badge--source">source</span>hereisafakefilename0000.jpg</span></td>
-          <td>1GB</td>
+          <td class="mono">
+            <span class="file-name-flex">
+              {% if fileset_object_file.file_function == "function:source" %}
+              <span class="badge badge--source">source</span>
+              {% elif fileset_object_file.file_function == "function:service" %}
+              <span class="badge badge--service">service</span>
+              {% endif %}
+              {{ fileset_object_file.name }}
+            </span>
+          </td>
+          <td>{{ fileset_object_file.size | filesizeformat }}</td>
           <td><button class="button--link">Download file</button></td>
         </tr>
-        <tr>
-          <td class="mono"><span class="file-name-flex"><span class="badge badge--service">service</span>hereisafakefilename0001.jpg</span></td>
-          <td>1GB</td>
-          <td><button class="button--link">Download file</button></td>
-        </tr>
+        {% endfor %}
       </tbody>
     </table>
     <button class="button button--ghost mb-2">View fileset descriptor and metadata files</button>
