@@ -15,6 +15,10 @@ Table of Contents:
 
 /* 1. Typography */
 
+h1 {
+  max-width: 45ch;
+}
+
 h2 {
   font-size: 1.75rem;
   font-weight: 600;
@@ -483,14 +487,6 @@ details[open] > summary:first-of-type {
 
 /* Tables */
 
-/*
-.table-wrapper {
-  overflow-x: auto;
-  width: 100%;
-  max-width: 100vw;
-}
-*/
-
 table.m-table {
   border-collapse: collapse;
   border-spacing: 0;
@@ -521,11 +517,16 @@ table.m-table {
   padding-right: var(--space-x-large);
 }
 
+.m-table.objects-table {
+  min-width: 1000px;
+}
+
 .m-table.objects-table td:first-child,
 .m-table.objects-table th:first-child {
-  width: 300px; 
-  min-width: 300px; 
-}
+  width: 400px;
+  max-width: 400px;
+  min-width: 350px;
+}  
 
 .m-table th[scope^="col"] {
   font-weight: var(--extrabold);
