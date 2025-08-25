@@ -27,6 +27,7 @@ h3 {
 
 .mono {
   font-family: monospace;
+  font-size: .9rem;
 }
 
 .prose {
@@ -63,7 +64,7 @@ h3 {
 }
 
 .object-flex-layout > :first-child {
-  min-width: 50%;
+  min-width: 60%;
 }
 
 .object-flex-layout > :nth-child(2) {
@@ -534,7 +535,7 @@ table.m-table {
   border-bottom: solid var(--space-xxx-small) var(--color-maize-400);
 }
 
-.m-table tbody > tr:nth-child(even) {
+.m-table tbody.striped > tr:nth-child(even) {
   background-color: var(--color-blue-100);
 }
 
