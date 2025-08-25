@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 from typing import List
 import uuid
 
@@ -38,3 +39,7 @@ class ObjectFile(Base):
         back_populates="object_file")
     checksums: Mapped[List["Checksum"]] = relationship(
         back_populates="object_file")
+
+    @property
+    def name(self) -> str:
+        return Path(self.identifier).name
