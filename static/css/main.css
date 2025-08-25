@@ -15,6 +15,10 @@ Table of Contents:
 
 /* 1. Typography */
 
+h1 {
+  max-width: 45ch;
+}
+
 h2 {
   font-size: 1.75rem;
   font-weight: 600;
@@ -27,6 +31,11 @@ h3 {
 
 .mono {
   font-family: monospace;
+  font-size: .9rem;
+}
+
+.prose {
+  max-width: 70ch;
 }
 
 /* 2. Layouts */
@@ -54,12 +63,28 @@ h3 {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 3rem;
 }
 
 .object-flex-layout > :first-child {
-  min-width: 65%;
+  min-width: 60%;
+}
+
+.object-flex-layout > :nth-child(2) {
+  min-width: 35%;
+} 
+
+@media screen and (max-width: 640px) {
+  .object-flex-layout > :nth-child(2) {
+    width: 100%;
+  } 
+}
+
+@media screen and (max-width: 960px) {
+  .object-flex-layout > :first-child {
+    width: 100%;
+  }
 }
 
 /* Layout for entire site- kees footer anchored to bottom */
@@ -70,17 +95,209 @@ h3 {
 } 
 
 /* 3. Pages */
-/* Objects Page */
+
+/* Object Page */
 
 .back-link {
   display: flex;
   color: var(--color-teal-400);
+  font-weight: var(--bold);
   margin: 1rem 0 3rem;
+}
+
+.back-link a {
+  text-decoration: none;
+}
+
+.object-event-history--container {
+  background-color: #F7F7F7;
+  padding: 0 2rem 3rem;
+  border-radius: 4px;
+}
+
+.button-group-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem 0;
+}
+
+.button-outline-variant {
+  background-color: #fff;
+  border: solid 1px var(--color-neutral-200);
+  min-height: 3rem;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: .25rem;
+  padding: 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: normal;
+  font-family: var(--font-base-family);
+  border-radius: var(--radius-default);
+}
+
+.button-outline-variant:hover {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--color-neutral-400);
+}
+
+.button-outline-variant > .label {
+  padding-right: .5rem;
+}
+
+.button-outline-variant.ingest-start > .label::before {
+  content: ""; 
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="%231C1B1F"><path d="M440-727 256-544l-56-56 280-280 280 280-56 57-184-184v287h-80v-287Zm0 487v-120h80v120h-80Zm0 160v-80h80v80h-80Z"/></svg>');
+  background-repeat: no-repeat;
+  background-size: contain;
+  margin-right: 8px;
+}
+
+.button-outline-variant.ingest-end > .label::before  {
+  content: ""; 
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  margin-right: 8px;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="%231C1B1F"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>');
+}
+
+/* About Fileset List */
+
+.two-column {
+  width: 50vw;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  list-style: none;
+  padding-left: 0;
+}
+
+.two-column > li {
+  font-weight: var(--bold);
+  padding: .5rem 0;
 }
 
 /* 4. Components */
 
+/* Badges */
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  color: var(--color-neutral-400);
+  background-color: var(--color-neutral-100);
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+}
+
+.badge--success {
+  background-color: var(--color-green-200);
+}
+
+.badge--warning {
+  background-color: var(--color-maize-200);
+}
+
+.badge--source {
+  background-color: var(--color-green-200);
+}
+
+.badge--service {
+  background-color: var(--color-maize-200);
+}
+
+.badge--critical {
+  background-color: var(--color-pink-200);
+}
+
+/* Dialog/Modal */
+
+.dialog {
+  padding: 2rem;
+  width: 60vw;
+  border: solid 2px transparent;
+  border-radius: 4px;
+}
+
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.6); 
+}
+
+body:has(dialog[open]) {
+    overflow: hidden;
+}
+
+#dialog-heading {
+  margin-top: 0;
+}
+
+.dialog-heading-container {
+  display: flex;
+  gap: 0 1rem;
+  align-items: center;
+}
+
+.dialog-list {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 1rem;
+}
+
+.dialog-list > dt {
+  grid-column: 1;
+  font-weight: var(--bold);
+}
+
+.dialog-list> dd {
+  grid-column: 1;
+  margin: 0;
+}
+
+.dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+@media screen and (max-width: 640px) {
+  .dialog-heading-container {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: .5rem;
+  }
+}
+
+@media screen and (max-width: 960px) {
+  .dialog {
+    width: 90vw;
+  }
+}
+
 /* Inputs */
+
+.input-group-inline-filters{
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: flex-start;
+  margin-bottom: 1rem;
+  gap: 0 1rem;
+  margin-bottom: 1rem;
+}
+
 
 .input-group-inline {
   display: flex;
@@ -88,7 +305,8 @@ h3 {
   flex-wrap: wrap;
   flex-direction: row;
   justify-content: space-between;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 .input-container {
@@ -101,8 +319,12 @@ input[type="text"], input[type="number"] {
   padding: 0.5rem 0.75rem;
   border-radius: 2px;
   accent-color: var(--color-teal-400);
-  height: 44px;
+  height: 40px;
   font-size: 1rem;
+}
+
+input#alt-id-input {
+  min-width: 28ch;
 }
 
 label {
@@ -121,7 +343,7 @@ label {
 select {
   min-width: 28ch;
   padding: 0 1.75rem 0 1.5rem;
-  height: 44px;
+  height: 40px;
   font-size: 1rem;
   font-family: var(--font-base-family);
   color: #262626;
@@ -157,43 +379,67 @@ aside.page-aside {
   margin-top: 0;
  }
  
- .side-nav li {
-   display: block;
- }
+.side-nav li {
+  display: block;
+}
  
- .side-nav li a {
-   color: var(--color-neutral-400);
-   text-decoration: none;
-   display: block;
-   padding: 1rem 0 1rem 1rem;
- }
+.side-nav li a {
+  color: var(--color-neutral-400);
+  text-decoration: none;
+  display: block;
+  padding: 1rem 0 1rem 1rem;
+}
 
- .side-nav ul li:first-child > a {
-   padding-top: 0;
- } 
+.side-nav ul li:first-child > a {
+  padding-top: 0;
+} 
  
-  .side-nav li a :hover {
-     text-decoration: underline;
-     text-decoration-thickness: 0.125rem;
-  }
+.side-nav ul li a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 0.125rem;
+}
 
- .side-nav li:not(:last-child){
+.side-nav li:not(:last-child){
   border-bottom: solid 1px var(--color-neutral-100);
 }
  
- .side-nav li.active-side-nav-page a {
-   color: var(--color-teal-400);
-   font-weight: var(--bold);
-   border-left: solid 4px var(--color-teal-400);
- }
+.side-nav li.active-side-nav-page a {
+  color: var(--color-teal-400);
+  font-weight: var(--bold);
+  border-left: solid 4px var(--color-teal-400);
+}
 
  /* Details */
+
+ details {
+  --bg-even: var(--color-blue-100);
+  padding: .145rem 0;
+  border-top: solid 1px var(--color-neutral-100);
+}
+
+details:last-of-type {
+   border-bottom: solid 1px var(--color-neutral-100);
+}
+
+details:nth-child(even) {
+  background-color: var(--bg-even);
+}
+
+.details-with-border {
+  border-left: solid 1px var(--color-neutral-100);
+  border-right: solid 1px var(--color-neutral-100);
+  border-radius: var(--radius-default);
+}
 
 details > summary::before {
   font-family: "Material Symbols Rounded";
   font-size: 24px;
   content: "\e313";
   color: var(--color-teal-400);
+}
+
+.details-with-border[open] > summary {
+  border-bottom: solid 1px var(--color-neutral-100);
 }
 
 details[open] > summary::before {
@@ -219,8 +465,6 @@ summary {
   padding: 0.25em 0.5em;
   list-style: none;
   cursor: pointer;
-  border-top: solid 1px var(--color-neutral-100);
-  border-bottom: solid 1px var(--color-neutral-100);
 }
 
 details[open] > summary:first-of-type {
@@ -231,7 +475,8 @@ details[open] > summary:first-of-type {
 }
 
 .details-contents-wrapper {
-  padding: 0 2rem;
+  padding: 1rem 2rem 1.5rem;
+  background-color: #fff
 }
 
 .order-label {
@@ -241,14 +486,6 @@ details[open] > summary:first-of-type {
 }
 
 /* Tables */
-
-/*
-.table-wrapper {
-  overflow-x: auto;
-  width: 100%;
-  max-width: 100vw;
-}
-  */
 
 table.m-table {
   border-collapse: collapse;
@@ -265,22 +502,31 @@ table.m-table {
 .m-table th {
   text-align: left;
 }
+
 .m-table  caption {
   color: var(--color-neutral-300);
 }
+
 .m-table tr > * {
   border-bottom: solid 1px var(--color-neutral-100);
   padding: var(--space-medium) 0;
   vertical-align: top;
 }
+
 .m-table tr > *:not(:last-child) {
   padding-right: var(--space-x-large);
 }
+
+.m-table.objects-table {
+  min-width: 1000px;
+}
+
 .m-table.objects-table td:first-child,
 .m-table.objects-table th:first-child {
-  width: 300px; 
-  min-width: 300px; 
-}
+  width: 400px;
+  max-width: 400px;
+  min-width: 350px;
+}  
 
 .m-table th[scope^="col"] {
   font-weight: var(--extrabold);
@@ -299,13 +545,13 @@ table.m-table {
   border-bottom: solid var(--space-xxx-small) var(--color-maize-400);
 }
 
-.m-table tbody > tr:nth-child(even) {
+.m-table tbody.striped > tr:nth-child(even) {
   background-color: var(--color-blue-100);
 }
 
 .m-table td:first-child,
 .m-table th:first-child {
-  padding-left: var(--space-medium); 
+  padding-left: 4px;
 }
 
 .m-table td:last-child,
@@ -313,24 +559,41 @@ table.m-table {
   padding-right: var(--space-medium);
 }
 
+.file-name-flex {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
 /* 5. Utilities */
 
 /* Margin */
 .m-0 { margin: 0; }
+.mt-0 { margin-top: 0}
 .mt-1 { margin-top: 1rem; }
 .mt-2 { margin-top: 2rem; }
 .mb-1 { margin-bottom: 1rem; }
 .mb-2 { margin-bottom: 2rem; }
+.mb-3 { margin-bottom: 3rem; }
+.mb-4 { margin-bottom: 4rem; }
+.ml-0_5 { margin-left: .5rem }
 .ml-1 { margin-left: 1rem; }
 .ml-2 { margin-left: 2rem; }
+.mr-0_5 { margin-right: .5rem }
 .mr-1 { margin-right: 1rem; }
 .mr-2 { margin-right: 2rem; }
+.mx-0_5 { 
+  margin-left: 0.5rem;
+  margin-right: 0.5rem; 
+}
 
 /* Padding */
 .p-0 { padding: 0; }
 .p-1 { padding: 1rem; }
-.pt-1 { padding: 1rem; }
-.pb-1 { padding: 1rem; }
+.pt-1 { padding-top: 1rem; }
+.pt-1_5 { padding-top: 1.5rem}
+.pb-1 { padding-bottom: 1rem; }
+.pb-2 { padding-bottom: 2rem; }
 
 /* Display */
 .block { display: block; }
