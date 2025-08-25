@@ -284,6 +284,35 @@ def test_memory_catalog_finds_objects_filtering_on_alt_identifier(
     assert len(objects) == 1
     assert objects == [sample_object_one]
 
+def test_memory_catalog_finds_total_with_all(
+    sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = MemoryCatalog()
+    catalog.add(sample_object_one)
+    catalog.add(sample_object_two)
+
+    assert catalog.find_total() == 2
+
+
+def test_memory_catalog_finds_total_with_some(
+    sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = MemoryCatalog()
+    catalog.add(sample_object_one)
+    catalog.add(sample_object_two)
+
+    assert catalog.find_total(alt_identifier="some-identifier-two") == 1
+
+
+def test_memory_catalog_gets_distinct_object_types(
+    sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
+) -> None:
+    catalog = MemoryCatalog()
+    catalog.add(sample_object_one)
+    catalog.add(sample_object_two)
+
+    assert catalog.get_distinct_types() == ["Monograph", "Slide"]
+
 
 # SqlalchemyCatalog
 
@@ -403,6 +432,7 @@ def test_sqlalchemy_catalog_finds_objects_with_start(
     assert len(objects) == 1
     assert objects == [sample_object_two]
 
+
 def test_sqlalchemy_catalog_finds_objects_filtering_on_collection_alt_identifier(
     db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
@@ -413,6 +443,7 @@ def test_sqlalchemy_catalog_finds_objects_filtering_on_collection_alt_identifier
     objects = catalog.find(collection_alt_identifier="collid_one")
     assert len(objects) == 1
     assert objects == [sample_object_one]
+
 
 def test_sqlalchemy_catalog_finds_objects_filtering_on_object_type(
     db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
@@ -457,6 +488,7 @@ def test_sqlalchemy_catalog_finds_total_with_some(
 
     assert catalog.find_total(alt_identifier="some-identifier-two") == 1
 
+
 def test_sqlalchemy_catalog_gets_distinct_object_types(
     db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
@@ -464,5 +496,4 @@ def test_sqlalchemy_catalog_gets_distinct_object_types(
     catalog.add(sample_object_one)
     catalog.add(sample_object_two)
 
-    print(catalog.get_distinct_types())
     assert catalog.get_distinct_types() == ["Monograph", "Slide"]

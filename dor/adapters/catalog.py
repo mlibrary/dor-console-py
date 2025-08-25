@@ -35,6 +35,17 @@ class Catalog(ABC):
     ) -> list[IntellectualObject]:
         raise NotImplementedError
 
+    def find_total(
+        self,
+        alt_identifier: str | None = None,
+        collection_alt_identifier: str | None = None,
+        object_type: str | None = None,
+    ) -> int:
+        raise NotImplementedError
+
+    def get_distinct_types(self) -> list[str]:
+        raise NotImplementedError
+
 
 class MemoryCatalog(Catalog):
 
@@ -50,13 +61,11 @@ class MemoryCatalog(Catalog):
                 return object
         return None
 
-    def find(
+    def filter(
         self,
         alt_identifier: str | None = None,
         collection_alt_identifier: str | None = None,
         object_type: str | None = None,
-        start: int = 0,
-        limit: int = 10
     ) -> list[IntellectualObject]:
 
         def has_alt_identifier(object: IntellectualObject) -> bool:
@@ -81,12 +90,48 @@ class MemoryCatalog(Catalog):
         if object_type:
             matching_objects = list(filter(has_object_type, matching_objects))
 
-        objects_beginning_at_start = matching_objects[start:]
+        return matching_objects
+
+    def find(
+        self,
+        alt_identifier: str | None = None,
+        collection_alt_identifier: str | None = None,
+        object_type: str | None = None,
+        start: int = 0,
+        limit: int = 10
+    ) -> list[IntellectualObject]:
+
+        filtered_objects = self.filter(
+            alt_identifier=alt_identifier,
+            collection_alt_identifier=collection_alt_identifier,
+            object_type=object_type
+        )
+
+        objects_beginning_at_start = filtered_objects[start:]
         if len(objects_beginning_at_start) > limit:
             return objects_beginning_at_start[:limit]
         else:
             return objects_beginning_at_start
-    
+
+    def find_total(
+        self,
+        alt_identifier: str | None = None,
+        collection_alt_identifier: str | None = None,
+        object_type: str | None = None,
+    ) -> int:
+
+        return len(self.filter(
+            alt_identifier=alt_identifier,
+            collection_alt_identifier=collection_alt_identifier,
+            object_type=object_type
+        ))
+
+    def get_distinct_types(self):
+        distinct_types = []
+        for object in self.objects:
+            if object.type not in distinct_types:
+                distinct_types.append(object.type)
+        return
 
 class SqlalchemyCatalog(Catalog):
 
