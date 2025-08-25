@@ -147,6 +147,7 @@ h1 {
     font-size: 14px;
     font-weight: var(--bold);
     font-family: var(--font-base-family);
+    margin-bottom: .5rem;
 }
 
 .viewport-container {
@@ -233,6 +234,7 @@ pre {
 .tag {
   display: flex;
   align-items: center;
+  text-decoration: none;
   gap: 4px;
   color: var(--color-neutral-400);
   background-color: var(--color-teal-100);
@@ -268,7 +270,7 @@ button:disabled {
 .tag-group {
   display: flex;
   width: 800px;
-  gap: 1rem;
+  gap: 0 0.25rem;
   padding-bottom: 2rem;
 }
 
@@ -388,6 +390,12 @@ button:focus,
  padding: 0;
 }
 
+.button--pagination {
+ background: #fff;
+ border: solid 1px var(--color-neutral-300);
+ color: var(--color-teal-400);
+}
+
  button:disabled,
  .button:disabled {
  opacity: 0.75;
@@ -397,7 +405,12 @@ button:focus,
 .button:not([disabled]):active, 
 .button:not([disabled]):focus, 
 .button:not([disabled]):hover {
-    box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--color-neutral-400);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--color-neutral-400);
+}
+
+.button--clear:hover {
+ text-decoration: underline;
+ text-decoration-thickness: 2px;
 }
 
 /* Description Lists */

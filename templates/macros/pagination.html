@@ -14,7 +14,7 @@
       <div class="input-container mr-1">
         <button
           id="{{ previous_button_id }}"
-          class="button--ghost"
+          class="button button--pagination"
           {% if previous_button_disabled %} disabled {% endif %}
         >
           <span class="material-symbols-rounded">chevron_backward</span>
@@ -24,7 +24,7 @@
       <div class="input-container">
         <button
           id="{{ next_button_id }}"
-          class="button--ghost"
+          class="button button--pagination"
           {% if next_button_disabled %} disabled {% endif %}
         >
           <span>Next</span>
@@ -38,6 +38,7 @@
           Go to page
           <input
             type="number"
+            class="mx-0_5"
             id="{{ page_number_input_id }}"
             name="number"
             min="1"
@@ -49,7 +50,7 @@
         </span>
       </div>
       <div class="input-container">
-        <button id="{{ go_button_id }}" class="button--primary">Go</button>
+        <button id="{{ go_button_id }}" class="button button--secondary">Go</button>
       </div>
     </div>
   </div>

@@ -9,11 +9,16 @@
 {% include '/partials/_side-nav.html' %}
 <div class="main-content">
   <h1 class="title"> {{ page_title }}</h1>
-  <p class="mb-2">View a list of the content objects. Click into an object's title to see more details about its contents.</p>
+  <p class="mb-2">View a list of the objects in the repository. Click into an object’s identifier to see more details about its contents.</p>
 
   <form action="" method="get">
     <h3 class="subtle-heading">Filter by</h3>
-    <div class="input-group-inline">
+    <div class="input-group-inline-filters">
+       <div class="input-container">
+        <label class="select-label" for="alt-id-input">Alternate Identifier</label>
+        <input id="alt-id-input" type="text" name="alt_identifier" />
+      </div>
+
       <div class="input-container">
         <label class="select-label" for="type-select">Type</label>
           <select id="type-select" class="select" name="object_type">
@@ -22,11 +27,6 @@
             <option value="{{ object_type }}">{{ object_type }}</option>
             {% endfor %}
           </select>
-      </div>
-
-      <div class="input-container">
-        <label class="select-label" for="alt-id-select">Alternate Identifier</label>
-        <input id="alt-id-select" type="text" name="alt_identifier" />
       </div>
 
       <div class="input-container">
@@ -45,7 +45,7 @@
       {% for filter_label in filter_labels %}
       <a class="tag" href="{{ filter_label.remove_url }}">
         <span>{{ filter_label.title }}</span>
-        <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 0 24 24" width="20px" fill="#212B36">
+        <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="#212B36">
           <path d="M0 0h24v24H0z" fill="none" />
           <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" />
         </svg>
@@ -57,7 +57,7 @@
     </div>
   </form>
 
-<p>
+<p class="mt-0">
   Showing {{ page.range }} of {{ page.total_items }} of Intellectual Objects.
 </p>
 <div class="table-wrapper">
@@ -70,7 +70,7 @@
       <th scope="col">Collection</td>
       <th scope="col">Size</td>
       <th scope="col"># Filesets</td>
-      <th scope="col">Updated</td>
+      <th scope="col">Date ingested</td>
     </tr>
   </thead>
   <tbody>
