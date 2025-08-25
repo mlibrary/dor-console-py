@@ -55,22 +55,13 @@
             </tr>
             </thead>
             <tbody>
-              <!--Add table loop--> 
+            {% for object_file in object.object_files %}
              <tr>
-              <td class="mono">Descriptor</td>
-              <td>1GB</td>
+              <td class="mono">{{ object_file.name }}</td>
+              <td>{{ object_file.size | filesizeformat }}</td>
               <td><button class="button--link">Download file</button></td>
             </tr>
-            <tr>
-              <td class="mono">Metadata</td>
-              <td>1GB</td>
-              <td><button class="button--link">Download file</button></td>
-            </tr>
-            <tr>
-              <td class="mono">Metadata</td>
-              <td>1GB</td>
-              <td><button class="button--link">Download file</button></td>
-            </tr>
+            {% endfor %}
             </tbody>
           </table>
         </div>
