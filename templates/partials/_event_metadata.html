@@ -1,0 +1,30 @@
+<dl class="{{ class }}">
+  <dt>Identifier</dt>
+  <dd>{{ event.identifier }}</dd>
+  <dt>Event Type</dt>
+  <dd>{{ event.type }}</dd>
+  <dt>Outcome</dt>
+  <dd>{{ event.outcome }}</dd>
+  <dt>Date and time</dt>
+  <dd>{{ event.date_time.strftime("%Y-%m-%d %H:%M:%S") }}</dd>
+  {% if event.intellectual_object %}
+  <dt>Object</dt>
+  <dd>
+    <a href="{{ url_for('get_object', identifier=event.intellectual_object.identifier) }}">
+      {{- event.intellectual_object.title -}}
+    </a>
+  </dd>
+  {% endif %}
+  {% if event.fileset %}
+  <dt>Fileset</dt>
+  <dd>
+    {{- event.fileset.title -}}
+  </dd>
+  {% endif %}
+  {% if event.object_file %}
+  <dt>File</dt>
+  <dd>{{ event.object_file.identifier }}</dd>
+  {% endif %}
+  <dt>Details</dt>
+  <dd>{{ event.detail }}</dd>
+</dl>

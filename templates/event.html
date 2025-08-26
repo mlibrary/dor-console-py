@@ -3,11 +3,24 @@
 {% block content %}
 <p class="subtle-heading">Event</p>
 <h1 class="mb-2">{{ event.identifier }}</h1>
+<div class="flex-layout">
+  <span class="badge">
+  {%- if event.object_file -%}
+  File-level
+  {%- else -%}
+  Object-level
+  {%- endif -%}
+</span>
+<span class="badge badge--success">Success</span>
+</div>
 
-{% if event.intellectual_object %}
-<p>Object Identifier</p>
-<a href="/admin/console/objects/{{ event.intellectual_object.identifier }}">
-  {{ event.intellectual_object.identifier }}
-</a>
-{% endif %}
+<div class="object-flex-layout mb-2">
+  <section>
+    <h2>{{ event.type }}</h2>
+    {% with class='object-list' %}
+      {% include '/partials/_event_metadata.html' %}
+    {% endwith %}  
+  </section>
+</div>
+
 {% endblock %}

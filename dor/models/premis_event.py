@@ -36,3 +36,7 @@ class PremisEvent(Base):
     fileset: Mapped["Fileset"] = relationship(back_populates="premis_events")
     object_file: Mapped["ObjectFile"] = relationship(
         back_populates="premis_events")
+
+    def to_dict(self):
+        """Converts the SQLAlchemy model instance to a dictionary."""
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

@@ -1,17 +1,20 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, status
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
 from dor.entrypoints.api.dependencies import get_db_session
 from dor.services.catalog import catalog
-from dor.utils import Filter
+from dor.utils import Filter, converter
 
 
 console_router = APIRouter(prefix="/console")
 templates = Jinja2Templates(directory="templates")
 templates.env.add_extension('jinja2.ext.loopcontrols')
+
+def template_name(name, modal=False):
+    return f"{name}{'_modal' if modal else ''}.html"
 
 
 @console_router.get("/collections/")
@@ -60,6 +63,7 @@ async def get_objects(
     labels = [filter.make_label(active_query_parameters) for filter in filters if filter.value]
 
     context = {
+        "title": "Objects",
         "page": page,
         "object_types": object_types,
         "collection_alt_identifiers": collection_alt_identifiers,
@@ -89,6 +93,7 @@ async def get_object(
     )
 
     context = dict(
+        title=f"Object: {object.title}",
         object=object,
         filesets_page=filesets_page,
         events=object.premis_events
@@ -101,12 +106,21 @@ async def get_object(
 
 @console_router.get("/events/{identifier}")
 async def get_event(
-    request: Request, identifier: UUID, session=Depends(get_db_session)
+    request: Request, identifier: UUID, modal: bool = False, session=Depends(get_db_session)
 ) -> HTMLResponse:
     event = catalog.events.get(session=session, identifier=identifier)
     if not event:
         return HTMLResponse(status_code=status.HTTP_404_NOT_FOUND)
-
+    
+    # probably not useful in the UI but an example of how we could return JSON
+    if "application/json" in request.headers.get("accept", ""):
+        return JSONResponse(converter.unstructure(event.to_dict()))
+    
     return templates.TemplateResponse(
-        request=request, name="event.html", context={"event": event}
+        request=request, 
+        name=template_name("event", modal),
+        context={
+            "event": event, 
+            "title": f"Event: {event.type}"
+        }
     )

@@ -1,0 +1,17 @@
+<div data-slot="dialog-detail">
+  <p class="subtle-heading">Event</p>
+  <div class="dialog-heading-container">
+    <h2 id="dialog-heading" class="m-0">{{ event.type }}</h2>
+    <span class="badge">
+      {%- if event.object_file -%}
+      File-level
+      {%- else -%}
+      Object-level
+      {%- endif -%}
+    </span>
+    <span class="badge badge--success">Success</span>
+  </div>
+  {% with class='dialog-list mt-2' %}
+    {% include '/partials/_event_metadata.html' %}
+  {% endwith %}  
+</div>
