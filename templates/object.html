@@ -57,7 +57,14 @@
             <tbody>
             {% for object_file in object.object_files %}
              <tr>
-              <td class="mono">{{ object_file.name }}</td>
+              <td class="mono">
+                <span class="file-name-flex">
+                  <span class="badge" data-file-function="{{ object_file.file_function }}">
+                    {{ object_file.file_function }}
+                  </span>
+                  {{ object_file.name }}
+                </span>
+              </td>
               <td>{{ object_file.size | filesizeformat }}</td>
               <td><button class="button--link">Download file</button></td>
             </tr>
@@ -121,11 +128,9 @@
         <tr>
           <td class="mono">
             <span class="file-name-flex">
-              {% if fileset_object_file.file_function == "function:source" %}
-              <span class="badge badge--source">source</span>
-              {% elif fileset_object_file.file_function == "function:service" %}
-              <span class="badge badge--service">service</span>
-              {% endif %}
+              <span class="badge" data-file-function="{{ fileset_object_file.file_function }}">
+                {{ fileset_object_file.file_function }}
+              </span>
               {{ fileset_object_file.name }}
             </span>
           </td>
