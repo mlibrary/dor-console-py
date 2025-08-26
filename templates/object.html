@@ -26,7 +26,7 @@
     <dd>{{ object.description }}</dd>
 
     <dt>Date ingested:</dt>
-    <dd>{{ object.created_at }}</dd>
+    <dd>{{ object.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</dd>
 
     <dt>Total size: </dt>
     <dd>{{ object.total_data_size | filesizeformat }}</dd>
@@ -113,7 +113,7 @@
     <h3 class="mt-0 pt-1">About this fileset</h3>
     <ul class="two-column">
       <li>Total size: {{ fileset.total_data_size | filesizeformat }}</li>
-      <li>Ingested: {{ fileset.created_at }}</li>
+      <li>Ingested: {{ fileset.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</li>
     </ul>
     <h3>Fileset contents</h3>
     <div class="table-wrapper">
