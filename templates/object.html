@@ -137,7 +137,7 @@
           <td class="mono">
             <span class="file-name-flex">
               <span class="badge" data-file-function="{{ fileset_object_file.file_function }}">
-                {{ fileset_object_file.file_function }}
+                {{ fileset_object_file.file_function.replace('function:', '') }}
               </span>
               {{ fileset_object_file.name }}
             </span>
