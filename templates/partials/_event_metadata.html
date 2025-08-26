@@ -7,12 +7,20 @@
   <dd>{{ event.outcome }}</dd>
   <dt>Date and time</dt>
   <dd>{{ event.date_time.strftime("%Y-%m-%d %H:%M:%S") }}</dd>
+  {% if event.intellectual_object %}
   <dt>Object</dt>
   <dd>
-    <a href="/admin/console/objects/{{ event.intellectual_object.identifier }}">
+    <a href="{{ url_for('get_object', identifier=event.intellectual_object.identifier) }}">
       {{- event.intellectual_object.title -}}
     </a>
   </dd>
+  {% endif %}
+  {% if event.fileset %}
+  <dt>Fileset</dt>
+  <dd>
+    {{- event.fileset.title -}}
+  </dd>
+  {% endif %}
   {% if event.object_file %}
   <dt>File</dt>
   <dd>{{ event.object_file.identifier }}</dd>
