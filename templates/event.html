@@ -3,6 +3,16 @@
 {% block content %}
 <p class="subtle-heading">Event</p>
 <h1 class="mb-2">{{ event.identifier }}</h1>
+<div class="flex-layout">
+  <span class="badge">
+  {%- if event.object_file -%}
+  File-level
+  {%- else -%}
+  Object-level
+  {%- endif -%}
+</span>
+<span class="badge badge--success">Success</span>
+</div>
 
 <div class="object-flex-layout mb-2">
   <section>
