@@ -39,6 +39,15 @@ if ( dialog ) {
   });
 }
 
+// ---- FILESET CONTENTS DISPLAY
+document.querySelectorAll(`button[data-action="toggle-view-all-files"]`).forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const wrapper = btn.closest("[data-view-all-files]");
+    wrapper.dataset.viewAllFiles = !!!(wrapper.dataset.viewAllFiles == "true");
+    btn.classList.toggle("toggled", wrapper.dataset.viewAllFiles == 'true');
+  })
+})
+
 // FUNCTIONS
 async function loadPageIntoModal(href, dialog) {
   // we could send an accept header for "application/json",

@@ -206,11 +206,11 @@ h3 {
   background-color: var(--color-maize-200);
 }
 
-.badge--source {
+.badge--source, [data-file-function="function:source"] {
   background-color: var(--color-green-200);
 }
 
-.badge--service {
+.badge--service, [data-file-function="function:service"] {
   background-color: var(--color-maize-200);
 }
 
@@ -602,3 +602,33 @@ table.m-table {
 .flex { display: flex; }
 .grid { display: grid; }
 .hidden { display: none; }
+
+/* Fileset display */
+tr[data-toggleable] {
+  display: none;
+}
+
+div[data-view-all-files="true"] tr[data-toggleable] {
+  display: table-row;
+}
+
+button[data-action="toggle-view-all-files"] {
+  span[data-toggled="true"] {
+    display: none;
+  }
+  span[data-toggled="false"] {
+    display: inline;
+  }
+}
+
+button[data-action="toggle-view-all-files"].toggled {
+  filter: invert(1);
+
+  span[data-toggled="true"] {
+    display: inline;
+  }
+  span[data-toggled="false"] {
+    display: none;
+  }
+
+}
