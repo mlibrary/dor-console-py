@@ -29,7 +29,7 @@
     <dd>{{ object.created_at }}</dd>
 
     <dt>Total size: </dt>
-    <dd>{{ object.total_data_size }}</dd>
+    <dd>{{ object.total_data_size | filesizeformat }}</dd>
 
     <dt>Number of filesets:</dt>
     <dd>{{ object.filesets|length }}</dd>
@@ -103,7 +103,7 @@
   <div class="details-contents-wrapper">
     <h3 class="mt-0 pt-1">About this fileset</h3>
     <ul class="two-column">
-      <li>Total size: {{ fileset.total_data_size }}</li>
+      <li>Total size: {{ fileset.total_data_size | filesizeformat }}</li>
       <li>Ingested: {{ fileset.created_at }}</li>
     </ul>
     <h3>Fileset contents</h3>
