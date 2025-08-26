@@ -55,16 +55,12 @@ async function loadPageIntoModal(href, dialog) {
     .then((text) => {
       const newDocument = new DOMParser().parseFromString(text, "text/html");
 
-      dialog.querySelector("#dialog-heading").innerText =
-        newDocument.querySelector("h2").innerText;
-
-      const dlEl = dialog.querySelector("dl");
-      while (dlEl.firstChild) {
-        dlEl.removeChild(dlEl.firstChild);
+      detailEl = dialog.querySelector('[data-slot="dialog-detail"]');
+      while (detailEl.firstChild) {
+        detailEl.removeChild(detailEl.firstChild);
       }
-
-      newDocument.querySelectorAll("dl > *").forEach((el) => {
-        dlEl.appendChild(el);
-      });
+      
+      const newDetailEl = newDocument.querySelector('[data-slot="dialog-detail"]');
+      detailEl.replaceWith(newDetailEl);
     });
 }

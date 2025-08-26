@@ -1,0 +1,22 @@
+<dl class="{{ class }}">
+  <dt>Identifier</dt>
+  <dd>{{ event.identifier }}</dd>
+  <dt>Event Type</dt>
+  <dd>{{ event.type }}</dd>
+  <dt>Outcome</dt>
+  <dd>{{ event.outcome }}</dd>
+  <dt>Date and time</dt>
+  <dd>{{ event.date_time.strftime("%Y-%m-%d %H:%M:%S") }}</dd>
+  <dt>Object</dt>
+  <dd>
+    <a href="/admin/console/objects/{{ event.intellectual_object.identifier }}">
+      {{- event.intellectual_object.title -}}
+    </a>
+  </dd>
+  {% if event.object_file %}
+  <dt>File</dt>
+  <dd>{{ event.object_file.identifier }}</dd>
+  {% endif %}
+  <dt>Details</dt>
+  <dd>{{ event.detail }}</dd>
+</dl>

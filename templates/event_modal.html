@@ -1,0 +1,9 @@
+<div data-slot="dialog-detail">
+  <div class="dialog-heading-container">
+    <p class="subtle-heading">Event</p>
+    <h2 id="dialog-heading" class="m-0">{{ event.type }}</h2>
+  </div>
+  {% with class='dialog-list mt-2' %}
+    {% include '/partials/_event_metadata.html' %}
+  {% endwith %}  
+</div>

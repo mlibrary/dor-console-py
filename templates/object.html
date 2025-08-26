@@ -85,7 +85,7 @@
       {% for event in events %}
         <button 
           data-action="open-modal" 
-          data-modal-href="{{ url_for('get_event', identifier=event.identifier) }}" 
+          data-modal-href="{{ url_for('get_event', identifier=event.identifier) }}?modal=true" 
           type="button" 
           class="button-outline-variant"
           data-event-type="{{ event.type.lower() }}">
