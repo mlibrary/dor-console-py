@@ -131,7 +131,7 @@ class MemoryCatalog(Catalog):
         for object in self.objects:
             if object.type not in distinct_types:
                 distinct_types.append(object.type)
-        return
+        return distinct_types
 
 class SqlalchemyCatalog(Catalog):
 
