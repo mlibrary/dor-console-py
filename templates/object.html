@@ -51,6 +51,7 @@
             <tr>
               <th>File name</td>
               <th>Size</td>
+              <th>Last fixity check</th>
               <th>Action</td>
             </tr>
             </thead>
@@ -66,6 +67,7 @@
                 </span>
               </td>
               <td>{{ object_file.size | filesizeformat }}</td>
+              <td>{{ object_file.last_fixity_check }}</td>
               <td><button class="button--link">Download file</button></td>
             </tr>
             {% endfor %}
@@ -120,6 +122,7 @@
         <tr>
           <th>File name</td>
           <th>Size</td>
+          <th>Last fixity check</th>
           <th>Action</td>
         </tr>
       </thead>
@@ -135,6 +138,7 @@
             </span>
           </td>
           <td>{{ fileset_object_file.size | filesizeformat }}</td>
+          <td>{{ fileset_object_file.last_fixity_check }}</td>
           <td><button class="button--link">Download file</button></td>
         </tr>
         {% endfor %}
