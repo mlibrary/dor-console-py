@@ -50,24 +50,25 @@ document.querySelectorAll(`button[data-action="toggle-view-all-files"]`).forEach
 async function loadPageIntoModal(href, dialog) {
   // we could send an accept header for "application/json",
   // but then we'd have to build the UI, meh
-  fetch(href, {
-    credentials: "include",
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Request error: ${response.status}`);
-      }
-      return response.text();
-    })
-    .then((text) => {
-      const newDocument = new DOMParser().parseFromString(text, "text/html");
 
-      detailEl = dialog.querySelector('[data-slot="dialog-detail"]');
-      while (detailEl.firstChild) {
-        detailEl.removeChild(detailEl.firstChild);
-      }
-      
-      const newDetailEl = newDocument.querySelector('[data-slot="dialog-detail"]');
-      detailEl.replaceWith(newDetailEl);
-    });
+  const response = await fetch(href, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Request error: ${response.status}`);
+  }
+
+  const text = await response.text();
+  const newDocument = new DOMParser().parseFromString(text, "text/html");
+
+  detailEl = dialog.querySelector('[data-slot="dialog-detail"]');
+  while (detailEl.firstChild) {
+    detailEl.removeChild(detailEl.firstChild);
+  }
+
+  const newDetailEl = newDocument.querySelector(
+    '[data-slot="dialog-detail"]'
+  );
+  detailEl.replaceWith(newDetailEl);
 }
