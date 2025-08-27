@@ -76,8 +76,8 @@
   <tbody class="striped">
     {% for item in page.items %}
     <tr>
-      <th scope="row">{{ item.title }}</th>
-      <td><a href="{{ item.identifier }}">{{ item.alternate_identifiers }}</a></td>
+      <th scope="row"><a href="{{ item.identifier }}">{{ item.title }}</a></th>
+      <td>{{ item.alternate_identifiers }}</td>
       <td>{{ item.type }}</td>
       <td>{{ item.collections_summary }}</td>
       <td>{{ item.total_data_size }}</td>

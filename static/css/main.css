@@ -19,6 +19,10 @@ h1 {
   max-width: 45ch;
 }
 
+h1.title {
+  padding-top: .5rem
+}
+
 h2 {
   font-size: 1.75rem;
   font-weight: 600;
@@ -109,6 +113,11 @@ h3 {
   text-decoration: none;
 }
 
+.back-link a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 0.125rem;
+}
+
 .object-event-history--container {
   background-color: #F7F7F7;
   padding: 0 2rem 3rem;
@@ -148,23 +157,43 @@ h3 {
 .button-outline-variant[data-event-type="ingestion start"] > .label::before {
   content: ""; 
   display: inline-block;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="%231C1B1F"><path d="M440-727 256-544l-56-56 280-280 280 280-56 57-184-184v287h-80v-287Zm0 487v-120h80v120h-80Zm0 160v-80h80v80h-80Z"/></svg>');
   background-repeat: no-repeat;
   background-size: contain;
-  margin-right: 8px;
+  margin-right: .5rem;
 }
 
 .button-outline-variant[data-event-type="ingestion end"] > .label::before  {
   content: ""; 
   display: inline-block;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="%231C1B1F"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>');
   background-repeat: no-repeat;
   background-size: contain;
-  margin-right: 8px;
-  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="%231C1B1F"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>');
+  margin-right: .5rem;
+}
+
+button[data-action="toggle-view-all-files"]::before {
+  content: ""; 
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M440-440H240q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h200v-200q0-17 11.5-28.5T480-760q17 0 28.5 11.5T520-720v200h200q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H520v200q0 17-11.5 28.5T480-200q-17 0-28.5-11.5T440-240v-200Z"/></svg>');
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+button[data-action="toggle-view-all-files"].toggled::before {
+  content: ""; 
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M240-440q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h480q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H240Z"/></svg>');
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 /* About Fileset List */
@@ -247,7 +276,7 @@ body:has(dialog[open]) {
 
 .dialog-list {
   display: grid;
-  grid-template-columns: max-content 1fr;
+  grid-template-columns: 1fr;
   gap: 1rem;
 }
 
@@ -390,10 +419,6 @@ aside.page-aside {
   padding: 1rem 0 1rem 1rem;
 }
 
-.side-nav ul li:first-child > a {
-  padding-top: 0;
-} 
- 
 .side-nav ul li a:hover {
   text-decoration: underline;
   text-decoration-thickness: 0.125rem;
@@ -415,25 +440,29 @@ aside.page-aside {
   --bg-even: var(--color-blue-100);
   padding: .145rem 0;
   border-top: solid 1px var(--color-neutral-100);
+  max-width: 100vw;
 }
 
-details:last-of-type {
-   border-bottom: solid 1px var(--color-neutral-100);
+details.fileset-details:last-of-type {
+  border-bottom: solid 1px var(--color-neutral-100);
+}
+
+details.object-descriptor summary {
+  font-weight: var(--semibold);
+}
+
+details.object-descriptor summary span:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 0.125rem;
 }
 
 details:nth-child(even) {
   background-color: var(--bg-even);
 }
 
-.details-with-border {
-  border-left: solid 1px var(--color-neutral-100);
-  border-right: solid 1px var(--color-neutral-100);
-  border-radius: var(--radius-default);
-}
-
 details > summary::before {
   font-family: "Material Symbols Rounded";
-  font-size: 24px;
+  font-size: 28px;
   content: "\e313";
   color: var(--color-teal-400);
 }
@@ -486,6 +515,10 @@ details[open] > summary:first-of-type {
 }
 
 /* Tables */
+
+.table-responsive {
+  overflow-x: auto;
+}
 
 table.m-table {
   border-collapse: collapse;
@@ -602,6 +635,13 @@ table.m-table {
 .flex { display: flex; }
 .grid { display: grid; }
 .hidden { display: none; }
+
+.no-border {
+  border-top: none;
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+}
 
 /* Fileset display */
 tr[data-toggleable] {
