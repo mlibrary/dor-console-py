@@ -19,7 +19,16 @@ from dor.domain import (
 # Fixture(s)
 
 @pytest.fixture
-def source_object_file() -> ObjectFile:
+def linking_agent() -> LinkingAgent:
+    return LinkingAgent(
+        value="someone@org.edu",
+        type="???",
+        role="collection manager"
+    )
+
+
+@pytest.fixture
+def source_object_file(linking_agent: LinkingAgent) -> ObjectFile:
     some_hash = hashlib.sha512(b"some_hash").digest()
 
     return ObjectFile(
@@ -31,26 +40,54 @@ def source_object_file() -> ObjectFile:
         created_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
         updated_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
         digest=some_hash,
-        last_fixity_check=datetime.now(tz=UTC),
+        last_fixity_check=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
         checksums=[Checksum(
             algorithm="sha512",
             digest=some_hash,
-            created_at=datetime.now(tz=UTC)
+            created_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC)
         )],
         premis_events=[PremisEvent(
             identifier=UUID('4a1e3052-fca8-49ec-9343-86d17141898e'),
             type="fixity",
             detail="File fixity checked",
-            datetime=datetime.now(tz=UTC),
+            datetime=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
             outcome="success",
             outcome_detail_note="something's happening here.",
-            linking_agent=LinkingAgent(
-                value="someone@org.edu",
-                type="???",
-                role="collection manager"
-            )
+            linking_agent=linking_agent
         )]
     )
+
+
+@pytest.fixture
+def source_object_file_revised(linking_agent) -> ObjectFile:
+    some_hash = hashlib.sha512(b"some_hash").digest()
+
+    return ObjectFile(
+        identifier=UUID('c8e0fc8a-9e60-4d48-afa5-ee18de31fe21'),
+        path=Path("some/path/00000001.function:source.format:image.tiff"),
+        file_format="tiff",
+        file_function="source",
+        size=1000000,
+        created_at=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
+        updated_at=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
+        digest=some_hash,
+        last_fixity_check=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
+        checksums=[Checksum(
+            algorithm="sha512",
+            digest=some_hash,
+            created_at=datetime(2025, 8, 17, 16, 0, tzinfo=UTC)
+        )],
+        premis_events=[PremisEvent(
+            identifier=UUID('828e0aa9-3629-492a-9c48-b4454dc97953'),
+            type="fixity",
+            detail="File fixity checked",
+            datetime=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
+            outcome="success",
+            outcome_detail_note="something's happening here.",
+            linking_agent=linking_agent
+        )]
+    )
+
 
 @pytest.fixture
 def descriptor_object_file() -> ObjectFile:
@@ -60,42 +97,62 @@ def descriptor_object_file() -> ObjectFile:
         identifier=UUID('6e47540b-9825-436b-b893-348059124b47'),
         path=Path("some/path/monograph.xml"),
         file_format="xml",
-        file_function="",
+        file_function="function:descriptor",
         size=1000000,
         created_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
         updated_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
         digest=some_hash,
-        last_fixity_check=datetime.now(tz=UTC),
+        last_fixity_check=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
         checksums=[Checksum(
             algorithm="sha512",
             digest=some_hash,
-            created_at=datetime.now(tz=UTC)
+            created_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC)
         )],
         premis_events=[]
     )
 
+
 @pytest.fixture
-def sample_fileset(source_object_file: ObjectFile) -> Fileset:
+def descriptor_object_file_revised() -> ObjectFile:
+    some_other_hash = hashlib.sha512(b"some_other_hash").digest()
+
+    return ObjectFile(
+        identifier=UUID('e90a35dd-ee6d-49b3-a2a9-5ce02e747f68'),
+        path=Path("some/path/monograph.xml"),
+        file_format="xml",
+        file_function="function:descriptor",
+        size=1000000,
+        created_at=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
+        updated_at=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
+        digest=some_other_hash,
+        last_fixity_check=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
+        checksums=[Checksum(
+            algorithm="sha512",
+            digest=some_other_hash,
+            created_at=datetime(2025, 8, 17, 16, 0, tzinfo=UTC)
+        )],
+        premis_events=[]
+    )
+
+
+@pytest.fixture
+def sample_fileset(source_object_file: ObjectFile, linking_agent: LinkingAgent) -> Fileset:
     return Fileset(
         identifier=UUID('0b65c631-e0da-444f-ad6d-80af949a11a0'),
         alternate_identifiers=["something or other"],
         title="some title",
         order_label="Page 1",
         revision_number=1,
-        created_at=datetime.now(tz=UTC),
+        created_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
         object_files=[source_object_file],
         premis_events=[PremisEvent(
             identifier=UUID('288ff3f6-2368-4467-8f41-90f233681900'),
             type="ocr",
             detail="OCR text generated.",
-            datetime=datetime.now(tz=UTC),
+            datetime=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
             outcome="success",
             outcome_detail_note="something's happening here.",
-            linking_agent=LinkingAgent(
-                value="someone@org.edu",
-                type="???",
-                role="collection manager"
-            )
+            linking_agent=linking_agent
         )]
     )
 
@@ -127,7 +184,8 @@ def sample_collection_two() -> Collection:
 def sample_object_one(
     sample_fileset: Fileset,
     descriptor_object_file: ObjectFile,
-    sample_collection_one: Collection
+    sample_collection_one: Collection,
+    linking_agent: LinkingAgent
 ) -> IntellectualObject:
     identifier = UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3")
 
@@ -137,8 +195,8 @@ def sample_object_one(
         alternate_identifiers=["some-identifier-one"],
         type="Monograph",
         revision_number=1,
-        created_at=datetime.now(tz=UTC),
-        updated_at=datetime.now(tz=UTC),
+        created_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
+        updated_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
         title="Sample Object",
         description="This is a sample monograph object.",
         filesets=[sample_fileset],
@@ -147,14 +205,10 @@ def sample_object_one(
             identifier=UUID('6ec34c12-4b59-428a-ac12-31e9f956a8ae'),
             type="ingest",
             detail="Object ingested.",
-            datetime=datetime.now(tz=UTC),
+            datetime=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
             outcome="success",
             outcome_detail_note="something's happening here.",
-            linking_agent=LinkingAgent(
-                value="someone@org.edu",
-                type="???",
-                role="collection manager"
-            )
+            linking_agent=linking_agent
         )],
         collections=[sample_collection_one]
     )
@@ -170,14 +224,73 @@ def sample_object_two(sample_collection_two: Collection) -> IntellectualObject:
         alternate_identifiers=["some-identifier-two"],
         type="Slide",
         revision_number=1,
-        created_at=datetime.now(tz=UTC),
-        updated_at=datetime.now(tz=UTC),
+        created_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
+        updated_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
         title="Sample Object Two",
         description="This is a sample monograph object.",
         filesets=[],
         object_files=[],
         premis_events=[],
         collections=[sample_collection_two]
+    )
+
+
+@pytest.fixture
+def sample_fileset_revised(
+    source_object_file_revised: ObjectFile,
+    linking_agent: LinkingAgent
+) -> Fileset:
+    return Fileset(
+        identifier=UUID('0b65c631-e0da-444f-ad6d-80af949a11a0'),
+        alternate_identifiers=["something or other"],
+        title="some title",
+        order_label="Page #1",
+        revision_number=2,
+        created_at=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
+        object_files=[source_object_file_revised],
+        premis_events=[PremisEvent(
+            identifier=UUID('327eee24-5992-4849-8559-b20f66b3d209'),
+            type="ocr",
+            detail="OCR text generated.",
+            datetime=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
+            outcome="success",
+            outcome_detail_note="something's happening here.",
+            linking_agent=linking_agent
+        )]
+    )
+
+
+@pytest.fixture
+def sample_object_one_revised(
+    descriptor_object_file_revised: ObjectFile,
+    sample_fileset_revised: Fileset,
+    sample_collection_one: Collection,
+    linking_agent: LinkingAgent
+) -> IntellectualObject:
+    identifier = UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3")
+
+    return IntellectualObject(
+        identifier=identifier,
+        bin_identifier=identifier,
+        alternate_identifiers=["some-identifier-one"],
+        type="Monograph",
+        revision_number=2,
+        created_at=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
+        updated_at=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
+        title="Sample Object",
+        description="This is a slightly different sample monograph object.",
+        filesets=[sample_fileset_revised],
+        object_files=[descriptor_object_file_revised],
+        premis_events=[PremisEvent(
+            identifier=UUID('e946c19e-4a53-42dd-be19-fece3f0a5e31'),
+            type="ingest",
+            detail="Object ingested.",
+            datetime=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
+            outcome="success",
+            outcome_detail_note="something's happening here.",
+            linking_agent=linking_agent
+        )],
+        collections=[sample_collection_one]
     )
 
 
@@ -216,6 +329,36 @@ def test_memory_catalog_gets_object(sample_object_one: IntellectualObject) -> No
     assert object == sample_object_one
 
 
+def test_memory_catalog_gets_latest_revision_of_object(
+    sample_object_one: IntellectualObject,
+    sample_object_one_revised: IntellectualObject
+) -> None:
+    catalog = MemoryCatalog()
+    catalog.add(sample_object_one)
+    catalog.add(sample_object_one_revised)
+
+    object = catalog.get(UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"))
+    assert object == sample_object_one_revised
+
+
+def test_memory_catalog_returns_no_current_revision_number():
+    catalog = MemoryCatalog()
+    number = catalog.get_current_revision_number(UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"))
+    assert number is None
+
+
+def test_memory_catalog_gets_current_revision_number(
+    sample_object_one: IntellectualObject,
+    sample_object_one_revised: IntellectualObject   
+):
+    catalog = MemoryCatalog()
+    catalog.add(sample_object_one)
+    catalog.add(sample_object_one_revised)
+
+    number = catalog.get_current_revision_number(UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"))
+    assert number == 2
+
+
 def test_memory_catalog_finds_all_objects(
     sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
@@ -251,6 +394,7 @@ def test_memory_catalog_finds_objects_with_start(
     assert len(objects) == 1
     assert objects == [sample_object_two]
 
+
 def test_memory_catalog_finds_objects_filtering_on_collection_alt_identifier(
     sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
@@ -273,6 +417,7 @@ def test_memory_catalog_finds_objects_filtering_on_object_type(
     assert len(objects) == 1
     assert objects == [sample_object_two]
 
+
 def test_memory_catalog_finds_objects_filtering_on_alt_identifier(
     sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
@@ -283,6 +428,7 @@ def test_memory_catalog_finds_objects_filtering_on_alt_identifier(
     objects = catalog.find(alt_identifier="some-identifier-one")
     assert len(objects) == 1
     assert objects == [sample_object_one]
+
 
 def test_memory_catalog_finds_total_with_all(
     sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
@@ -397,12 +543,56 @@ def test_sqlalchemy_catalog_gets_object(
     assert object == sample_object_one
 
 
+def test_sqlalchemy_catalog_gets_latest_revision_of_object(
+    db_session,
+    sample_object_one: IntellectualObject,
+    sample_object_one_revised: IntellectualObject
+) -> None:
+    catalog = SqlalchemyCatalog(db_session)
+    with db_session.begin():
+        catalog.add(sample_object_one)
+        db_session.commit()
+
+    with db_session.begin():
+        catalog.add(sample_object_one_revised)
+        db_session.commit()
+
+    the_object = catalog.get(UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"))
+    assert the_object == sample_object_one_revised
+
+
+def test_sqlalchemy_catalog_returns_no_current_revision_number(db_session):
+    catalog = SqlalchemyCatalog(db_session)
+    number = catalog.get_current_revision_number(UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"))
+    assert number is None
+
+
+def test_sqlalchemy_catalog_gets_current_revision_number(
+    db_session,
+    sample_object_one: IntellectualObject,
+    sample_object_one_revised: IntellectualObject   
+):
+    catalog = SqlalchemyCatalog(db_session)
+    with db_session.begin():
+        catalog.add(sample_object_one)
+        db_session.commit()
+
+    with db_session.begin():
+        catalog.add(sample_object_one_revised)
+        db_session.commit()
+
+    number = catalog.get_current_revision_number(UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"))
+    assert number == 2
+
+
 def test_sqlalchemy_catalog_finds_all_objects(
     db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
     catalog = SqlalchemyCatalog(db_session)
-    catalog.add(sample_object_one)
-    catalog.add(sample_object_two)
+    with db_session.begin():
+        catalog.add(sample_object_one)
+        catalog.add(sample_object_two)
+        db_session.commit()
 
     objects = catalog.find()
     assert len(objects) == 2
@@ -413,8 +603,10 @@ def test_sqlalchemy_catalog_finds_objects_with_limit(
     db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
     catalog = SqlalchemyCatalog(db_session)
-    catalog.add(sample_object_one)
-    catalog.add(sample_object_two)
+    with db_session.begin():
+        catalog.add(sample_object_one)
+        catalog.add(sample_object_two)
+        db_session.commit()
 
     objects = catalog.find(limit=1)
     assert len(objects) == 1
@@ -425,8 +617,10 @@ def test_sqlalchemy_catalog_finds_objects_with_start(
     db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
     catalog = SqlalchemyCatalog(db_session)
-    catalog.add(sample_object_one)
-    catalog.add(sample_object_two)
+    with db_session.begin():
+        catalog.add(sample_object_one)
+        catalog.add(sample_object_two)
+        db_session.commit()
 
     objects = catalog.find(start=1)
     assert len(objects) == 1
@@ -437,8 +631,10 @@ def test_sqlalchemy_catalog_finds_objects_filtering_on_collection_alt_identifier
     db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
     catalog = SqlalchemyCatalog(db_session)
-    catalog.add(sample_object_one)
-    catalog.add(sample_object_two)
+    with db_session.begin():
+        catalog.add(sample_object_one)
+        catalog.add(sample_object_two)
+        db_session.commit()
 
     objects = catalog.find(collection_alt_identifier="collid_one")
     assert len(objects) == 1
@@ -449,8 +645,10 @@ def test_sqlalchemy_catalog_finds_objects_filtering_on_object_type(
     db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
     catalog = SqlalchemyCatalog(db_session)
-    catalog.add(sample_object_one)
-    catalog.add(sample_object_two)
+    with db_session.begin():
+        catalog.add(sample_object_one)
+        catalog.add(sample_object_two)
+        db_session.commit()
 
     objects = catalog.find(object_type="Slide")
     assert len(objects) == 1
@@ -461,8 +659,10 @@ def test_sqlalchemy_catalog_finds_objects_filtering_on_alt_identifier(
     db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
     catalog = SqlalchemyCatalog(db_session)
-    catalog.add(sample_object_one)
-    catalog.add(sample_object_two)
+    with db_session.begin():
+        catalog.add(sample_object_one)
+        catalog.add(sample_object_two)
+        db_session.commit()
 
     objects = catalog.find(alt_identifier="some-identifier-one")
     assert len(objects) == 1
@@ -473,8 +673,10 @@ def test_sqlalchemy_catalog_finds_total_with_all(
     db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
     catalog = SqlalchemyCatalog(db_session)
-    catalog.add(sample_object_one)
-    catalog.add(sample_object_two)
+    with db_session.begin():
+        catalog.add(sample_object_one)
+        catalog.add(sample_object_two)
+        db_session.commit()
 
     assert catalog.find_total() == 2
 
@@ -483,8 +685,10 @@ def test_sqlalchemy_catalog_finds_total_with_some(
     db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
     catalog = SqlalchemyCatalog(db_session)
-    catalog.add(sample_object_one)
-    catalog.add(sample_object_two)
+    with db_session.begin():
+        catalog.add(sample_object_one)
+        catalog.add(sample_object_two)
+        db_session.commit()
 
     assert catalog.find_total(alt_identifier="some-identifier-two") == 1
 
@@ -493,7 +697,9 @@ def test_sqlalchemy_catalog_gets_distinct_object_types(
     db_session, sample_object_one: IntellectualObject, sample_object_two: IntellectualObject
 ) -> None:
     catalog = SqlalchemyCatalog(db_session)
-    catalog.add(sample_object_one)
-    catalog.add(sample_object_two)
+    with db_session.begin():
+        catalog.add(sample_object_one)
+        catalog.add(sample_object_two)
+        db_session.commit()
 
     assert catalog.get_distinct_types() == ["Monograph", "Slide"]

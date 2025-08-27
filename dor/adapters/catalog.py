@@ -12,7 +12,10 @@ from dor.domain import (
 from dor.models.checksum import Checksum as ChecksumModel
 from dor.models.collection import Collection as CollectionModel
 from dor.models.fileset import Fileset as FilesetModel
-from dor.models.intellectual_object import IntellectualObject as IntellectualObjectModel
+from dor.models.intellectual_object import (
+    IntellectualObject as IntellectualObjectModel,
+    CurrentRevision as CurrentRevisionModel
+)
 from dor.models.object_file import ObjectFile as ObjectFileModel
 from dor.models.premis_event import PremisEvent as PremisEventModel
 
@@ -23,6 +26,9 @@ class Catalog(ABC):
         raise NotImplementedError
 
     def get(self, identifier: UUID) -> IntellectualObject | None:
+        raise NotImplementedError
+
+    def get_current_revision_number(self, identifier: UUID) -> int | None:
         raise NotImplementedError
 
     def find(
@@ -51,15 +57,23 @@ class MemoryCatalog(Catalog):
 
     def __init__(self) -> None:
         self.objects: list[IntellectualObject] = []
+        self.current_revision_data: dict[UUID, int] = {}
 
     def add(self, object: IntellectualObject) -> None:
         self.objects.append(object)
+        self.current_revision_data[object.identifier] = object.revision_number
 
     def get(self, identifier: UUID) -> IntellectualObject | None:
         for object in self.objects:
-            if object.identifier == identifier:
+            if (
+                object.identifier == identifier and
+                self.current_revision_data[identifier] == object.revision_number
+            ):
                 return object
         return None
+
+    def get_current_revision_number(self, identifier: UUID):
+        return self.current_revision_data.get(identifier)
 
     def filter(
         self,
@@ -132,6 +146,7 @@ class MemoryCatalog(Catalog):
             if object.type not in distinct_types:
                 distinct_types.append(object.type)
         return distinct_types
+
 
 class SqlalchemyCatalog(Catalog):
 
@@ -322,6 +337,16 @@ class SqlalchemyCatalog(Catalog):
         self.session.add(collection_model)
         return collection_model
 
+    def _get_current_revision(self, identifier:  UUID) -> CurrentRevisionModel | None:
+        query = sqlalchemy.select(CurrentRevisionModel) \
+            .where(CurrentRevisionModel.intellectual_object_identifier == identifier)
+        try:
+            with self.session.no_autoflush:
+                result = self.session.scalars(query).one()
+        except sqlalchemy.exc.NoResultFound:
+            return None
+        return result
+
     def add(self, object: IntellectualObject) -> None:
         object_model = IntellectualObjectModel(
             identifier=object.identifier,
@@ -360,25 +385,42 @@ class SqlalchemyCatalog(Catalog):
             )
 
         for object_file in object.object_files:
-            object_file_model = SqlalchemyCatalog.object_file_to_model(object_file)
-            object_model.object_files.append(object_file_model)
+            object_model.object_files.append(SqlalchemyCatalog.object_file_to_model(object_file))
 
         for collection in object.collections:
             collection_model = self.upsert_collection(collection)
             object_model.collections.append(collection_model)
-        self.session.add_all([object_model])
+
+        current_revision = self._get_current_revision(object.identifier)
+        if not current_revision:
+            object_model.revision = CurrentRevisionModel(
+                revision_number=1,
+                intellectual_object_identifier=object.identifier
+            )
+        else:
+            current_revision.revision_number = object.revision_number
+            current_revision.intellectual_object = object_model
+            self.session.add(current_revision)
+
+        self.session.add(object_model)
 
     def get(self, identifier: UUID) -> IntellectualObject | None:
-        statement = sqlalchemy.select(IntellectualObjectModel).where(
-            IntellectualObjectModel.identifier == identifier
-        )
+        statement = sqlalchemy.select(CurrentRevisionModel) \
+            .join(IntellectualObjectModel) \
+            .where(IntellectualObjectModel.identifier == identifier)
+
         try:
             result = self.session.scalars(statement).one()
-
-            intellectual_object = SqlalchemyCatalog.model_to_intellectual_object(result)
+            intellectual_object = SqlalchemyCatalog.model_to_intellectual_object(
+                result.intellectual_object
+            )
             return intellectual_object
         except sqlalchemy.exc.NoResultFound:
             return None
+
+    def get_current_revision_number(self, identifier: UUID) -> int | None:
+        result = self._get_current_revision(identifier)
+        return result.revision_number if result else None
 
     @staticmethod
     def get_find_query(
