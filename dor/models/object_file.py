@@ -41,4 +41,4 @@ class ObjectFile(Base):
 
     @property
     def name(self) -> str:
-        return Path(self.identifier).name
+        return Path(self.path).name
