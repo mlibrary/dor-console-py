@@ -11,6 +11,7 @@ from rich.table import Table
 from sqlalchemy import delete, select
 
 from dor.adapters.sqlalchemy import Base
+from dor.adapters.catalog import SqlalchemyCatalog
 from dor.builder import build_collection, build_intellectual_object
 from dor.config import config
 from dor.models.collection import Collection
@@ -97,7 +98,6 @@ def collection(
         collection_data = fetch(collection_url)
         if not collection:
             collection = build_collection(collection_data, collection_type)
-            session.add(collection)
 
         total_items = collection_data['total']
         num_items = len(collection_data['manifests'])
@@ -112,21 +112,17 @@ def collection(
             manifest_data = fetch(manifest_url)
 
             intellectual_object = build_intellectual_object(
-                collid=collid,
+                collection=collection,
                 manifest_data=manifest_data,
                 object_type=object_type,
             )
-
-            session.add(intellectual_object)
-            collection.objects.append(intellectual_object)
+            catalog = SqlalchemyCatalog(session=session)
+            catalog.add(intellectual_object)
 
             session.commit()
 
             console.print(f":frame_with_picture:\t{num_processed} : importing {datum['label']}")
             if limit > 0 and num_processed >= limit: break
-
-
-
 
         collection_url = collection_data.get('next', None)
         if not collection_url or limit > 0 and num_processed >= limit:
