@@ -28,13 +28,11 @@ if ( dialog ) {
     `button[data-action="open-modal"]`
   );
   triggerBtns.forEach((triggerBtn) => {
-    triggerBtn.addEventListener("click", (event) => {
+    triggerBtn.addEventListener("click", async (event) => {
       lastTriggerBtn = triggerBtn;
-      loadPageIntoModal(triggerBtn.dataset.modalHref, dialog)
-      .then(() => {
-        dialog.showModal();
-        cancelBtn.focus();
-      })
+      await loadPageIntoModal(triggerBtn.dataset.modalHref, dialog);
+      dialog.showModal();
+      cancelBtn.focus();
     });
   });
 }
