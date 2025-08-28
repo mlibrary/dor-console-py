@@ -56,7 +56,7 @@ async def get_objects(
 
     filters: list[Filter] = [
         Filter(key="object_type", value=object_type, name="Object Type"),
-        Filter(key="alt_identifier", value=alt_identifier, name="Alternative Identifier"),
+        Filter(key="alt_identifier", value=alt_identifier, name="Alternate Identifier"),
         Filter(key="collection_alt_identifier", value=collection_alt_identifier, name="Collection")
     ]
     active_query_parameters = { filter.key: filter.value for filter in filters if filter.value }
