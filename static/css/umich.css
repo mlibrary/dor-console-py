@@ -124,12 +124,18 @@ html {
     font-size: 16px;
     box-sizing: border-box;
 }
+
 a {
     color: var(--color-teal-400);
     text-decoration: underline;
 }
+
 a:hover {
     text-decoration-thickness: 2px;
+}
+
+m-website-header.hydrated:focus {
+  box-shadow: none;
 }
 
 /* 3. Typography */
