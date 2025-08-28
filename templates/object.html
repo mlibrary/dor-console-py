@@ -17,7 +17,7 @@
 
 <h1 class="mb-2">{{ object.title }}</h1>
 
-<div class="object-flex-layout mb-2">
+<div class="object-flex-layout mb-1">
 <section>
   <h2 class="mt-0 pt-1_5">About this object</h2>
   <dl class="object-list">
@@ -45,12 +45,33 @@
     <dt>Revisions</dt>
     <dd>{{ object.revision_number}}</dd>
   </dl>
+</section>
 
-  <details class="details-with-border">
-    <summary>View object descriptor and metadata files</summary>
+<section>
+  <div class="object-event-history--container">
+    <h2 class="mt-0 pt-1_5">Object event history</h2>
+    <div class="button-group-column">
+      {% for event in events %}
+        <button 
+          data-action="open-modal" 
+          data-modal-href="{{ url_for('get_event', identifier=event.identifier) }}?modal=true" 
+          type="button" 
+          class="button-outline-variant"
+          data-event-type="{{ event.type.lower() }}">
+            <span class="label">{{ event.type | capitalize }}</span> 
+            <span>{{ event.date_time.strftime("%Y-%m-%d %H:%M:%S") }}</span></button>
+      {% endfor %}
+    </div>
+    {% include '/partials/_dialog.html' %}
+  </div>
+</section>
+</div>
+
+<details class="no-border object-descriptor">
+    <summary><span>View object descriptor and metadata files</span></summary>
     <div class="details-contents-wrapper">
       <h3>Object descriptor and metadata</h3>
-        <div class="table-wrapper">
+        <div class="table-responsive scroll-shadows--horizontal">
           <table class="m-table">
             <thead>
             <tr>
@@ -80,28 +101,7 @@
           </table>
         </div>
     </div>
-  </details>
-</section>
-
-<section>
-  <div class="object-event-history--container">
-    <h2 class="mt-0 pt-1_5">Object event history</h2>
-    <div class="button-group-column">
-      {% for event in events %}
-        <button 
-          data-action="open-modal" 
-          data-modal-href="{{ url_for('get_event', identifier=event.identifier) }}?modal=true" 
-          type="button" 
-          class="button-outline-variant"
-          data-event-type="{{ event.type.lower() }}">
-            <span class="label">{{ event.type }}</span> 
-            <span>{{ event.date_time.strftime("%Y-%m-%d %H:%M:%S") }}</span></button>
-      {% endfor %}
-    </div>
-    {% include '/partials/_dialog.html' %}
-  </div>
-</section>
-</div>
+</details>
 
 <h2>Filesets</h2>
 <p class="prose pb-1">
@@ -112,7 +112,7 @@
 <div class="mb-1">
 <p>Showing {{ filesets_page.range }} of {{ filesets_page.total_items }} filesets</p>
 {% for fileset in filesets_page.items %}
-<details>
+<details class="fileset-details">
   <summary class="mono">{{ fileset.source_object_file.name }} <span class="order-label">{{ fileset.order_label }}</span></summary>
   <div class="details-contents-wrapper">
     <h3 class="mt-0 pt-1">About this fileset</h3>
@@ -121,7 +121,7 @@
       <li>Ingested: {{ fileset.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</li>
     </ul>
     <h3>Fileset contents</h3>
-    <div class="table-wrapper" data-view-all-files="false">
+    <div class="table-responsive scroll-shadows--horizontal" data-view-all-files="false">
     <table class="m-table">
       <thead>
         <tr>
