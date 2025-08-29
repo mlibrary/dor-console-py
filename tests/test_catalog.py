@@ -28,11 +28,11 @@ def linking_agent() -> LinkingAgent:
 
 
 @pytest.fixture
-def source_object_file(linking_agent: LinkingAgent) -> ObjectFile:
+def source_object_file_one(linking_agent: LinkingAgent) -> ObjectFile:
     some_hash = hashlib.sha512(b"some_hash").digest()
 
     return ObjectFile(
-        identifier=UUID('279bcb2e-17b3-4cd1-8d04-8d2d1e670b75'),
+        identifier=UUID("279bcb2e-17b3-4cd1-8d04-8d2d1e670b75"),
         path=Path("some/path/00000001.function:source.format:image.tiff"),
         file_format="tiff",
         file_function="source",
@@ -47,7 +47,7 @@ def source_object_file(linking_agent: LinkingAgent) -> ObjectFile:
             created_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC)
         )],
         premis_events=[PremisEvent(
-            identifier=UUID('4a1e3052-fca8-49ec-9343-86d17141898e'),
+            identifier=UUID("4a1e3052-fca8-49ec-9343-86d17141898e"),
             type="fixity",
             detail="File fixity checked",
             datetime=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
@@ -59,11 +59,42 @@ def source_object_file(linking_agent: LinkingAgent) -> ObjectFile:
 
 
 @pytest.fixture
-def source_object_file_revised(linking_agent) -> ObjectFile:
-    some_hash = hashlib.sha512(b"some_hash").digest()
+def source_object_file_two(linking_agent: LinkingAgent) -> ObjectFile:
+    some_hash = hashlib.sha512(b"some_other_hash").digest()
 
     return ObjectFile(
-        identifier=UUID('c8e0fc8a-9e60-4d48-afa5-ee18de31fe21'),
+        identifier=UUID("e7571095-bd69-4e21-8afa-e5aa97d63a2a"),
+        path=Path("some/path/00000002.function:source.format:image.tiff"),
+        file_format="tiff",
+        file_function="source",
+        size=1000005,
+        created_at=datetime(2025, 8, 17, 14, 0, tzinfo=UTC),
+        updated_at=datetime(2025, 8, 17, 14, 0, tzinfo=UTC),
+        digest=some_hash,
+        last_fixity_check=datetime(2025, 8, 17, 14, 0, tzinfo=UTC),
+        checksums=[Checksum(
+            algorithm="sha512",
+            digest=some_hash,
+            created_at=datetime(2025, 8, 17, 14, 0, tzinfo=UTC)
+        )],
+        premis_events=[PremisEvent(
+            identifier=UUID("57f89774-a9b8-410e-8623-7be6b30187bf"),
+            type="fixity",
+            detail="File fixity checked",
+            datetime=datetime(2025, 8, 17, 14, 0, tzinfo=UTC),
+            outcome="success",
+            outcome_detail_note="something's happening here.",
+            linking_agent=linking_agent
+        )]
+    )
+
+
+@pytest.fixture
+def source_object_file_one_revised(linking_agent) -> ObjectFile:
+    some_hash = hashlib.sha512(b"some_third_hash").digest()
+
+    return ObjectFile(
+        identifier=UUID("c8e0fc8a-9e60-4d48-afa5-ee18de31fe21"),
         path=Path("some/path/00000001.function:source.format:image.tiff"),
         file_format="tiff",
         file_function="source",
@@ -78,7 +109,7 @@ def source_object_file_revised(linking_agent) -> ObjectFile:
             created_at=datetime(2025, 8, 17, 16, 0, tzinfo=UTC)
         )],
         premis_events=[PremisEvent(
-            identifier=UUID('828e0aa9-3629-492a-9c48-b4454dc97953'),
+            identifier=UUID("828e0aa9-3629-492a-9c48-b4454dc97953"),
             type="fixity",
             detail="File fixity checked",
             datetime=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
@@ -136,17 +167,17 @@ def descriptor_object_file_revised() -> ObjectFile:
 
 
 @pytest.fixture
-def sample_fileset(source_object_file: ObjectFile, linking_agent: LinkingAgent) -> Fileset:
+def sample_fileset_one(source_object_file_one: ObjectFile, linking_agent: LinkingAgent) -> Fileset:
     return Fileset(
         identifier=UUID('0b65c631-e0da-444f-ad6d-80af949a11a0'),
         alternate_identifiers=["something or other"],
-        title="some title",
+        title="00001",
         order_label="Page 1",
         revision_number=1,
         created_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
-        object_files=[source_object_file],
+        object_files=[source_object_file_one],
         premis_events=[PremisEvent(
-            identifier=UUID('288ff3f6-2368-4467-8f41-90f233681900'),
+            identifier=UUID("288ff3f6-2368-4467-8f41-90f233681900"),
             type="ocr",
             detail="OCR text generated.",
             datetime=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
@@ -155,6 +186,29 @@ def sample_fileset(source_object_file: ObjectFile, linking_agent: LinkingAgent) 
             linking_agent=linking_agent
         )]
     )
+
+
+@pytest.fixture
+def sample_fileset_two(source_object_file_two: ObjectFile, linking_agent: LinkingAgent) -> Fileset:
+    return Fileset(
+        identifier=UUID("5ff0bd21-c6ed-489f-a639-dca89ff702d9"),
+        alternate_identifiers=["something else"],
+        title="00002",
+        order_label="Page 2",
+        revision_number=1,
+        created_at=datetime(2025, 8, 17, 14, 0, tzinfo=UTC),
+        object_files=[source_object_file_two],
+        premis_events=[PremisEvent(
+            identifier=UUID("feb7a406-48c9-48fc-8d4a-a6126296138b"),
+            type="ocr",
+            detail="OCR text generated.",
+            datetime=datetime(2025, 8, 17, 14, 0, tzinfo=UTC),
+            outcome="success",
+            outcome_detail_note="something's happening here.",
+            linking_agent=linking_agent
+        )]
+    )
+
 
 @pytest.fixture
 def sample_collection_one() -> Collection:
@@ -168,6 +222,7 @@ def sample_collection_one() -> Collection:
         updated_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC)
     )
 
+
 @pytest.fixture
 def sample_collection_two() -> Collection:
     return Collection(
@@ -180,9 +235,11 @@ def sample_collection_two() -> Collection:
         updated_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC)
     )
 
+
 @pytest.fixture
 def sample_object_one(
-    sample_fileset: Fileset,
+    sample_fileset_one: Fileset,
+    sample_fileset_two: Fileset,
     descriptor_object_file: ObjectFile,
     sample_collection_one: Collection,
     linking_agent: LinkingAgent
@@ -199,7 +256,7 @@ def sample_object_one(
         updated_at=datetime(2025, 8, 17, 12, 0, tzinfo=UTC),
         title="Sample Object",
         description="This is a sample monograph object.",
-        filesets=[sample_fileset],
+        filesets=[sample_fileset_one, sample_fileset_two],
         object_files=[descriptor_object_file],
         premis_events=[PremisEvent(
             identifier=UUID('6ec34c12-4b59-428a-ac12-31e9f956a8ae'),
@@ -236,8 +293,8 @@ def sample_object_two(sample_collection_two: Collection) -> IntellectualObject:
 
 
 @pytest.fixture
-def sample_fileset_revised(
-    source_object_file_revised: ObjectFile,
+def sample_fileset_one_revised(
+    source_object_file_one_revised: ObjectFile,
     linking_agent: LinkingAgent
 ) -> Fileset:
     return Fileset(
@@ -247,7 +304,7 @@ def sample_fileset_revised(
         order_label="Page #1",
         revision_number=2,
         created_at=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
-        object_files=[source_object_file_revised],
+        object_files=[source_object_file_one_revised],
         premis_events=[PremisEvent(
             identifier=UUID('327eee24-5992-4849-8559-b20f66b3d209'),
             type="ocr",
@@ -263,7 +320,7 @@ def sample_fileset_revised(
 @pytest.fixture
 def sample_object_one_revised(
     descriptor_object_file_revised: ObjectFile,
-    sample_fileset_revised: Fileset,
+    sample_fileset_one_revised: Fileset,
     sample_collection_one: Collection,
     linking_agent: LinkingAgent
 ) -> IntellectualObject:
@@ -279,7 +336,7 @@ def sample_object_one_revised(
         updated_at=datetime(2025, 8, 17, 16, 0, tzinfo=UTC),
         title="Sample Object",
         description="This is a slightly different sample monograph object.",
-        filesets=[sample_fileset_revised],
+        filesets=[sample_fileset_one_revised],
         object_files=[descriptor_object_file_revised],
         premis_events=[PremisEvent(
             identifier=UUID('e946c19e-4a53-42dd-be19-fece3f0a5e31'),
@@ -458,6 +515,64 @@ def test_memory_catalog_gets_distinct_object_types(
     catalog.add(sample_object_two)
 
     assert catalog.get_distinct_types() == ["Monograph", "Slide"]
+
+
+def test_memory_catalog_gets_filesets_for_object(
+    sample_object_one: IntellectualObject,
+    sample_fileset_one: Fileset,
+    sample_fileset_two: Fileset
+):
+    catalog = MemoryCatalog()
+    catalog.add(sample_object_one)
+
+    filesets = catalog.get_filesets_for_object(
+        identifier=UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3")
+    )
+
+    assert [sample_fileset_one, sample_fileset_two] == filesets
+
+
+def test_memory_catalog_gets_filesets_for_object_with_limit(
+    sample_object_one: IntellectualObject,
+    sample_fileset_one: Fileset
+):
+    catalog = MemoryCatalog()
+    catalog.add(sample_object_one)
+
+    filesets = catalog.get_filesets_for_object(
+        identifier=UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"),
+        limit=1
+    )
+
+    assert [sample_fileset_one] == filesets
+
+
+def test_memory_catalog_gets_filesets_for_object_with_start(
+    sample_object_one: IntellectualObject,
+    sample_fileset_two: Fileset
+):
+    catalog = MemoryCatalog()
+    catalog.add(sample_object_one)
+
+    filesets = catalog.get_filesets_for_object(
+        identifier=UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"),
+        start=1
+    )
+
+    assert [sample_fileset_two] == filesets
+
+
+def test_memory_catalog_gets_filesets_total(
+    sample_object_one: IntellectualObject,
+):
+    catalog = MemoryCatalog()
+    catalog.add(sample_object_one)
+
+    filesets_total = catalog.get_filesets_total(
+        identifier=UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3")
+    )
+
+    assert filesets_total == 2
 
 
 # SqlalchemyCatalog
@@ -703,3 +818,67 @@ def test_sqlalchemy_catalog_gets_distinct_object_types(
         db_session.commit()
 
     assert catalog.get_distinct_types() == ["Monograph", "Slide"]
+
+
+def test_sqlalchemy_catalog_gets_filesets_for_object(
+    db_session,
+    sample_object_one: IntellectualObject,
+    sample_fileset_one: Fileset,
+    sample_fileset_two: Fileset
+):
+    with db_session.begin():
+        catalog = SqlalchemyCatalog(db_session)
+        catalog.add(sample_object_one)
+        db_session.commit()
+
+    filesets = catalog.get_filesets_for_object(
+        identifier=UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3")
+    )
+
+    assert [sample_fileset_one, sample_fileset_two] == filesets
+
+
+def test_sqlalchemy_catalog_gets_filesets_for_object_with_limit(
+    db_session,
+    sample_object_one: IntellectualObject,
+    sample_fileset_one: Fileset
+):
+    catalog = SqlalchemyCatalog(db_session)
+    catalog.add(sample_object_one)
+
+    filesets = catalog.get_filesets_for_object(
+        identifier=UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"),
+        limit=1
+    )
+
+    assert [sample_fileset_one] == filesets
+
+
+def test_sqlalchemy_catalog_gets_filesets_for_object_with_start(
+    db_session,
+    sample_object_one: IntellectualObject,
+    sample_fileset_two: Fileset
+):
+    catalog = SqlalchemyCatalog(db_session)
+    catalog.add(sample_object_one)
+
+    filesets = catalog.get_filesets_for_object(
+        identifier=UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3"),
+        start=1
+    )
+
+    assert [sample_fileset_two] == filesets
+
+
+def test_sqlalchemy_catalog_gets_filesets_total(
+    db_session,
+    sample_object_one: IntellectualObject,
+):
+    catalog = SqlalchemyCatalog(db_session)
+    catalog.add(sample_object_one)
+
+    filesets_total = catalog.get_filesets_total(
+        identifier=UUID("8e449bbe-7cf5-493c-a782-b752e97fe6e3")
+    )
+
+    assert filesets_total == 2
