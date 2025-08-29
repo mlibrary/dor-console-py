@@ -52,6 +52,17 @@ class Catalog(ABC):
     def get_distinct_types(self) -> list[str]:
         raise NotImplementedError
 
+    def get_filesets_for_object(
+        self,
+        identifier: UUID,
+        start: int = 0,
+        limit: int = 10
+    ) -> list[Fileset]:
+        raise NotImplementedError
+
+    def get_filesets_total(self, identifier: UUID) -> int:
+        raise NotImplementedError
+
 
 class MemoryCatalog(Catalog):
 
@@ -146,6 +157,36 @@ class MemoryCatalog(Catalog):
             if object.type not in distinct_types:
                 distinct_types.append(object.type)
         return distinct_types
+
+    def get_filesets_for_object(
+        self,
+        identifier: UUID,
+        start: int = 0,
+        limit: int = 10,
+    ) -> list[Fileset]:
+        object = self.get(identifier)
+        if not object:
+            return []
+
+        filesets = object.filesets
+
+        if start > len(filesets) - 1:
+            return []
+        filesets_at_start = filesets[start:]
+
+        if len(filesets_at_start) > limit:
+            return filesets_at_start[:limit]
+        else:
+            return filesets_at_start
+
+    def get_filesets_total(
+        self,
+        identifier: UUID
+    ) -> int:
+        the_object = self.get(identifier)
+        if not the_object:
+            return 0
+        return len(the_object.filesets)
 
 
 class SqlalchemyCatalog(Catalog):
@@ -246,6 +287,26 @@ class SqlalchemyCatalog(Catalog):
         )
 
     @staticmethod
+    def model_to_fileset(model: FilesetModel) -> Fileset:
+        fileset = Fileset(
+            identifier=model.identifier,
+            alternate_identifiers=model.alternate_identifiers.split(","),
+            title=model.title,
+            revision_number=model.revision_number,
+            created_at=model.created_at.replace(tzinfo=UTC),
+            order_label=model.order_label,
+            object_files=[
+                SqlalchemyCatalog.model_to_object_file(object_file_model)
+                for object_file_model in model.object_files
+            ],
+            premis_events=[
+                SqlalchemyCatalog.model_to_premis_event(premis_event_model)
+                for premis_event_model in model.premis_events
+            ]
+        )
+        return fileset
+
+    @staticmethod
     def model_to_intellectual_object(model: IntellectualObjectModel) -> IntellectualObject:
         premis_events: list[PremisEvent] = []
         for event_result in model.premis_events:
@@ -259,22 +320,7 @@ class SqlalchemyCatalog(Catalog):
 
         filesets: list[Fileset] = []
         for fileset_model in model.filesets:
-            fileset = Fileset(
-                identifier=fileset_model.identifier,
-                alternate_identifiers=fileset_model.alternate_identifiers.split(","),
-                title=fileset_model.title,
-                revision_number=fileset_model.revision_number,
-                created_at=fileset_model.created_at.replace(tzinfo=UTC),
-                order_label=fileset_model.order_label,
-                object_files=[
-                    SqlalchemyCatalog.model_to_object_file(object_file_model)
-                    for object_file_model in fileset_model.object_files
-                ],
-                premis_events=[
-                    SqlalchemyCatalog.model_to_premis_event(premis_event_model)
-                    for premis_event_model in fileset_model.premis_events
-                ]
-            )
+            fileset = SqlalchemyCatalog.model_to_fileset(fileset_model)
             filesets.append(fileset)
 
         collections: list[Collection] = []
@@ -429,7 +475,8 @@ class SqlalchemyCatalog(Catalog):
         object_type: str | None = None
     ) -> sqlalchemy.Select:
         query = sqlalchemy.select(IntellectualObjectModel) \
-            .join(CollectionModel, IntellectualObjectModel.collections)
+            .join(CollectionModel, IntellectualObjectModel.collections) \
+            .join(CurrentRevisionModel)
         if object_type:
             query = query.filter(IntellectualObjectModel.type == object_type)
         if alt_identifier:
@@ -480,3 +527,22 @@ class SqlalchemyCatalog(Catalog):
             for result in results
         ]
         return objects
+
+    def get_filesets_for_object(self, identifier: UUID, start = 0, limit = 10) -> list[Fileset]:
+        query = sqlalchemy.select(FilesetModel) \
+            .join(IntellectualObjectModel) \
+            .join(CurrentRevisionModel) \
+            .where(IntellectualObjectModel.identifier == identifier)
+        query = query.offset(start).limit(limit)
+        results = self.session.execute(query).scalars()
+        return [SqlalchemyCatalog.model_to_fileset(result) for result in results]
+
+
+    def get_filesets_total(self, identifier: UUID) -> int:
+        query = sqlalchemy.select(FilesetModel) \
+            .join(IntellectualObjectModel) \
+            .join(CurrentRevisionModel) \
+            .where(IntellectualObjectModel.identifier == identifier)
+        from_clause = query.alias("count_query")
+        count_query = sqlalchemy.select(sqlalchemy.func.count()).select_from(from_clause)
+        return self.session.execute(count_query).scalar_one()
