@@ -24,8 +24,8 @@
     <dt>Identifier</dt>
     <dd>{{ object.identifier }}</dd>
 
-    <dt>Alternate identifier</dt>
-    <dd>{{ object.alternate_identifiers }}</dd>
+    <dt>Alternate identifiers</dt>
+    <dd>{{ object.alternate_identifiers | join(", ") }}</dd>
 
     <dt>Description</dt>
     <dd>{{ object.description }}</dd>
@@ -52,14 +52,17 @@
     <h2 class="mt-0 pt-1_5">Object event history</h2>
     <div class="button-group-column">
       {% for event in events %}
-        <button 
-          data-action="open-modal" 
-          data-modal-href="{{ url_for('get_event', identifier=event.identifier) }}?modal=true" 
-          type="button" 
-          class="button-outline-variant"
-          data-event-type="{{ event.type.lower() }}">
-            <span class="label">{{ event.type | capitalize }}</span> 
-            <span>{{ event.date_time.strftime("%Y-%m-%d %H:%M:%S") }}</span></button>
+      <button
+        data-action="open-modal"
+        data-modal-href="{{ url_for('get_event', identifier=event.identifier) }}?modal=true"
+        type="button"
+        class="button-outline-variant"
+        data-event-type="{{ event.type.lower() }}"
+      >
+        <span class="label">{{ event.type | capitalize }}</span>
+        <span>{{ event.datetime.strftime("%Y-%m-%d %H:%M:%S") }}
+        </span>
+      </button>
       {% endfor %}
     </div>
     {% include '/partials/_dialog.html' %}

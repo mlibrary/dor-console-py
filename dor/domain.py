@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from decimal import Decimal
 from pathlib import Path
 from uuid import UUID
 
@@ -43,6 +44,10 @@ class ObjectFile:
     checksums: list[Checksum]
     premis_events: list[PremisEvent]
 
+    @property
+    def name(self) -> str:
+        return Path(self.path).name
+
 
 @dataclass
 class Fileset:
@@ -54,6 +59,25 @@ class Fileset:
     order_label: str
     object_files: list[ObjectFile]
     premis_events: list[PremisEvent]
+
+    @property
+    def total_data_size(self):
+        file_sizes = [
+            f.size for f in self.object_files
+            if f.file_function == "function:source"
+        ]
+        return sum(file_sizes, start=Decimal("0"))
+
+    @property
+    def source_object_file(self) -> ObjectFile | None:
+        source_object_files = [
+            object_file
+            for object_file in self.object_files
+            if object_file.file_function == "function:source"
+        ]
+        if source_object_files:
+            return source_object_files[0]
+        return None
 
 
 @dataclass
@@ -82,3 +106,17 @@ class IntellectualObject:
     object_files: list[ObjectFile]
     premis_events: list[PremisEvent]
     collections: list[Collection]
+
+    @property
+    def collections_summary(self):
+        return '/'.join([
+            alternate_identifier
+            for collection in self.collections
+            for alternate_identifier in collection.alternate_identifiers
+        ])
+
+    @property
+    def total_data_size(self):
+        fileset_sizes = [f.total_data_size for f in self.filesets]
+        return sum(fileset_sizes, start=Decimal("0"))
+

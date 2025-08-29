@@ -4,9 +4,11 @@ from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
+from dor.adapters.catalog import SqlalchemyCatalog
+from dor.adapters.collection_repository import SqlalchemyCollectionRepository
 from dor.entrypoints.api.dependencies import get_db_session
 from dor.services.catalog import catalog
-from dor.utils import Filter, converter
+from dor.utils import converter, Filter, Page
 
 
 console_router = APIRouter(prefix="/console")
@@ -37,21 +39,34 @@ async def get_objects(
     collection_alt_identifier: str | None = None,
     session=Depends(get_db_session)
 ) -> HTMLResponse:
+    limit = 10
+    sqlalchemy_catalog = SqlalchemyCatalog(session)
+    sqlalchemy_collections_repo = SqlalchemyCollectionRepository(session)
 
-    page = catalog.objects.find(
-        session=session,
-        start=start,
+    objects = sqlalchemy_catalog.find(
         object_type=object_type,
         alt_identifier=alt_identifier,
         collection_alt_identifier=collection_alt_identifier,
-        limit=10
+        limit=limit,
+        start=start
+    )
+    items_total = sqlalchemy_catalog.find_total(
+        object_type=object_type,
+        alt_identifier=alt_identifier,
+        collection_alt_identifier=collection_alt_identifier,
+    )
+    page = Page(
+        total_items=items_total,
+        offset=start,
+        limit=limit,
+        items=objects
     )
 
-    object_types = catalog.objects.get_distinct_types(session)
-
+    object_types = sqlalchemy_catalog.get_distinct_types()
     collection_alt_identifiers = [
-        collection.alternate_identifiers
-        for collection in catalog.collections.find(session, limit=10000).items
+        collection_alternate_identifier
+        for collection in sqlalchemy_collections_repo.find_all()
+        for collection_alternate_identifier in collection.alternate_identifiers
     ]
 
     filters: list[Filter] = [
@@ -82,14 +97,22 @@ async def get_object(
     fileset_start: int = 0,
     session=Depends(get_db_session)
 ) -> HTMLResponse:
+    limit = 10
+    sqlalchemy_catalog = SqlalchemyCatalog(session)
 
-    object = catalog.objects.get(session=session, identifier=identifier)
-
+    object = sqlalchemy_catalog.get(identifier=identifier)
     if not object:
         return HTMLResponse(status_code=status.HTTP_404_NOT_FOUND)
 
-    filesets_page = catalog.filesets.find(
-        session=session, object_identifier=identifier, start=fileset_start, limit=10
+    filesets = sqlalchemy_catalog.get_filesets_for_object(
+        identifier=identifier, start=fileset_start, limit=limit
+    )
+    filesets_total = sqlalchemy_catalog.get_filesets_total(identifier=identifier)
+    filesets_page = Page(
+        total_items=filesets_total,
+        offset=fileset_start,
+        limit=limit,
+        items=filesets
     )
 
     context = dict(
