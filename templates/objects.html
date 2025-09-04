@@ -77,7 +77,7 @@
     {% for item in page.items %}
     <tr>
       <th scope="row"><a href="{{ item.identifier }}">{{ item.title }}</a></th>
-      <td>{{ item.alternate_identifiers }}</td>
+      <td>{{ item.alternate_identifiers | join(", ") }}/td>
       <td>{{ item.type }}</td>
       <td>{{ item.collections_summary }}</td>
       <td>{{ item.total_data_size }}</td>

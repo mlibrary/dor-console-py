@@ -6,12 +6,12 @@
   <dt>Outcome</dt>
   <dd>{{ event.outcome }}</dd>
   <dt>Date and time</dt>
-  <dd>{{ event.date_time.strftime("%Y-%m-%d %H:%M:%S") }}</dd>
-  {% if event.intellectual_object %}
+  <dd>{{ event.datetime.strftime("%Y-%m-%d %H:%M:%S") }}</dd>
+  {% if event.intellectual_object_identifier %}
   <dt>Object</dt>
   <dd>
-    <a href="{{ url_for('get_object', identifier=event.intellectual_object.identifier) }}">
-      {{- event.intellectual_object.title -}}
+    <a href="{{ url_for('get_object', identifier=event.intellectual_object_identifier) }}">
+      {{- event.intellectual_object_identifier -}}
     </a>
   </dd>
   {% endif %}
