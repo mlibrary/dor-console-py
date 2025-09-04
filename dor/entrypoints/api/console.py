@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 
 from dor.adapters.catalog import SqlalchemyCatalog
 from dor.adapters.collection_repository import SqlalchemyCollectionRepository
+from dor.adapters.premis_event_repository import SqlalchemyPremisEventRepository
 from dor.entrypoints.api.dependencies import get_db_session
 from dor.services.catalog import catalog
 from dor.utils import converter, Filter, Page
@@ -131,13 +132,14 @@ async def get_object(
 async def get_event(
     request: Request, identifier: UUID, modal: bool = False, session=Depends(get_db_session)
 ) -> HTMLResponse:
-    event = catalog.events.get(session=session, identifier=identifier)
+    sqlalchemy_catalog = SqlalchemyPremisEventRepository(session)
+    event = sqlalchemy_catalog.get(identifier)
     if not event:
         return HTMLResponse(status_code=status.HTTP_404_NOT_FOUND)
     
     # probably not useful in the UI but an example of how we could return JSON
     if "application/json" in request.headers.get("accept", ""):
-        return JSONResponse(converter.unstructure(event.to_dict()))
+        return JSONResponse(converter.unstructure(event))
     
     return templates.TemplateResponse(
         request=request, 

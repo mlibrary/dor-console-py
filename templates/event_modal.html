@@ -3,7 +3,7 @@
   <div class="dialog-heading-container">
     <h2 id="dialog-heading" class="m-0">{{ event.type | capitalize }}</h2>
     <span class="badge">
-      {%- if event.object_file -%}
+      {%- if event.object_file_identifier -%}
       File-level
       {%- else -%}
       Object-level

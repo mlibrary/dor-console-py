@@ -24,6 +24,13 @@ class PremisEvent:
 
 
 @dataclass
+class PremisEventConnected(PremisEvent):
+    object_file_identifier: UUID | None = None
+    fileset_identifier: UUID | None = None
+    intellectual_object_identifier: UUID | None = None
+
+
+@dataclass
 class Checksum:
     algorithm: str
     digest: bytes
