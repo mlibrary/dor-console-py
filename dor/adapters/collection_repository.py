@@ -16,6 +16,12 @@ class CollectionRepository(ABC):
     def get(self, identifier: UUID) -> Collection | None:
         raise NotImplementedError
     
+    def find(self, collection_type: str | None = None, start: int = 0, limit: int = 100) -> list[Collection]:
+        raise NotImplementedError
+
+    def find_total(self, collection_type: str | None = None) -> int:
+        raise NotImplementedError
+
     def find_all(self) -> list[Collection]:
         raise NotImplementedError
 
@@ -34,6 +40,28 @@ class MemoryCollectionRepository(CollectionRepository):
                 return collection
         return None
     
+    def filter(self, collection_type: str | None = None) -> list[Collection]:
+        def has_collection_type(collection: Collection) -> bool:
+            return collection.type == collection_type
+
+        matching_collections = self.collections
+        if collection_type:
+            matching_collections = list(filter(has_collection_type, matching_collections))
+        return matching_collections
+
+
+    def find(self, collection_type: str | None = None, start: int = 0, limit: int = 100) -> list[Collection]:
+        matching_collections = self.filter(collection_type=collection_type)
+
+        collections_beginning_at_start = matching_collections[start:]
+        if len(collections_beginning_at_start) > limit:
+            return collections_beginning_at_start[:limit]
+        else:
+            return collections_beginning_at_start
+
+    def find_total(self, collection_type: str | None = None) -> int:
+        return len(self.filter(collection_type=collection_type))
+
     def find_all(self) -> list[Collection]:
         return self.collections
     
@@ -79,6 +107,22 @@ class SqlalchemyCollectionRepository(CollectionRepository):
 
         collection = SqlalchemyCollectionRepository.model_to_collection(result)
         return collection
+
+    def find(self, collection_type: str | None = None, start: int = 0, limit: int = 100) -> list[Collection]:
+        query = sqlalchemy.select(CollectionModel)
+        if collection_type:
+            query = query.where(CollectionModel.type == collection_type)
+        query = query.offset(start).limit(limit)
+        results = self.session.execute(query).scalars()
+        return [SqlalchemyCollectionRepository.model_to_collection(result) for result in results]
+
+    def find_total(self, collection_type: str | None = None) -> int:
+        query = sqlalchemy.select(CollectionModel)
+        if collection_type:
+            query = query.where(CollectionModel.type == collection_type)
+        from_clause = query.alias("count_query")
+        count_query = sqlalchemy.select(sqlalchemy.func.count()).select_from(from_clause)
+        return self.session.execute(count_query).scalar_one()
 
     def find_all(self) -> list[Collection]:
         query = sqlalchemy.select(CollectionModel)

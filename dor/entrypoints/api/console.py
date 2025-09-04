@@ -8,7 +8,6 @@ from dor.adapters.catalog import SqlalchemyCatalog
 from dor.adapters.collection_repository import SqlalchemyCollectionRepository
 from dor.adapters.premis_event_repository import SqlalchemyPremisEventRepository
 from dor.entrypoints.api.dependencies import get_db_session
-from dor.services.catalog import catalog
 from dor.utils import converter, Filter, Page
 
 
@@ -21,10 +20,18 @@ def template_name(name, modal=False):
 
 
 @console_router.get("/collections/")
-async def get_collections(request: Request, start: int = 0, collection_type: str = None, session=Depends(get_db_session)) -> HTMLResponse:
+async def get_collections(request: Request, start: int = 0, collection_type: str | None = None, session=Depends(get_db_session)) -> HTMLResponse:
+    limit = 100
+    collection_repo = SqlalchemyCollectionRepository(session)
+    collections = collection_repo.find(collection_type=collection_type, start=start, limit=limit)
+    collections_total = collection_repo.find_total(collection_type=collection_type)
 
-    page = catalog.collections.find(
-        session=session, start=start, collection_type=collection_type)
+    page = Page(
+        total_items=collections_total,
+        offset=start,
+        limit=limit,
+        items=collections
+    )
 
     return templates.TemplateResponse(
         request=request, name="collections.html", context={"page": page}
